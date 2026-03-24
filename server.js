@@ -6,6 +6,8 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -53,15 +55,65 @@ function initData() {
 
 initData();
 
+const isTest = process.env.NODE_ENV === 'test';
+
+// --- Security Middleware ---
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://js.stripe.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://api.stripe.com"],
+      frameSrc: ["https://js.stripe.com"],
+    },
+  },
+}));
+
+// Rate limiting — general
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isTest ? 10000 : 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' },
+});
+app.use(generalLimiter);
+
+// Strict rate limiting for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isTest ? 10000 : 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts. Please wait 15 minutes.' },
+});
+
+// Rate limit for form submissions
+const formLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: isTest ? 10000 : 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many form submissions. Please try again later.' },
+});
+
 // --- Middleware ---
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '1mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'daffodils-montessori-secret-2026',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }, // 24 hours
+  cookie: {
+    maxAge: 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  },
 }));
 
 // Make session user available to all responses
@@ -69,6 +121,16 @@ app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
 });
+
+// Input sanitization helper
+function sanitize(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[<>]/g, '').trim();
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
 // Auth middleware
 function requireAuth(req, res, next) {
@@ -105,8 +167,11 @@ app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'register.html'));
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', authLimiter, (req, res) => {
   const { email, password } = req.body;
+  if (!email || !password || !isValidEmail(email)) {
+    return res.status(400).json({ error: 'Valid email and password are required.' });
+  }
   const data = loadData();
   const user = data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
 
@@ -119,10 +184,13 @@ app.post('/api/login', (req, res) => {
   res.json({ success: true, redirect });
 });
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', authLimiter, (req, res) => {
   const { name, email, password, phone } = req.body;
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Name, email, and password are required.' });
+  }
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: 'Please provide a valid email address.' });
   }
   if (password.length < 6) {
     return res.status(400).json({ error: 'Password must be at least 6 characters.' });
@@ -352,11 +420,14 @@ app.post('/api/portal/select-program', requireAuth, (req, res) => {
 });
 
 // Contact form — saves as interested lead
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', formLimiter, async (req, res) => {
   const { name, email, phone, subject, message } = req.body;
 
   if (!name || !email || !message) {
     return res.status(400).json({ error: 'Name, email, and message are required.' });
+  }
+  if (!isValidEmail(email)) {
+    return res.status(400).json({ error: 'Please provide a valid email address.' });
   }
 
   const data = loadData();
@@ -466,7 +537,7 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Enrollment form
-app.post('/api/enroll', async (req, res) => {
+app.post('/api/enroll', formLimiter, async (req, res) => {
   const { childName, childAge, parentName, email, phone, program, startDate, notes } = req.body;
 
   if (!childName || !parentName || !email || !program) {
@@ -508,7 +579,7 @@ app.post('/api/enroll', async (req, res) => {
 });
 
 // Tour booking form
-app.post('/api/book-tour', (req, res) => {
+app.post('/api/book-tour', formLimiter, (req, res) => {
   const { parentName, email, phone, tourDate, tourTime, childAge, notes } = req.body;
 
   if (!parentName || !email || !phone || !tourDate) {
@@ -704,6 +775,10 @@ function generateAutoReplyEmail(name) {
 </html>`;
 }
 
-app.listen(PORT, () => {
-  console.log(`Daffodils Montessori website running at http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Daffodils Montessori website running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

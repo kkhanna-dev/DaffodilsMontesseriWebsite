@@ -22,6 +22,9 @@ beforeAll(() => {
     tourRequests: [],
     children: [],
     contactSubmissions: [],
+    curriculum: [],
+    siteContent: {},
+    announcements: [],
   }, null, 2));
   app = require('./server');
 });
@@ -534,5 +537,291 @@ describe('Contact form requires children', () => {
       .send({ name: 'NoKids Parent', email: 'nokids@example.com', message: 'Now I have a kid' });
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
+  });
+});
+
+// ==========================================
+// UNIT TESTS — Admin Curriculum Management
+// ==========================================
+describe('Admin Curriculum Management', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('POST /api/admin/upload-curriculum — rejects without file', async () => {
+    const res = await agent
+      .post('/api/admin/upload-curriculum')
+      .field('title', 'Test Curriculum')
+      .field('program', 'Primary Program')
+      .field('description', 'Test');
+    expect(res.status).toBe(400);
+  });
+
+  test('POST /api/admin/upload-curriculum — uploads a PDF', async () => {
+    // Create a minimal fake PDF
+    const tempPdf = path.join(__dirname, 'test-curriculum.pdf');
+    fs.writeFileSync(tempPdf, '%PDF-1.4 test content');
+    const res = await agent
+      .post('/api/admin/upload-curriculum')
+      .field('title', 'Spring Curriculum')
+      .field('program', 'Primary Program')
+      .field('description', 'Spring semester plan')
+      .attach('file', tempPdf);
+    fs.unlinkSync(tempPdf);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.curriculum).toBeDefined();
+    expect(res.body.curriculum.title).toBe('Spring Curriculum');
+  });
+
+  test('GET /api/admin/curriculum — lists curriculum files', async () => {
+    const res = await agent.get('/api/admin/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum).toBeDefined();
+    expect(res.body.curriculum.length).toBeGreaterThan(0);
+  });
+
+  test('DELETE /api/admin/curriculum/:id — deletes curriculum', async () => {
+    const listRes = await agent.get('/api/admin/curriculum');
+    const id = listRes.body.curriculum[0].id;
+    const res = await agent.delete(`/api/admin/curriculum/${id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  test('DELETE /api/admin/curriculum/9999 — 404 for nonexistent', async () => {
+    const res = await agent.delete('/api/admin/curriculum/9999');
+    expect(res.status).toBe(404);
+  });
+});
+
+// ==========================================
+// UNIT TESTS — Admin Curriculum (non-admin rejected)
+// ==========================================
+describe('Curriculum — Non-admin rejected', () => {
+  test('POST /api/admin/upload-curriculum — redirects for unauthenticated', async () => {
+    const res = await request(app)
+      .post('/api/admin/upload-curriculum')
+      .field('title', 'Hack')
+      .field('program', 'Primary Program');
+    expect(res.status).toBe(302);
+  });
+
+  test('GET /api/admin/curriculum — redirects for unauthenticated', async () => {
+    const res = await request(app).get('/api/admin/curriculum');
+    expect(res.status).toBe(302);
+  });
+
+  test('DELETE /api/admin/curriculum/1 — redirects for unauthenticated', async () => {
+    const res = await request(app).delete('/api/admin/curriculum/1');
+    expect(res.status).toBe(302);
+  });
+});
+
+// ==========================================
+// UNIT TESTS — Admin Site Content Management
+// ==========================================
+describe('Admin Site Content Management', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('GET /api/admin/site-content — returns site content', async () => {
+    const res = await agent.get('/api/admin/site-content');
+    expect(res.status).toBe(200);
+    expect(res.body.siteContent).toBeDefined();
+  });
+
+  test('POST /api/admin/update-content — updates allowed keys', async () => {
+    const res = await agent
+      .post('/api/admin/update-content')
+      .send({ heroTitle: 'Welcome to Daffodils!', aboutDesc: 'Our school is great.' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  test('POST /api/admin/update-content — content persists', async () => {
+    const res = await agent.get('/api/admin/site-content');
+    expect(res.body.siteContent.heroTitle).toBe('Welcome to Daffodils!');
+    expect(res.body.siteContent.aboutDesc).toBe('Our school is great.');
+  });
+
+  test('POST /api/admin/update-content — rejects disallowed keys', async () => {
+    const res = await agent
+      .post('/api/admin/update-content')
+      .send({ hackerKey: 'malicious', heroTitle: 'OK' });
+    expect(res.status).toBe(200);
+    // Check the hackerKey was NOT saved
+    const contentRes = await agent.get('/api/admin/site-content');
+    expect(contentRes.body.siteContent.hackerKey).toBeUndefined();
+  });
+
+  test('GET /api/admin/site-content — rejected for unauthenticated', async () => {
+    const res = await request(app).get('/api/admin/site-content');
+    expect(res.status).toBe(302);
+  });
+});
+
+// ==========================================
+// UNIT TESTS — Admin Announcements
+// ==========================================
+describe('Admin Announcements', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('POST /api/admin/announcement — creates announcement', async () => {
+    const res = await agent
+      .post('/api/admin/announcement')
+      .send({ title: 'Spring Break', text: 'School closed March 28-April 4', date: '2026-03-25' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.announcement.title).toBe('Spring Break');
+  });
+
+  test('POST /api/admin/announcement — rejects missing title', async () => {
+    const res = await agent
+      .post('/api/admin/announcement')
+      .send({ title: '', text: 'Some text' });
+    expect(res.status).toBe(400);
+  });
+
+  test('GET /api/announcements — public endpoint returns announcements', async () => {
+    const res = await request(app).get('/api/announcements');
+    expect(res.status).toBe(200);
+    expect(res.body.announcements).toBeDefined();
+    expect(res.body.announcements.length).toBeGreaterThan(0);
+    expect(res.body.announcements[0].title).toBe('Spring Break');
+  });
+
+  test('DELETE /api/admin/announcement/:id — deletes announcement', async () => {
+    const listRes = await request(app).get('/api/announcements');
+    const id = listRes.body.announcements[0].id;
+    const res = await agent.delete(`/api/admin/announcement/${id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  test('DELETE /api/admin/announcement/9999 — 404 for nonexistent', async () => {
+    const res = await agent.delete('/api/admin/announcement/9999');
+    expect(res.status).toBe(404);
+  });
+
+  test('POST /api/admin/announcement — rejected for non-admin', async () => {
+    const res = await request(app)
+      .post('/api/admin/announcement')
+      .send({ title: 'Hack', text: 'Bad' });
+    expect(res.status).toBe(302);
+  });
+});
+
+// ==========================================
+// UNIT TESTS — Parent Portal Curriculum
+// ==========================================
+describe('Parent Portal Curriculum', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'testparent@example.com', password: 'TestPass123' });
+  });
+
+  test('GET /api/portal/curriculum — returns curriculum for parent', async () => {
+    const res = await agent.get('/api/portal/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum).toBeDefined();
+  });
+
+  test('GET /api/portal/curriculum — rejected for unauthenticated', async () => {
+    const res = await request(app).get('/api/portal/curriculum');
+    expect(res.status).toBe(302);
+  });
+});
+
+// ==========================================
+// UNIT TESTS — Dashboard includes new data
+// ==========================================
+describe('Dashboard includes new features', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('GET /api/admin/dashboard — includes curriculum array', async () => {
+    const res = await agent.get('/api/admin/dashboard');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum).toBeDefined();
+    expect(Array.isArray(res.body.curriculum)).toBe(true);
+  });
+
+  test('GET /api/admin/dashboard — includes siteContent object', async () => {
+    const res = await agent.get('/api/admin/dashboard');
+    expect(res.body.siteContent).toBeDefined();
+    expect(typeof res.body.siteContent).toBe('object');
+  });
+
+  test('GET /api/admin/dashboard — includes announcements array', async () => {
+    const res = await agent.get('/api/admin/dashboard');
+    expect(res.body.announcements).toBeDefined();
+    expect(Array.isArray(res.body.announcements)).toBe(true);
+  });
+});
+
+// ==========================================
+// SECURITY TESTS — File Upload
+// ==========================================
+describe('File Upload Security', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('Curriculum upload rejects non-PDF files', async () => {
+    const tempTxt = path.join(__dirname, 'test-hack.txt');
+    fs.writeFileSync(tempTxt, 'not a pdf');
+    const res = await agent
+      .post('/api/admin/upload-curriculum')
+      .field('title', 'Hack')
+      .field('program', 'Primary Program')
+      .attach('file', tempTxt);
+    fs.unlinkSync(tempTxt);
+    // Should reject (400 or 500 depending on multer filter)
+    expect(res.status).toBeGreaterThanOrEqual(400);
+  });
+
+  test('Image upload rejects non-image files', async () => {
+    const tempTxt = path.join(__dirname, 'test-hack.txt');
+    fs.writeFileSync(tempTxt, 'not an image');
+    const res = await agent
+      .post('/api/admin/upload-site-image')
+      .field('section', 'hero')
+      .attach('image', tempTxt);
+    fs.unlinkSync(tempTxt);
+    expect(res.status).toBeGreaterThanOrEqual(400);
   });
 });

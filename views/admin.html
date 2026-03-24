@@ -53,6 +53,10 @@
           <div class="admin-stat-icon" style="background:#fce4ec;color:#c62828;"><i class="fas fa-users"></i></div>
           <div><span class="admin-stat-num" id="statUsers">0</span><span class="admin-stat-label">Parent Accounts</span></div>
         </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:#e8f5e9;color:#2e7d32;"><i class="fas fa-book"></i></div>
+          <div><span class="admin-stat-num" id="statCurriculum">0</span><span class="admin-stat-label">Curriculum Items</span></div>
+        </div>
       </div>
 
       <!-- Tabs -->
@@ -63,6 +67,9 @@
         <button class="admin-tab" data-tab="tours"><i class="fas fa-calendar-check"></i> Tour Requests</button>
         <button class="admin-tab" data-tab="children"><i class="fas fa-child"></i> Children Profiles</button>
         <button class="admin-tab" data-tab="accounts"><i class="fas fa-users-cog"></i> Parent Accounts</button>
+        <button class="admin-tab" data-tab="curriculum"><i class="fas fa-book"></i> Curriculum</button>
+        <button class="admin-tab" data-tab="editor"><i class="fas fa-edit"></i> Site Editor</button>
+        <button class="admin-tab" data-tab="announcements"><i class="fas fa-bullhorn"></i> Announcements</button>
       </div>
 
       <!-- Leads Tab -->
@@ -228,6 +235,169 @@
         </div>
       </div>
 
+      <!-- Curriculum Management Tab -->
+      <div class="admin-panel" id="panel-curriculum">
+        <div class="admin-panel-header">
+          <h3>Curriculum Management</h3>
+          <p>Upload and manage curriculum documents for each program.</p>
+        </div>
+
+        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-upload"></i> Upload New Curriculum</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Title</label>
+              <input type="text" id="curriculumTitle" placeholder="e.g. Weekly Lesson Plan - March" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Program</label>
+              <select id="curriculumProgram" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                <option value="Toddler Program">Toddler Program</option>
+                <option value="Primary Program">Primary Program</option>
+                <option value="Kindergarten">Kindergarten</option>
+                <option value="Before & After Care">Before & After Care</option>
+                <option value="All Programs">All Programs</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Description</label>
+            <textarea id="curriculumDescription" rows="3" placeholder="Brief description of this curriculum document..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+          </div>
+          <div style="margin-top:16px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">File (PDF)</label>
+            <input type="file" id="curriculumFile" accept=".pdf" style="font-size:14px;">
+          </div>
+          <button class="btn btn-primary" onclick="uploadCurriculum()" style="margin-top:16px;"><i class="fas fa-cloud-upload-alt"></i> Upload Curriculum</button>
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Program</th>
+                <th>Description</th>
+                <th>File</th>
+                <th>Uploaded</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="curriculumTableBody">
+              <tr><td colspan="6" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Site Editor Tab -->
+      <div class="admin-panel" id="panel-editor">
+        <div class="admin-panel-header">
+          <h3>Site Editor</h3>
+          <p>Edit text content and images displayed on the public website.</p>
+        </div>
+
+        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <h4 style="margin:0 0 20px;color:#2d5016;"><i class="fas fa-pen-fancy"></i> Edit Site Content</h4>
+
+          <div style="display:grid;gap:20px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Hero Title</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <span id="currentHeroTitle" style="flex:1;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:#888;border:1px solid #eee;"></span>
+                <input type="text" id="editHeroTitle" placeholder="New hero title..." style="flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Hero Subtitle</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <span id="currentHeroSubtitle" style="flex:1;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:#888;border:1px solid #eee;"></span>
+                <input type="text" id="editHeroSubtitle" placeholder="New hero subtitle..." style="flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Hero Description</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <span id="currentHeroDescription" style="flex:1;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:#888;border:1px solid #eee;"></span>
+                <textarea id="editHeroDescription" rows="2" placeholder="New hero description..." style="flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">About Title</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <span id="currentAboutTitle" style="flex:1;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:#888;border:1px solid #eee;"></span>
+                <input type="text" id="editAboutTitle" placeholder="New about title..." style="flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              </div>
+            </div>
+
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">About Description</label>
+              <div style="display:flex;gap:10px;align-items:center;">
+                <span id="currentAboutDescription" style="flex:1;padding:8px 12px;background:#fff;border-radius:6px;font-size:13px;color:#888;border:1px solid #eee;"></span>
+                <textarea id="editAboutDescription" rows="2" placeholder="New about description..." style="flex:1;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="saveSiteContent()" style="margin-top:20px;"><i class="fas fa-save"></i> Save Content Changes</button>
+        </div>
+
+        <div style="background:#f9f7f4;border-radius:12px;padding:24px;">
+          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-image"></i> Upload Site Image</h4>
+          <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Image Section</label>
+              <select id="siteImageSection" style="padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                <option value="hero">Hero Background</option>
+                <option value="about">About Section</option>
+                <option value="programs">Programs Section</option>
+                <option value="gallery">Gallery</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Image File</label>
+              <input type="file" id="siteImageFile" accept="image/*" style="font-size:14px;">
+            </div>
+            <button class="btn btn-primary" onclick="uploadSiteImage()"><i class="fas fa-cloud-upload-alt"></i> Upload Image</button>
+          </div>
+          <div id="siteImagePreview" style="margin-top:16px;"></div>
+        </div>
+      </div>
+
+      <!-- Announcements Tab -->
+      <div class="admin-panel" id="panel-announcements">
+        <div class="admin-panel-header">
+          <h3>Announcements</h3>
+          <p>Create and manage announcements displayed on the website.</p>
+        </div>
+
+        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-plus-circle"></i> Create New Announcement</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Title</label>
+              <input type="text" id="announcementTitle" placeholder="Announcement title..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Date</label>
+              <input type="date" id="announcementDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Text</label>
+            <textarea id="announcementText" rows="4" placeholder="Announcement details..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="createAnnouncement()" style="margin-top:16px;"><i class="fas fa-bullhorn"></i> Create Announcement</button>
+        </div>
+
+        <div id="announcementsList">
+          <p class="table-empty">Loading...</p>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -284,6 +454,9 @@
         renderTours(dashboardData.tourRequests);
         renderChildren(dashboardData.children || [], dashboardData.contactSubmissions || []);
         renderUsers(dashboardData.users, dashboardData.children || [], dashboardData.contactSubmissions || []);
+        renderCurriculum(dashboardData.curriculum || []);
+        renderAnnouncements(dashboardData.announcements || []);
+        loadSiteContent();
       } catch { window.location.href = '/login'; }
     }
 
@@ -292,6 +465,7 @@
       document.getElementById('statEnrollments').textContent = data.enrollments.length;
       document.getElementById('statTours').textContent = data.tourRequests.length;
       document.getElementById('statUsers').textContent = data.users.filter(u => u.role === 'parent').length;
+      document.getElementById('statCurriculum').textContent = (data.curriculum || []).length;
     }
 
     function escapeHtml(str) {
@@ -444,6 +618,205 @@
       `}).join('');
     }
 
+    // --- Curriculum Management ---
+    function renderCurriculum(curriculumItems) {
+      const tbody = document.getElementById('curriculumTableBody');
+      if (!curriculumItems || !curriculumItems.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="table-empty">No curriculum documents uploaded yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = curriculumItems.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(c => `
+        <tr>
+          <td><strong>${escapeHtml(c.title)}</strong></td>
+          <td>${escapeHtml(c.program)}</td>
+          <td class="msg-cell">${escapeHtml(c.description)}</td>
+          <td><a href="${escapeHtml(c.fileUrl)}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a></td>
+          <td>${formatDate(c.createdAt)}</td>
+          <td><button class="btn-icon btn-delete" onclick="deleteCurriculum(${c.id})" title="Delete"><i class="fas fa-trash"></i></button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function uploadCurriculum() {
+      const title = document.getElementById('curriculumTitle').value.trim();
+      const program = document.getElementById('curriculumProgram').value;
+      const description = document.getElementById('curriculumDescription').value.trim();
+      const fileInput = document.getElementById('curriculumFile');
+      const file = fileInput.files[0];
+
+      if (!title) { alert('Please enter a title.'); return; }
+      if (!file) { alert('Please select a PDF file.'); return; }
+
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('program', program);
+      formData.append('description', description);
+      formData.append('file', file);
+
+      try {
+        const resp = await fetch('/api/admin/upload-curriculum', {
+          method: 'POST',
+          body: formData
+        });
+        if (resp.ok) {
+          document.getElementById('curriculumTitle').value = '';
+          document.getElementById('curriculumDescription').value = '';
+          fileInput.value = '';
+          loadDashboard();
+        } else {
+          const err = await resp.json();
+          alert(err.error || 'Failed to upload curriculum.');
+        }
+      } catch (e) {
+        alert('Error uploading curriculum.');
+      }
+    }
+
+    async function deleteCurriculum(id) {
+      if (!confirm('Delete this curriculum document?')) return;
+      await fetch('/api/admin/curriculum/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
+    // --- Site Editor ---
+    async function loadSiteContent() {
+      try {
+        const resp = await fetch('/api/admin/site-content');
+        if (!resp.ok) return;
+        const content = await resp.json();
+        document.getElementById('currentHeroTitle').textContent = content.heroTitle || '';
+        document.getElementById('currentHeroSubtitle').textContent = content.heroSubtitle || '';
+        document.getElementById('currentHeroDescription').textContent = content.heroDescription || '';
+        document.getElementById('currentAboutTitle').textContent = content.aboutTitle || '';
+        document.getElementById('currentAboutDescription').textContent = content.aboutDescription || '';
+      } catch (e) {
+        // Site content endpoint may not exist yet
+      }
+    }
+
+    async function saveSiteContent() {
+      const payload = {};
+      const heroTitle = document.getElementById('editHeroTitle').value.trim();
+      const heroSubtitle = document.getElementById('editHeroSubtitle').value.trim();
+      const heroDescription = document.getElementById('editHeroDescription').value.trim();
+      const aboutTitle = document.getElementById('editAboutTitle').value.trim();
+      const aboutDescription = document.getElementById('editAboutDescription').value.trim();
+
+      if (heroTitle) payload.heroTitle = heroTitle;
+      if (heroSubtitle) payload.heroSubtitle = heroSubtitle;
+      if (heroDescription) payload.heroDescription = heroDescription;
+      if (aboutTitle) payload.aboutTitle = aboutTitle;
+      if (aboutDescription) payload.aboutDescription = aboutDescription;
+
+      if (Object.keys(payload).length === 0) { alert('Please fill in at least one field to update.'); return; }
+
+      try {
+        const resp = await fetch('/api/admin/update-content', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (resp.ok) {
+          alert('Site content updated successfully!');
+          document.getElementById('editHeroTitle').value = '';
+          document.getElementById('editHeroSubtitle').value = '';
+          document.getElementById('editHeroDescription').value = '';
+          document.getElementById('editAboutTitle').value = '';
+          document.getElementById('editAboutDescription').value = '';
+          loadSiteContent();
+        } else {
+          const err = await resp.json();
+          alert(err.error || 'Failed to update content.');
+        }
+      } catch (e) {
+        alert('Error saving site content.');
+      }
+    }
+
+    async function uploadSiteImage() {
+      const section = document.getElementById('siteImageSection').value;
+      const fileInput = document.getElementById('siteImageFile');
+      const file = fileInput.files[0];
+
+      if (!file) { alert('Please select an image file.'); return; }
+
+      const formData = new FormData();
+      formData.append('section', section);
+      formData.append('image', file);
+
+      try {
+        const resp = await fetch('/api/admin/upload-site-image', {
+          method: 'POST',
+          body: formData
+        });
+        if (resp.ok) {
+          const result = await resp.json();
+          const preview = document.getElementById('siteImagePreview');
+          preview.innerHTML = `<p style="color:#2e7d32;font-weight:600;"><i class="fas fa-check-circle"></i> Image uploaded successfully!</p>
+            <img src="${escapeHtml(result.imageUrl || '')}" style="max-width:300px;border-radius:8px;margin-top:8px;border:1px solid #ddd;" alt="Uploaded preview">`;
+          fileInput.value = '';
+        } else {
+          const err = await resp.json();
+          alert(err.error || 'Failed to upload image.');
+        }
+      } catch (e) {
+        alert('Error uploading image.');
+      }
+    }
+
+    // --- Announcements ---
+    function renderAnnouncements(announcements) {
+      const container = document.getElementById('announcementsList');
+      if (!announcements || !announcements.length) {
+        container.innerHTML = '<p class="table-empty">No announcements yet. Create one above.</p>';
+        return;
+      }
+      container.innerHTML = announcements.sort((a,b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)).map(a => `
+        <div style="background:#f9f7f4;border-radius:12px;padding:20px;margin-bottom:12px;border-left:4px solid #6ba832;display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <h4 style="margin:0 0 6px;color:#2d5016;font-size:16px;">${escapeHtml(a.title)}</h4>
+            <p style="margin:0 0 8px;color:#555;font-size:14px;">${escapeHtml(a.text)}</p>
+            <span style="color:#999;font-size:12px;">${formatDate(a.date || a.createdAt)}</span>
+          </div>
+          <button class="btn-icon btn-delete" onclick="deleteAnnouncement(${a.id})" title="Delete"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+    }
+
+    async function createAnnouncement() {
+      const title = document.getElementById('announcementTitle').value.trim();
+      const text = document.getElementById('announcementText').value.trim();
+      const date = document.getElementById('announcementDate').value;
+
+      if (!title || !text) { alert('Please enter a title and text.'); return; }
+
+      try {
+        const resp = await fetch('/api/admin/announcement', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, text, date: date || new Date().toISOString() })
+        });
+        if (resp.ok) {
+          document.getElementById('announcementTitle').value = '';
+          document.getElementById('announcementText').value = '';
+          document.getElementById('announcementDate').value = '';
+          loadDashboard();
+        } else {
+          const err = await resp.json();
+          alert(err.error || 'Failed to create announcement.');
+        }
+      } catch (e) {
+        alert('Error creating announcement.');
+      }
+    }
+
+    async function deleteAnnouncement(id) {
+      if (!confirm('Delete this announcement?')) return;
+      await fetch('/api/admin/announcement/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
+    // --- Existing admin functions ---
     async function updateEnrollmentStatus(id, status) {
       await fetch('/api/admin/enrollment/' + id + '/status', {
         method: 'POST',

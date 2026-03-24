@@ -8,6 +8,7 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,12 +22,15 @@ function loadData() {
       const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
       if (!data.children) data.children = [];
       if (!data.contactSubmissions) data.contactSubmissions = [];
+      if (!data.curriculum) data.curriculum = [];
+      if (!data.siteContent) data.siteContent = {};
+      if (!data.announcements) data.announcements = [];
       return data;
     }
   } catch (e) {
     console.error('Error loading data:', e);
   }
-  return { users: [], interestedLeads: [], enrollments: [], tourRequests: [], children: [], contactSubmissions: [] };
+  return { users: [], interestedLeads: [], enrollments: [], tourRequests: [], children: [], contactSubmissions: [], curriculum: [], siteContent: {}, announcements: [] };
 }
 
 function saveData(data) {
@@ -56,6 +60,57 @@ function initData() {
 initData();
 
 const isTest = process.env.NODE_ENV === 'test';
+
+// --- File Upload Configuration (Multer) ---
+
+// Ensure upload directories exist
+const curriculumUploadDir = path.join(__dirname, 'public', 'uploads', 'curriculum');
+const imagesUploadDir = path.join(__dirname, 'public', 'uploads', 'images');
+if (!fs.existsSync(curriculumUploadDir)) fs.mkdirSync(curriculumUploadDir, { recursive: true });
+if (!fs.existsSync(imagesUploadDir)) fs.mkdirSync(imagesUploadDir, { recursive: true });
+
+// Curriculum upload: PDFs only, max 10MB
+const curriculumStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, curriculumUploadDir),
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const uploadCurriculum = multer({
+  storage: curriculumStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed for curriculum uploads.'));
+    }
+  },
+});
+
+// Site image upload: jpg/png/gif/webp only, max 5MB
+const imageStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, imagesUploadDir),
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  },
+});
+
+const uploadSiteImage = multer({
+  storage: imageStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only JPG, PNG, GIF, and WEBP images are allowed.'));
+    }
+  },
+});
 
 // --- Security Middleware ---
 app.use(helmet({
@@ -259,7 +314,33 @@ app.get('/api/portal/data', requireAuth, (req, res) => {
     children,
     contactSubmission: contactSubmission || null,
     contactSubmitted: !!contactSubmission,
+    announcements: data.announcements || [],
   });
+});
+
+// --- Portal Curriculum Access ---
+app.get('/api/portal/curriculum', requireAuth, (req, res) => {
+  const data = loadData();
+  const user = req.session.user;
+  const children = (data.children || []).filter(
+    c => c.parentEmail.toLowerCase() === user.email.toLowerCase()
+  );
+
+  // Gather programs for this parent's enrolled children
+  const childPrograms = children
+    .filter(c => c.enrollmentStatus === 'enrolled' && c.program)
+    .map(c => c.program);
+
+  if (childPrograms.length === 0) {
+    return res.json({ curriculum: [] });
+  }
+
+  // Filter curriculum: match child's program or "All Programs"
+  const curriculum = (data.curriculum || []).filter(
+    c => c.program === 'All Programs' || childPrograms.includes(c.program)
+  );
+
+  res.json({ curriculum });
 });
 
 // --- Child Management ---
@@ -324,6 +405,9 @@ app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
     users: data.users.map(u => ({ id: u.id, email: u.email, name: u.name, phone: u.phone || '', role: u.role, createdAt: u.createdAt })),
     children: data.children || [],
     contactSubmissions: data.contactSubmissions || [],
+    curriculum: data.curriculum || [],
+    siteContent: data.siteContent || {},
+    announcements: data.announcements || [],
   });
 });
 
@@ -391,6 +475,202 @@ app.delete('/api/admin/tour/:id', requireAdmin, (req, res) => {
   data.tourRequests = data.tourRequests.filter(t => t.id !== parseInt(req.params.id));
   saveData(data);
   res.json({ success: true });
+});
+
+// --- Admin Curriculum Management ---
+
+// Upload curriculum file with metadata
+app.post('/api/admin/upload-curriculum', requireAdmin, (req, res) => {
+  uploadCurriculum.single('file')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'File too large. Maximum size is 10MB.' });
+      }
+      return res.status(400).json({ error: err.message });
+    }
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded.' });
+    }
+
+    const { title, program, description } = req.body;
+    if (!title || !program) {
+      // Remove the uploaded file if validation fails
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: 'Title and program are required.' });
+    }
+
+    const validPrograms = ['Toddler Program', 'Primary Program', 'Kindergarten', 'Before & After Care', 'All Programs'];
+    if (!validPrograms.includes(program)) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: 'Invalid program. Must be one of: ' + validPrograms.join(', ') });
+    }
+
+    const data = loadData();
+    const curriculumItem = {
+      id: data.curriculum.length > 0 ? Math.max(...data.curriculum.map(c => c.id)) + 1 : 1,
+      title: title.trim(),
+      program,
+      description: (description || '').trim(),
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      filepath: '/uploads/curriculum/' + req.file.filename,
+      size: req.file.size,
+      uploadedAt: new Date().toISOString(),
+    };
+
+    data.curriculum.push(curriculumItem);
+    saveData(data);
+    res.json({ success: true, curriculum: curriculumItem });
+  });
+});
+
+// List all curriculum files
+app.get('/api/admin/curriculum', requireAdmin, (req, res) => {
+  const data = loadData();
+  res.json({ curriculum: data.curriculum || [] });
+});
+
+// Delete a curriculum file
+app.delete('/api/admin/curriculum/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  const idx = data.curriculum.findIndex(c => c.id === parseInt(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: 'Curriculum file not found.' });
+
+  const item = data.curriculum[idx];
+  // Remove file from disk
+  const filePath = path.join(__dirname, 'public', item.filepath);
+  try {
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  } catch (e) {
+    console.error('Error deleting curriculum file:', e.message);
+  }
+
+  data.curriculum.splice(idx, 1);
+  saveData(data);
+  res.json({ success: true });
+});
+
+// --- Admin Site Content Management (CMS) ---
+
+// Get all editable site content
+app.get('/api/admin/site-content', requireAdmin, (req, res) => {
+  const data = loadData();
+  res.json({ siteContent: data.siteContent || {} });
+});
+
+// Update text content (key-value pairs)
+app.post('/api/admin/update-content', requireAdmin, (req, res) => {
+  const allowedKeys = [
+    'heroTitle', 'heroSubtitle', 'heroDesc',
+    'aboutTitle', 'aboutDesc', 'aboutDesc2',
+    'announcementTitle', 'announcementText',
+  ];
+
+  const updates = req.body;
+  if (!updates || typeof updates !== 'object') {
+    return res.status(400).json({ error: 'Invalid content data.' });
+  }
+
+  const data = loadData();
+  if (!data.siteContent) data.siteContent = {};
+
+  for (const key of Object.keys(updates)) {
+    if (allowedKeys.includes(key)) {
+      data.siteContent[key] = sanitize(updates[key]);
+    }
+  }
+
+  saveData(data);
+  res.json({ success: true, siteContent: data.siteContent });
+});
+
+// Upload images for site content (hero, about, etc.)
+app.post('/api/admin/upload-site-image', requireAdmin, (req, res) => {
+  uploadSiteImage.single('image')(req, res, (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ error: 'Image too large. Maximum size is 5MB.' });
+      }
+      return res.status(400).json({ error: err.message });
+    }
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image uploaded.' });
+    }
+
+    const { key } = req.body;
+    if (!key) {
+      fs.unlinkSync(req.file.path);
+      return res.status(400).json({ error: 'Content key is required (e.g., heroImage, aboutImage).' });
+    }
+
+    const data = loadData();
+    if (!data.siteContent) data.siteContent = {};
+
+    // If there's an old image for this key, try to remove it
+    const oldImage = data.siteContent[key];
+    if (oldImage && oldImage.startsWith('/uploads/images/')) {
+      const oldPath = path.join(__dirname, 'public', oldImage);
+      try {
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      } catch (e) {
+        console.error('Error removing old site image:', e.message);
+      }
+    }
+
+    const imagePath = '/uploads/images/' + req.file.filename;
+    data.siteContent[key] = imagePath;
+    saveData(data);
+
+    res.json({ success: true, key, imagePath });
+  });
+});
+
+// --- Admin Announcements ---
+
+// Create announcement
+app.post('/api/admin/announcement', requireAdmin, (req, res) => {
+  const { title, text, date } = req.body;
+  if (!title || !text) {
+    return res.status(400).json({ error: 'Title and text are required.' });
+  }
+
+  const data = loadData();
+  const announcement = {
+    id: data.announcements.length > 0 ? Math.max(...data.announcements.map(a => a.id)) + 1 : 1,
+    title: sanitize(title),
+    text: sanitize(text),
+    date: date || new Date().toISOString().split('T')[0],
+    createdAt: new Date().toISOString(),
+  };
+
+  data.announcements.push(announcement);
+  saveData(data);
+  res.json({ success: true, announcement });
+});
+
+// Delete announcement
+app.delete('/api/admin/announcement/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  const idx = data.announcements.findIndex(a => a.id === parseInt(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: 'Announcement not found.' });
+
+  data.announcements.splice(idx, 1);
+  saveData(data);
+  res.json({ success: true });
+});
+
+// Public endpoint to get announcements
+app.get('/api/announcements', (req, res) => {
+  const data = loadData();
+  res.json({ announcements: data.announcements || [] });
 });
 
 // --- Public Form Endpoints ---

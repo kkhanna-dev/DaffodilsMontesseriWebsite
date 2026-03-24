@@ -84,18 +84,9 @@
 
         <div class="portal-announcements">
           <h3><i class="fas fa-bullhorn"></i> Announcements</h3>
-          <div class="announcement-card">
-            <div class="announcement-date">Mar 2026</div>
-            <div>
-              <strong>Welcome to the New Semester!</strong>
-              <p>We're excited to have your family with us. Please review the curriculum tab for this semester's learning plan.</p>
-            </div>
-          </div>
-          <div class="announcement-card">
-            <div class="announcement-date">Ongoing</div>
-            <div>
-              <strong>Daily Schedule Reminder</strong>
-              <p>Drop-off is between 9:00 - 9:30 AM. Please ensure your child has a change of clothes and any allergy medications.</p>
+          <div id="announcements-container">
+            <div style="text-align:center;padding:2rem;color:#999;">
+              <i class="fas fa-spinner fa-spin"></i> Loading announcements...
             </div>
           </div>
         </div>
@@ -104,75 +95,87 @@
       <!-- Curriculum -->
       <div class="admin-panel" id="panel-curriculum">
         <div class="admin-panel-header">
-          <h3>Curriculum Overview</h3>
-          <p>What your child is learning this semester across all Montessori areas.</p>
+          <h3>Curriculum Documents</h3>
+          <p>Curriculum files and resources uploaded by your child's teachers.</p>
         </div>
-        <div class="curriculum-grid">
-          <div class="curriculum-area">
-            <div class="curriculum-icon" style="background:#fff3e0;"><i class="fas fa-hands" style="color:#e65100;"></i></div>
-            <h4>Practical Life</h4>
-            <ul>
-              <li>Pouring, spooning, and transferring activities</li>
-              <li>Buttoning, zipping, and dressing frames</li>
-              <li>Table setting and food preparation</li>
-              <li>Care of self and environment</li>
-              <li>Grace and courtesy lessons</li>
-            </ul>
+        <div id="curriculum-documents-container">
+          <div style="text-align:center;padding:2rem;color:#999;">
+            <i class="fas fa-spinner fa-spin"></i> Loading curriculum documents...
           </div>
-          <div class="curriculum-area">
-            <div class="curriculum-icon" style="background:#e8f5e9;"><i class="fas fa-hand-sparkles" style="color:#2e7d32;"></i></div>
-            <h4>Sensorial</h4>
-            <ul>
-              <li>Pink tower and brown stair</li>
-              <li>Color tablets and grading</li>
-              <li>Sound cylinders and bells</li>
-              <li>Geometric solids and shapes</li>
-              <li>Texture and temperature exploration</li>
-            </ul>
+        </div>
+
+        <div style="margin-top:2.5rem;">
+          <div class="admin-panel-header">
+            <h3>Curriculum Areas</h3>
+            <p>What your child is learning this semester across all Montessori areas.</p>
           </div>
-          <div class="curriculum-area">
-            <div class="curriculum-icon" style="background:#e3f2fd;"><i class="fas fa-book-open" style="color:#1565c0;"></i></div>
-            <h4>Language</h4>
-            <ul>
-              <li>Sandpaper letters and sound games</li>
-              <li>Moveable alphabet work</li>
-              <li>Reading readiness activities</li>
-              <li>Storytelling and oral language</li>
-              <li>Writing practice and journaling</li>
-            </ul>
-          </div>
-          <div class="curriculum-area">
-            <div class="curriculum-icon" style="background:#fce4ec;"><i class="fas fa-calculator" style="color:#c62828;"></i></div>
-            <h4>Mathematics</h4>
-            <ul>
-              <li>Number rods and spindle boxes</li>
-              <li>Golden bead material (place value)</li>
-              <li>Addition and subtraction with materials</li>
-              <li>Counting and number recognition</li>
-              <li>Pattern and sequence work</li>
-            </ul>
-          </div>
-          <div class="curriculum-area">
-            <div class="curriculum-icon" style="background:#f3e5f5;"><i class="fas fa-globe-americas" style="color:#6a1b9a;"></i></div>
-            <h4>Cultural Studies</h4>
-            <ul>
-              <li>Continent and country studies</li>
-              <li>Botany: parts of a plant, leaf shapes</li>
-              <li>Zoology: animal classification</li>
-              <li>Science experiments and observations</li>
-              <li>Art and music appreciation</li>
-            </ul>
-          </div>
-          <div class="curriculum-area">
-            <div class="curriculum-icon" style="background:#fff8e1;"><i class="fas fa-palette" style="color:#f57f17;"></i></div>
-            <h4>Creative Arts</h4>
-            <ul>
-              <li>Painting and drawing</li>
-              <li>Clay and sculpture work</li>
-              <li>Music, rhythm, and movement</li>
-              <li>Dramatic play and storytelling</li>
-              <li>Nature-based art projects</li>
-            </ul>
+          <div class="curriculum-grid">
+            <div class="curriculum-area">
+              <div class="curriculum-icon" style="background:#fff3e0;"><i class="fas fa-hands" style="color:#e65100;"></i></div>
+              <h4>Practical Life</h4>
+              <ul>
+                <li>Pouring, spooning, and transferring activities</li>
+                <li>Buttoning, zipping, and dressing frames</li>
+                <li>Table setting and food preparation</li>
+                <li>Care of self and environment</li>
+                <li>Grace and courtesy lessons</li>
+              </ul>
+            </div>
+            <div class="curriculum-area">
+              <div class="curriculum-icon" style="background:#e8f5e9;"><i class="fas fa-hand-sparkles" style="color:#2e7d32;"></i></div>
+              <h4>Sensorial</h4>
+              <ul>
+                <li>Pink tower and brown stair</li>
+                <li>Color tablets and grading</li>
+                <li>Sound cylinders and bells</li>
+                <li>Geometric solids and shapes</li>
+                <li>Texture and temperature exploration</li>
+              </ul>
+            </div>
+            <div class="curriculum-area">
+              <div class="curriculum-icon" style="background:#e3f2fd;"><i class="fas fa-book-open" style="color:#1565c0;"></i></div>
+              <h4>Language</h4>
+              <ul>
+                <li>Sandpaper letters and sound games</li>
+                <li>Moveable alphabet work</li>
+                <li>Reading readiness activities</li>
+                <li>Storytelling and oral language</li>
+                <li>Writing practice and journaling</li>
+              </ul>
+            </div>
+            <div class="curriculum-area">
+              <div class="curriculum-icon" style="background:#fce4ec;"><i class="fas fa-calculator" style="color:#c62828;"></i></div>
+              <h4>Mathematics</h4>
+              <ul>
+                <li>Number rods and spindle boxes</li>
+                <li>Golden bead material (place value)</li>
+                <li>Addition and subtraction with materials</li>
+                <li>Counting and number recognition</li>
+                <li>Pattern and sequence work</li>
+              </ul>
+            </div>
+            <div class="curriculum-area">
+              <div class="curriculum-icon" style="background:#f3e5f5;"><i class="fas fa-globe-americas" style="color:#6a1b9a;"></i></div>
+              <h4>Cultural Studies</h4>
+              <ul>
+                <li>Continent and country studies</li>
+                <li>Botany: parts of a plant, leaf shapes</li>
+                <li>Zoology: animal classification</li>
+                <li>Science experiments and observations</li>
+                <li>Art and music appreciation</li>
+              </ul>
+            </div>
+            <div class="curriculum-area">
+              <div class="curriculum-icon" style="background:#fff8e1;"><i class="fas fa-palette" style="color:#f57f17;"></i></div>
+              <h4>Creative Arts</h4>
+              <ul>
+                <li>Painting and drawing</li>
+                <li>Clay and sculpture work</li>
+                <li>Music, rhythm, and movement</li>
+                <li>Dramatic play and storytelling</li>
+                <li>Nature-based art projects</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -312,19 +315,108 @@
       });
     });
 
+    // Render announcements into the overview tab
+    function renderAnnouncements(announcements) {
+      const container = document.getElementById('announcements-container');
+      if (!announcements || announcements.length === 0) {
+        container.innerHTML = `
+          <div class="announcement-card">
+            <div class="announcement-date"><i class="fas fa-info-circle"></i></div>
+            <div>
+              <strong>No Announcements</strong>
+              <p>There are no announcements at this time. Check back soon!</p>
+            </div>
+          </div>`;
+        return;
+      }
+      container.innerHTML = announcements.map(a => {
+        const date = a.date ? new Date(a.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : 'Recent';
+        return `
+          <div class="announcement-card">
+            <div class="announcement-date">${date}</div>
+            <div>
+              <strong>${a.title || 'Announcement'}</strong>
+              <p>${a.content || a.message || ''}</p>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // Render curriculum documents into the curriculum tab
+    function renderCurriculumDocuments(documents) {
+      const container = document.getElementById('curriculum-documents-container');
+      if (!documents || documents.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center;padding:2.5rem 1rem;background:#f9f9f9;border-radius:12px;border:2px dashed #ddd;">
+            <i class="fas fa-folder-open" style="font-size:2.5rem;color:#ccc;margin-bottom:1rem;display:block;"></i>
+            <h4 style="color:#888;margin-bottom:0.5rem;">No Curriculum Documents Yet</h4>
+            <p style="color:#aaa;margin:0;">Your child's teachers have not uploaded any curriculum documents yet. Check back soon!</p>
+          </div>`;
+        return;
+      }
+      container.innerHTML = `
+        <div class="portal-cards">
+          ${documents.map(doc => `
+            <div class="portal-card" style="text-align:left;">
+              <div class="portal-card-icon" style="background:#e8f5e9;">
+                <i class="fas fa-file-pdf" style="color:#2e7d32;"></i>
+              </div>
+              <h3 style="font-size:1.05rem;">${doc.title || doc.originalName || 'Curriculum Document'}</h3>
+              <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">
+                <i class="fas fa-graduation-cap"></i> ${doc.program || 'General'}
+              </p>
+              ${doc.description ? `<p style="font-size:0.85rem;color:#888;margin-bottom:0.75rem;">${doc.description}</p>` : ''}
+              <a href="/uploads/curriculum/${doc.filename}" target="_blank"
+                 style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.5rem 1rem;background:var(--secondary);color:#fff;border-radius:8px;text-decoration:none;font-size:0.85rem;font-weight:500;transition:opacity 0.2s;"
+                 onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                <i class="fas fa-download"></i> Download
+              </a>
+            </div>
+          `).join('')}
+        </div>`;
+    }
+
     // Load portal data
     async function loadPortal() {
       try {
-        const resp = await fetch('/api/portal/data');
-        if (!resp.ok) { window.location.href = '/login'; return; }
-        const data = await resp.json();
+        // Fetch portal data, announcements, and curriculum in parallel
+        const [portalResp, announcementsResp, curriculumResp] = await Promise.all([
+          fetch('/api/portal/data'),
+          fetch('/api/announcements').catch(() => null),
+          fetch('/api/portal/curriculum').catch(() => null)
+        ]);
+
+        if (!portalResp.ok) { window.location.href = '/login'; return; }
+        const data = await portalResp.json();
+
         document.getElementById('parentName').textContent = data.user.name;
         if (data.enrollment) {
           document.getElementById('childName').textContent = data.enrollment.childName;
           document.getElementById('childProgram').textContent = data.enrollment.program;
           document.getElementById('overviewProgram').textContent = data.enrollment.program;
         }
-      } catch { window.location.href = '/login'; }
+
+        // Render announcements
+        if (announcementsResp && announcementsResp.ok) {
+          const announcementsData = await announcementsResp.json();
+          const announcements = Array.isArray(announcementsData) ? announcementsData : (announcementsData.announcements || []);
+          renderAnnouncements(announcements);
+        } else {
+          renderAnnouncements([]);
+        }
+
+        // Render curriculum documents
+        if (curriculumResp && curriculumResp.ok) {
+          const curriculumData = await curriculumResp.json();
+          const documents = Array.isArray(curriculumData) ? curriculumData : (curriculumData.documents || curriculumData.curriculum || []);
+          renderCurriculumDocuments(documents);
+        } else {
+          renderCurriculumDocuments([]);
+        }
+
+      } catch {
+        window.location.href = '/login';
+      }
     }
     loadPortal();
   </script>

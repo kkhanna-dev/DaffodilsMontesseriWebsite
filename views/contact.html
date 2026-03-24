@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Us - Daffodils Montessori</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Montessori</span>
+        </div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/programs">Programs</a></li>
+        <li><a href="/staff">Our Staff</a></li>
+        <li><a href="/gallery">Gallery</a></li>
+        <li><a href="/contact" class="active">Contact</a></li>
+        <li><a href="/login" class="nav-register"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        <li><a href="/enrollment" class="nav-cta">Enroll Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <h1>Contact Us</h1>
+      <p>We'd love to hear from you. Reach out with questions, schedule a tour, or just say hello.</p>
+      <div class="breadcrumb">
+        <a href="/">Home</a> <i class="fas fa-chevron-right"></i> <span>Contact</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="section">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Contact Form -->
+        <div class="contact-form-wrapper">
+          <h2>Send Us a Message</h2>
+          <p>Fill out the form below and we'll get back to you within 24 hours.</p>
+          <form id="contactForm" class="contact-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="name">Full Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Your full name" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="your@email.com" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="(555) 000-0000">
+              </div>
+              <div class="form-group">
+                <label for="subject">Subject</label>
+                <select id="subject" name="subject">
+                  <option value="">Select a topic</option>
+                  <option value="General Inquiry">General Inquiry</option>
+                  <option value="Schedule a Tour">Schedule a Tour</option>
+                  <option value="Enrollment Question">Enrollment Question</option>
+                  <option value="Tuition & Fees">Tuition &amp; Fees</option>
+                  <option value="Employment">Employment Opportunities</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="message">Message <span class="required">*</span></label>
+              <textarea id="message" name="message" rows="6" placeholder="How can we help you?" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large btn-full">
+              <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+            <div id="contactFormMessage" class="form-message"></div>
+          </form>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="contact-info-wrapper">
+          <div class="contact-info-card">
+            <h3>Get in Touch</h3>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+              <div>
+                <strong>Visit Us</strong>
+                <p>5051 86th Ave NE<br>Marysville, WA 98270</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+              <div>
+                <strong>Call Us</strong>
+                <p>(425) 623-2684</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+              <div>
+                <strong>Email Us</strong>
+                <p>rishiekhanna@yahoo.com</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-clock"></i></div>
+              <div>
+                <strong>School Hours</strong>
+                <p>Monday - Friday<br>9:00 AM - 5:00 PM</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-calendar-alt"></i></div>
+              <div>
+                <strong>Office Hours</strong>
+                <p>Monday - Friday<br>9:00 AM - 5:00 PM</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-info-card">
+            <h3>Follow Us</h3>
+            <p>Stay connected and see what's happening at Daffodils!</p>
+            <div class="contact-social">
+              <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
+              <a href="#" class="social-btn instagram"><i class="fab fa-instagram"></i> Instagram</a>
+              <a href="#" class="social-btn youtube"><i class="fab fa-youtube"></i> YouTube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map Section -->
+  <section class="section map-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Find Us</span>
+        <h2>Our Location</h2>
+      </div>
+      <div class="map-placeholder">
+        <i class="fas fa-map-marked-alt"></i>
+        <p>5051 86th Ave NE, Marysville, WA 98270</p>
+        <span>Interactive map will be displayed here.<br>Replace with your Google Maps embed code.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section faq-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">FAQ</span>
+        <h2>Frequently Asked Questions</h2>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What ages do you accept?</span>
+            <i class="fas fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>We accept children from ages 2 through 6. Our Toddler Program is for ages 2-3, our Primary Program is for ages 3-5, and our Kindergarten Program is for ages 5-6.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What are your tuition rates?</span>
+            <i class="fas fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Tuition varies by program and schedule. Half-day rates start at $850/month and full-day rates start at $1,200/month. Please visit our Programs page or contact us for detailed pricing information.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Do you offer tours?</span>
+            <i class="fas fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Yes! We offer personalized campus tours during school hours. Tours typically last 45 minutes to an hour and include observation of classrooms in action. Contact us to schedule your visit.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>Is lunch provided?</span>
+            <i class="fas fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Yes, we provide freshly prepared, nutritious lunches and snacks daily. Our kitchen accommodates common allergies and dietary restrictions. Parents may also choose to send lunch from home.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>What is your teacher-to-student ratio?</span>
+            <i class="fas fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>Our Toddler Program maintains a 4:1 ratio (12 children with 3 teachers), and our Primary and Kindergarten programs maintain an 8:1 ratio (24 children with 3 teachers).</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>How does the enrollment process work?</span>
+            <i class="fas fa-plus"></i>
+          </button>
+          <div class="faq-answer">
+            <p>The enrollment process includes: 1) Schedule a tour, 2) Submit an application, 3) Family interview, 4) Acceptance notification, 5) Complete enrollment paperwork and deposit. Visit our Enrollment page for details.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <span class="logo-icon">🌼</span>
+            <div class="logo-text">
+              <span class="logo-name">Daffodils</span>
+              <span class="logo-tagline">Montessori</span>
+            </div>
+          </div>
+          <p>Nurturing young minds through the Montessori method since 2010. Every child deserves to bloom.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/programs">Programs</a></li>
+            <li><a href="/staff">Our Staff</a></li>
+            <li><a href="/gallery">Gallery</a></li>
+            <li><a href="/enrollment">Enrollment</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Programs</h4>
+          <ul>
+            <li><a href="/programs">Toddler (2-3)</a></li>
+            <li><a href="/programs">Primary (3-5)</a></li>
+            <li><a href="/programs">Kindergarten (5-6)</a></li>
+            <li><a href="/programs">Summer Camp</a></li>
+            <li><a href="/programs">After School</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact Us</h4>
+          <ul>
+            <li><i class="fas fa-map-marker-alt"></i> 5051 86th Ave NE, Marysville, WA 98270</li>
+            <li><i class="fas fa-phone"></i> (425) 623-2684</li>
+            <li><i class="fas fa-envelope"></i> rishiekhanna@yahoo.com</li>
+            <li><i class="fas fa-clock"></i> Mon-Fri: 9:00 AM - 5:00 PM</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Daffodils Montessori. All rights reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

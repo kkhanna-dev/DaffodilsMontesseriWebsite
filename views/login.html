@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Daffodils Montessori</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Montessori</span>
+        </div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/programs">Programs</a></li>
+        <li><a href="/staff">Our Staff</a></li>
+        <li><a href="/gallery">Gallery</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/enrollment" class="nav-cta">Enroll Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="section login-section">
+    <div class="container">
+      <div class="login-wrapper">
+        <div class="login-card">
+          <div class="login-header">
+            <span class="logo-icon" style="font-size:3rem;">🌼</span>
+            <h2>Welcome Back</h2>
+            <p>Log in to your Daffodils Montessori portal</p>
+          </div>
+          <form id="loginForm" class="contact-form">
+            <div class="form-group">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" name="email" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large btn-full">
+              <i class="fas fa-sign-in-alt"></i> Log In
+            </button>
+            <div id="loginMessage" class="form-message"></div>
+          </form>
+          <div class="login-footer">
+            <p>Don't have an account yet?</p>
+            <a href="/register"><i class="fas fa-user-plus"></i> Create a Free Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/js/main.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msgEl = document.getElementById('loginMessage');
+      const btn = e.target.querySelector('button[type="submit"]');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: document.getElementById('loginEmail').value,
+            password: document.getElementById('loginPassword').value,
+          }),
+        });
+        const result = await resp.json();
+        if (result.success) {
+          window.location.href = result.redirect;
+        } else {
+          msgEl.className = 'form-message error';
+          msgEl.textContent = result.error;
+        }
+      } catch {
+        msgEl.className = 'form-message error';
+        msgEl.textContent = 'Something went wrong. Please try again.';
+      }
+
+      btn.innerHTML = orig;
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>

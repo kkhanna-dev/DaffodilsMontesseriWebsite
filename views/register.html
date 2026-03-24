@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - Daffodils Montessori</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Montessori</span>
+        </div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/programs">Programs</a></li>
+        <li><a href="/staff">Our Staff</a></li>
+        <li><a href="/gallery">Gallery</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/enrollment" class="nav-cta">Enroll Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="section login-section">
+    <div class="container">
+      <div class="login-wrapper">
+        <div class="login-card" style="max-width:520px;">
+          <div class="login-header">
+            <span class="logo-icon" style="font-size:3rem;">🌼</span>
+            <h2>Create Your Account</h2>
+            <p>Join the Daffodils Montessori family. Register to manage your child's enrollment, track progress, and stay connected.</p>
+          </div>
+          <form id="registerForm" class="contact-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="regName">Full Name <span class="required">*</span></label>
+                <input type="text" id="regName" name="name" placeholder="Your full name" required>
+              </div>
+              <div class="form-group">
+                <label for="regPhone">Phone Number</label>
+                <input type="tel" id="regPhone" name="phone" placeholder="(555) 000-0000">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="regEmail">Email Address <span class="required">*</span></label>
+              <input type="email" id="regEmail" name="email" placeholder="your@email.com" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="regPassword">Password <span class="required">*</span></label>
+                <input type="password" id="regPassword" name="password" placeholder="Min. 6 characters" required minlength="6">
+              </div>
+              <div class="form-group">
+                <label for="regConfirm">Confirm Password <span class="required">*</span></label>
+                <input type="password" id="regConfirm" placeholder="Re-enter password" required minlength="6">
+              </div>
+            </div>
+            <div class="register-benefits">
+              <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:8px;"><i class="fas fa-info-circle" style="color:var(--primary);"></i> Your account will give you access to:</p>
+              <div class="benefits-mini">
+                <span><i class="fas fa-check" style="color:var(--secondary);"></i> Parent portal & dashboard</span>
+                <span><i class="fas fa-check" style="color:var(--secondary);"></i> Add child profiles</span>
+                <span><i class="fas fa-check" style="color:var(--secondary);"></i> Enrollment tracking</span>
+                <span><i class="fas fa-check" style="color:var(--secondary);"></i> Progress reports</span>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large btn-full">
+              <i class="fas fa-user-plus"></i> Create Account
+            </button>
+            <div id="registerMessage" class="form-message"></div>
+          </form>
+          <div class="login-footer">
+            <p>Already have an account?</p>
+            <a href="/login"><i class="fas fa-sign-in-alt"></i> Log In Here</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="/js/main.js"></script>
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msgEl = document.getElementById('registerMessage');
+      const btn = e.target.querySelector('button[type="submit"]');
+      const orig = btn.innerHTML;
+
+      const password = document.getElementById('regPassword').value;
+      const confirm = document.getElementById('regConfirm').value;
+
+      if (password !== confirm) {
+        msgEl.className = 'form-message error';
+        msgEl.textContent = 'Passwords do not match.';
+        return;
+      }
+
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+      btn.disabled = true;
+
+      try {
+        const resp = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: document.getElementById('regName').value,
+            email: document.getElementById('regEmail').value,
+            password: password,
+            phone: document.getElementById('regPhone').value,
+          }),
+        });
+        const result = await resp.json();
+        if (result.success) {
+          msgEl.className = 'form-message success';
+          msgEl.textContent = 'Account created! Redirecting to your portal...';
+          setTimeout(() => { window.location.href = result.redirect; }, 1000);
+        } else {
+          msgEl.className = 'form-message error';
+          msgEl.textContent = result.error;
+        }
+      } catch {
+        msgEl.className = 'form-message error';
+        msgEl.textContent = 'Something went wrong. Please try again.';
+      }
+
+      btn.innerHTML = orig;
+      btn.disabled = false;
+    });
+  </script>
+</body>
+</html>

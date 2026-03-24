@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Daffodils Montessori</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Admin Nav -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Admin Panel</span>
+        </div>
+      </a>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="/">View Site</a></li>
+        <li><a href="/admin" class="active">Dashboard</a></li>
+        <li><a href="/logout" class="nav-cta"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="section admin-section" style="padding-top:110px;">
+    <div class="container">
+      <div class="admin-header">
+        <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+        <p>Manage leads, enrollments, tours, and parent accounts.</p>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="admin-stats" id="adminStats">
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:var(--primary-light);color:var(--primary-dark);"><i class="fas fa-user-plus"></i></div>
+          <div><span class="admin-stat-num" id="statLeads">0</span><span class="admin-stat-label">Interested Leads</span></div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:var(--secondary-light);color:var(--secondary-dark);"><i class="fas fa-file-alt"></i></div>
+          <div><span class="admin-stat-num" id="statEnrollments">0</span><span class="admin-stat-label">Enrollments</span></div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:#e3f2fd;color:#1565c0;"><i class="fas fa-calendar-check"></i></div>
+          <div><span class="admin-stat-num" id="statTours">0</span><span class="admin-stat-label">Tour Requests</span></div>
+        </div>
+        <div class="admin-stat-card">
+          <div class="admin-stat-icon" style="background:#fce4ec;color:#c62828;"><i class="fas fa-users"></i></div>
+          <div><span class="admin-stat-num" id="statUsers">0</span><span class="admin-stat-label">Parent Accounts</span></div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" data-tab="leads"><i class="fas fa-user-plus"></i> Interested Leads</button>
+        <button class="admin-tab" data-tab="submissions"><i class="fas fa-envelope-open-text"></i> Contact Submissions</button>
+        <button class="admin-tab" data-tab="enrollments"><i class="fas fa-file-alt"></i> Enrollments</button>
+        <button class="admin-tab" data-tab="tours"><i class="fas fa-calendar-check"></i> Tour Requests</button>
+        <button class="admin-tab" data-tab="children"><i class="fas fa-child"></i> Children Profiles</button>
+        <button class="admin-tab" data-tab="accounts"><i class="fas fa-users-cog"></i> Parent Accounts</button>
+      </div>
+
+      <!-- Leads Tab -->
+      <div class="admin-panel active" id="panel-leads">
+        <div class="admin-panel-header">
+          <h3>Interested Leads</h3>
+          <p>People who filled out the contact form or showed interest. Use this for outreach.</p>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Source</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="leadsTableBody">
+              <tr><td colspan="8" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Contact Submissions Tab -->
+      <div class="admin-panel" id="panel-submissions">
+        <div class="admin-panel-header">
+          <h3>Contact Form Submissions (Per Account)</h3>
+          <p>Logged-in parents who submitted the contact form. Review and mark as reviewed to update their portal status.</p>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Parent Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="submissionsTableBody">
+              <tr><td colspan="7" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Enrollments Tab -->
+      <div class="admin-panel" id="panel-enrollments">
+        <div class="admin-panel-header">
+          <h3>Enrollment Applications</h3>
+          <p>Review and manage enrollment applications. Change status to enroll families.</p>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Child</th>
+                <th>Age</th>
+                <th>Parent</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Program</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="enrollmentsTableBody">
+              <tr><td colspan="9" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tours Tab -->
+      <div class="admin-panel" id="panel-tours">
+        <div class="admin-panel-header">
+          <h3>Tour Requests</h3>
+          <p>Upcoming tour bookings from the enrollment page.</p>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Child Age</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="toursTableBody">
+              <tr><td colspan="8" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Children Tab -->
+      <div class="admin-panel" id="panel-children">
+        <div class="admin-panel-header">
+          <h3>Children Profiles</h3>
+          <p>All children added by registered parents. Approve children for enrollment so parents can select a program and pay.</p>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Child Name</th>
+                <th>DOB</th>
+                <th>Gender</th>
+                <th>Parent Email</th>
+                <th>Allergies</th>
+                <th>Status</th>
+                <th>Program</th>
+                <th>Added</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="childrenTableBody">
+              <tr><td colspan="9" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Accounts Tab -->
+      <div class="admin-panel" id="panel-accounts">
+        <div class="admin-panel-header">
+          <h3>Parent Accounts</h3>
+          <p>Parents who registered on the website. Accounts are self-service — parents register on their own.</p>
+        </div>
+
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Contact Form</th>
+                <th>Children</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Parent Profile Modal -->
+  <div id="parentProfileModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;max-width:700px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.2);position:relative;">
+      <button onclick="closeParentModal()" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#888;">&times;</button>
+      <div style="background:linear-gradient(135deg,#2d5016,#6ba832);padding:24px 30px;border-radius:16px 16px 0 0;color:#fff;">
+        <h2 style="margin:0;font-size:20px;" id="modalParentName"></h2>
+        <p style="margin:6px 0 0;opacity:0.85;font-size:14px;" id="modalParentEmail"></p>
+      </div>
+      <div style="padding:24px 30px;">
+        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;">
+          <div><strong style="color:#888;font-size:12px;text-transform:uppercase;">Phone</strong><p style="margin:4px 0 0;font-size:15px;" id="modalParentPhone"></p></div>
+          <div><strong style="color:#888;font-size:12px;text-transform:uppercase;">Registered</strong><p style="margin:4px 0 0;font-size:15px;" id="modalParentDate"></p></div>
+          <div><strong style="color:#888;font-size:12px;text-transform:uppercase;">Contact Status</strong><p style="margin:4px 0 0;font-size:15px;" id="modalContactStatus"></p></div>
+        </div>
+        <div style="border-top:1px solid #eee;padding-top:20px;">
+          <h3 style="margin:0 0 12px;color:#2d5016;font-size:16px;"><i class="fas fa-child"></i> Children Profiles</h3>
+          <div id="modalChildrenList"></div>
+        </div>
+        <div style="border-top:1px solid #eee;padding-top:20px;margin-top:20px;" id="modalInquirySection">
+          <h3 style="margin:0 0 12px;color:#2d5016;font-size:16px;"><i class="fas fa-envelope-open-text"></i> Contact Inquiry</h3>
+          <div id="modalInquiryContent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+  <script>
+    // Tab switching
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    let dashboardData = {};
+
+    // Load dashboard data
+    async function loadDashboard() {
+      try {
+        const resp = await fetch('/api/admin/dashboard');
+        if (!resp.ok) { window.location.href = '/login'; return; }
+        dashboardData = await resp.json();
+        renderStats(dashboardData);
+        renderLeads(dashboardData.interestedLeads);
+        renderSubmissions(dashboardData.contactSubmissions || []);
+        renderEnrollments(dashboardData.enrollments);
+        renderTours(dashboardData.tourRequests);
+        renderChildren(dashboardData.children || [], dashboardData.contactSubmissions || []);
+        renderUsers(dashboardData.users, dashboardData.children || [], dashboardData.contactSubmissions || []);
+      } catch { window.location.href = '/login'; }
+    }
+
+    function renderStats(data) {
+      document.getElementById('statLeads').textContent = data.interestedLeads.length;
+      document.getElementById('statEnrollments').textContent = data.enrollments.length;
+      document.getElementById('statTours').textContent = data.tourRequests.length;
+      document.getElementById('statUsers').textContent = data.users.filter(u => u.role === 'parent').length;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    function formatDate(d) {
+      return d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    }
+
+    function renderLeads(leads) {
+      const tbody = document.getElementById('leadsTableBody');
+      if (!leads.length) { tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No leads yet. They\'ll appear here when people fill out the contact form.</td></tr>'; return; }
+      tbody.innerHTML = leads.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(l => `
+        <tr>
+          <td><strong>${escapeHtml(l.name)}</strong></td>
+          <td><a href="mailto:${escapeHtml(l.email)}">${escapeHtml(l.email)}</a></td>
+          <td>${escapeHtml(l.phone)}</td>
+          <td><span class="badge badge-${l.source}">${escapeHtml(l.source.replace('_', ' '))}</span></td>
+          <td>${escapeHtml(l.subject)}</td>
+          <td class="msg-cell">${escapeHtml(l.message)}</td>
+          <td>${formatDate(l.createdAt)}</td>
+          <td><button class="btn-icon btn-delete" onclick="deleteLead(${l.id})" title="Remove"><i class="fas fa-trash"></i></button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSubmissions(submissions) {
+      const tbody = document.getElementById('submissionsTableBody');
+      if (!submissions.length) { tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No contact form submissions from logged-in parents yet.</td></tr>'; return; }
+      tbody.innerHTML = submissions.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(s => {
+        const statusClass = s.status === 'reviewed' ? 'enrolled' : s.status === 'contacted' ? 'waitlisted' : 'pending';
+        return `
+        <tr>
+          <td><strong><a href="#" onclick="showParentProfile('${escapeHtml(s.userEmail)}');return false;" style="color:#2d5016;text-decoration:underline;cursor:pointer;">${escapeHtml(s.userName)} <i class="fas fa-external-link-alt" style="font-size:10px;"></i></a></strong></td>
+          <td><a href="mailto:${escapeHtml(s.userEmail)}">${escapeHtml(s.userEmail)}</a></td>
+          <td>${escapeHtml(s.subject)}</td>
+          <td class="msg-cell">${escapeHtml(s.message)}</td>
+          <td>
+            <select class="status-select status-${statusClass}" onchange="updateSubmissionStatus(${s.id}, this.value)">
+              <option value="pending" ${s.status==='pending'?'selected':''}>Pending</option>
+              <option value="reviewed" ${s.status==='reviewed'?'selected':''}>Reviewed</option>
+              <option value="contacted" ${s.status==='contacted'?'selected':''}>Contacted</option>
+            </select>
+          </td>
+          <td>${formatDate(s.createdAt)}</td>
+          <td>${s.reviewedAt ? '<span class="badge badge-enrolled">Reviewed ' + formatDate(s.reviewedAt) + '</span>' : '<span class="badge badge-pending">Awaiting</span>'}</td>
+        </tr>
+      `}).join('');
+    }
+
+    function renderEnrollments(enrollments) {
+      const tbody = document.getElementById('enrollmentsTableBody');
+      if (!enrollments.length) { tbody.innerHTML = '<tr><td colspan="9" class="table-empty">No enrollment applications yet.</td></tr>'; return; }
+      tbody.innerHTML = enrollments.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(e => `
+        <tr>
+          <td><strong>${escapeHtml(e.childName)}</strong></td>
+          <td>${escapeHtml(e.childAge)}</td>
+          <td>${escapeHtml(e.parentName)}</td>
+          <td><a href="mailto:${escapeHtml(e.email)}">${escapeHtml(e.email)}</a></td>
+          <td>${escapeHtml(e.phone)}</td>
+          <td>${escapeHtml(e.program)}</td>
+          <td>
+            <select class="status-select status-${e.status}" onchange="updateEnrollmentStatus(${e.id}, this.value)">
+              <option value="pending" ${e.status==='pending'?'selected':''}>Pending</option>
+              <option value="enrolled" ${e.status==='enrolled'?'selected':''}>Enrolled</option>
+              <option value="waitlisted" ${e.status==='waitlisted'?'selected':''}>Waitlisted</option>
+              <option value="declined" ${e.status==='declined'?'selected':''}>Declined</option>
+            </select>
+          </td>
+          <td>${formatDate(e.createdAt)}</td>
+          <td>${escapeHtml(e.notes || '')}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderTours(tours) {
+      const tbody = document.getElementById('toursTableBody');
+      if (!tours.length) { tbody.innerHTML = '<tr><td colspan="8" class="table-empty">No tour requests yet.</td></tr>'; return; }
+      tbody.innerHTML = tours.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(t => `
+        <tr>
+          <td><strong>${escapeHtml(t.parentName)}</strong></td>
+          <td><a href="mailto:${escapeHtml(t.email)}">${escapeHtml(t.email)}</a></td>
+          <td>${escapeHtml(t.phone)}</td>
+          <td>${escapeHtml(t.tourDate)}</td>
+          <td>${escapeHtml(t.tourTime)}</td>
+          <td>${escapeHtml(t.childAge)}</td>
+          <td class="msg-cell">${escapeHtml(t.notes)}</td>
+          <td><button class="btn-icon btn-delete" onclick="deleteTour(${t.id})" title="Remove"><i class="fas fa-trash"></i></button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderChildren(children) {
+      const tbody = document.getElementById('childrenTableBody');
+      if (!children.length) { tbody.innerHTML = '<tr><td colspan="9" class="table-empty">No children profiles yet. Parents will add them through their portal.</td></tr>'; return; }
+      tbody.innerHTML = children.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(c => {
+        const status = c.enrollmentStatus || 'none';
+        let statusBadge = '<span class="badge badge-pending">Not Enrolled</span>';
+        if (status === 'approved') statusBadge = '<span class="badge badge-waitlisted">Approved - Awaiting Payment</span>';
+        if (status === 'enrolled') statusBadge = '<span class="badge badge-enrolled">Enrolled</span>';
+
+        let actionBtn = '';
+        if (status === 'none' || !status) {
+          actionBtn = `<button class="btn btn-primary btn-sm" onclick="enrollChild(${c.id})" title="Approve for Enrollment"><i class="fas fa-check"></i> Approve</button>`;
+        } else if (status === 'approved') {
+          actionBtn = `<button class="btn btn-secondary btn-sm" onclick="unenrollChild(${c.id})" title="Revoke Approval"><i class="fas fa-times"></i> Revoke</button>`;
+        } else if (status === 'enrolled') {
+          actionBtn = `<button class="btn btn-secondary btn-sm" onclick="unenrollChild(${c.id})" title="Unenroll"><i class="fas fa-undo"></i> Unenroll</button>`;
+        }
+
+        return `
+        <tr>
+          <td><strong>${escapeHtml(c.childName)}</strong></td>
+          <td>${c.dateOfBirth ? formatDate(c.dateOfBirth) : ''}</td>
+          <td>${escapeHtml(c.gender || '')}</td>
+          <td><a href="mailto:${escapeHtml(c.parentEmail)}">${escapeHtml(c.parentEmail)}</a></td>
+          <td>${escapeHtml(c.allergies || 'None listed')}</td>
+          <td>${statusBadge}</td>
+          <td>${c.program ? escapeHtml(c.program) + (c.schedule ? ' (' + escapeHtml(c.schedule) + ')' : '') : '<em>—</em>'}</td>
+          <td>${formatDate(c.createdAt)}</td>
+          <td>${actionBtn}</td>
+        </tr>
+      `}).join('');
+    }
+
+    function renderUsers(users, children, submissions) {
+      const tbody = document.getElementById('usersTableBody');
+      const parents = users.filter(u => u.role === 'parent');
+      if (!parents.length) { tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No parent accounts yet. Parents register on their own.</td></tr>'; return; }
+      tbody.innerHTML = parents.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)).map(u => {
+        const userChildren = children.filter(c => c.parentEmail.toLowerCase() === u.email.toLowerCase());
+        const sub = submissions.find(s => s.userEmail && s.userEmail.toLowerCase() === u.email.toLowerCase());
+        const contactBadge = sub
+          ? `<span class="badge badge-${sub.status === 'reviewed' || sub.status === 'contacted' ? 'enrolled' : 'pending'}">${sub.status}</span>`
+          : '<span class="badge" style="background:#eee;color:#999;">Not submitted</span>';
+
+        return `
+        <tr>
+          <td><strong><a href="#" onclick="showParentProfile('${escapeHtml(u.email)}');return false;" style="color:#2d5016;text-decoration:underline;cursor:pointer;">${escapeHtml(u.name)} <i class="fas fa-external-link-alt" style="font-size:10px;"></i></a></strong></td>
+          <td><a href="mailto:${escapeHtml(u.email)}">${escapeHtml(u.email)}</a></td>
+          <td>${escapeHtml(u.phone || '—')}</td>
+          <td><span class="badge badge-${u.role}">${u.role}</span></td>
+          <td>${contactBadge}</td>
+          <td>${userChildren.length > 0 ? userChildren.map(c => escapeHtml(c.childName)).join(', ') : '<em>None</em>'}</td>
+          <td>${formatDate(u.createdAt)}</td>
+        </tr>
+      `}).join('');
+    }
+
+    async function updateEnrollmentStatus(id, status) {
+      await fetch('/api/admin/enrollment/' + id + '/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      loadDashboard();
+    }
+
+    async function updateSubmissionStatus(id, status) {
+      await fetch('/api/admin/contact-submission/' + id + '/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      loadDashboard();
+    }
+
+    async function enrollChild(id) {
+      if (!confirm('Approve this child for enrollment? The parent will be able to select a program and pay on their portal.')) return;
+      await fetch('/api/admin/enroll-child/' + id, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      loadDashboard();
+    }
+
+    async function unenrollChild(id) {
+      if (!confirm('Revoke enrollment approval for this child?')) return;
+      await fetch('/api/admin/unenroll-child/' + id, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+      loadDashboard();
+    }
+
+    async function deleteLead(id) {
+      if (!confirm('Remove this lead?')) return;
+      await fetch('/api/admin/lead/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
+    async function deleteTour(id) {
+      if (!confirm('Remove this tour request?')) return;
+      await fetch('/api/admin/tour/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
+    function showParentProfile(email) {
+      const user = dashboardData.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      const children = (dashboardData.children || []).filter(c => c.parentEmail.toLowerCase() === email.toLowerCase());
+      const submission = (dashboardData.contactSubmissions || []).find(s => s.userEmail && s.userEmail.toLowerCase() === email.toLowerCase());
+
+      document.getElementById('modalParentName').textContent = user ? user.name : email;
+      document.getElementById('modalParentEmail').textContent = email;
+      document.getElementById('modalParentPhone').textContent = user && user.phone ? user.phone : 'Not provided';
+      document.getElementById('modalParentDate').textContent = user ? formatDate(user.createdAt) : '—';
+
+      if (submission) {
+        const sClass = submission.status === 'reviewed' ? 'enrolled' : submission.status === 'contacted' ? 'waitlisted' : 'pending';
+        document.getElementById('modalContactStatus').innerHTML = '<span class="badge badge-' + sClass + '">' + escapeHtml(submission.status) + '</span>';
+      } else {
+        document.getElementById('modalContactStatus').innerHTML = '<span style="color:#999;">Not submitted</span>';
+      }
+
+      const childrenEl = document.getElementById('modalChildrenList');
+      if (children.length === 0) {
+        childrenEl.innerHTML = '<p style="color:#999;font-style:italic;">No children added yet.</p>';
+      } else {
+        childrenEl.innerHTML = children.map(c => {
+          const age = c.dateOfBirth ? Math.floor((Date.now() - new Date(c.dateOfBirth)) / (365.25*24*60*60*1000)) : null;
+          const statusBadge = c.enrollmentStatus === 'enrolled'
+            ? '<span class="badge badge-enrolled">Enrolled</span>'
+            : c.enrollmentStatus === 'approved'
+              ? '<span class="badge badge-waitlisted">Approved</span>'
+              : '<span class="badge badge-pending">Not Enrolled</span>';
+          return `
+          <div style="background:#f9f7f4;border-radius:10px;padding:16px;margin-bottom:12px;border-left:4px solid #6ba832;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <h4 style="margin:0;color:#2d5016;font-size:16px;"><i class="fas fa-child" style="margin-right:6px;"></i>${escapeHtml(c.childName)}</h4>
+              ${statusBadge}
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;">
+              <div><strong style="color:#888;">DOB:</strong> ${c.dateOfBirth ? formatDate(c.dateOfBirth) + (age !== null ? ' (' + age + ' yrs)' : '') : '—'}</div>
+              <div><strong style="color:#888;">Gender:</strong> ${escapeHtml(c.gender || '—')}</div>
+              <div><strong style="color:#888;">Allergies:</strong> ${escapeHtml(c.allergies || 'None')}</div>
+              <div><strong style="color:#888;">Medical:</strong> ${escapeHtml(c.medicalNotes || 'None')}</div>
+              <div><strong style="color:#888;">Emergency:</strong> ${escapeHtml(c.emergencyContact || '—')} ${c.emergencyPhone ? '(' + escapeHtml(c.emergencyPhone) + ')' : ''}</div>
+              <div><strong style="color:#888;">Program:</strong> ${c.program ? escapeHtml(c.program) + (c.schedule ? ' (' + escapeHtml(c.schedule) + ')' : '') : '—'}</div>
+            </div>
+            ${c.notes ? '<div style="margin-top:8px;font-size:13px;"><strong style="color:#888;">Notes:</strong> ' + escapeHtml(c.notes) + '</div>' : ''}
+          </div>`;
+        }).join('');
+      }
+
+      const inquirySection = document.getElementById('modalInquirySection');
+      const inquiryContent = document.getElementById('modalInquiryContent');
+      if (submission) {
+        inquirySection.style.display = 'block';
+        inquiryContent.innerHTML = `
+          <div style="background:#f9f7f4;border-radius:10px;padding:16px;border-left:4px solid #2d5016;">
+            <p style="margin:0 0 6px;"><strong style="color:#888;">Subject:</strong> ${escapeHtml(submission.subject)}</p>
+            <p style="margin:0 0 6px;"><strong style="color:#888;">Message:</strong> ${escapeHtml(submission.message)}</p>
+            <p style="margin:0;font-size:12px;color:#999;">Submitted: ${formatDate(submission.createdAt)}</p>
+          </div>`;
+      } else {
+        inquirySection.style.display = 'none';
+      }
+
+      const modal = document.getElementById('parentProfileModal');
+      modal.style.display = 'flex';
+      modal.onclick = function(e) { if (e.target === modal) closeParentModal(); };
+    }
+
+    function closeParentModal() {
+      document.getElementById('parentProfileModal').style.display = 'none';
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

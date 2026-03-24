@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enrollment &amp; Book a Tour - Daffodils Montessori</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Open+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="/" class="nav-logo">
+        <span class="logo-icon">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Montessori</span>
+        </div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/programs">Programs</a></li>
+        <li><a href="/staff">Our Staff</a></li>
+        <li><a href="/gallery">Gallery</a></li>
+        <li><a href="/contact">Contact</a></li>
+        <li><a href="/login" class="nav-register"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+        <li><a href="/enrollment" class="nav-cta active">Enroll Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <h1>Enrollment &amp; Book a Tour</h1>
+      <p>Begin your child's Montessori journey today. Apply for enrollment or schedule a campus tour below.</p>
+      <div class="breadcrumb">
+        <a href="/">Home</a> <i class="fas fa-chevron-right"></i> <span>Enrollment</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enrollment Steps -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">How to Enroll</span>
+        <h2>Enrollment Process</h2>
+        <p>Our simple 5-step enrollment process ensures a smooth start for your family.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Schedule a Tour</h3>
+          <p>Visit our campus, observe classrooms, and meet our teachers during a personalized tour.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Submit Application</h3>
+          <p>Complete the enrollment application form below with your child's information.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Family Interview</h3>
+          <p>Meet with our admissions team to discuss your child's needs and our programs.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Acceptance</h3>
+          <p>Receive your acceptance letter and enrollment packet within one week.</p>
+        </div>
+        <div class="step-connector"><i class="fas fa-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-number">5</div>
+          <h3>Welcome!</h3>
+          <p>Complete paperwork, pay enrollment deposit, and join the Daffodils family!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Application Form -->
+  <section class="section enrollment-form-section" id="apply">
+    <div class="container">
+      <div class="enrollment-grid">
+        <div class="enrollment-form-wrapper">
+          <h2><i class="fas fa-file-alt"></i> Enrollment Application</h2>
+          <p>Please complete all required fields. We will contact you within 2 business days.</p>
+          <form id="enrollmentForm" class="enrollment-form">
+            <div class="form-section-title">Child Information</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="childName">Child's Full Name <span class="required">*</span></label>
+                <input type="text" id="childName" name="childName" placeholder="First and last name" required>
+              </div>
+              <div class="form-group">
+                <label for="childDob">Date of Birth <span class="required">*</span></label>
+                <input type="date" id="childDob" name="childDob" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="childAge">Current Age</label>
+                <input type="text" id="childAge" name="childAge" placeholder="e.g., 3 years, 4 months">
+              </div>
+              <div class="form-group">
+                <label for="program">Program of Interest <span class="required">*</span></label>
+                <select id="program" name="program" required>
+                  <option value="">Select a program</option>
+                  <option value="Toddler Half-Day ($850/mo)">Toddler Half-Day — $850/month</option>
+                  <option value="Toddler Full-Day ($1,200/mo)">Toddler Full-Day — $1,200/month</option>
+                  <option value="Primary Half-Day ($950/mo)">Primary Half-Day — $950/month</option>
+                  <option value="Primary Full-Day ($1,400/mo)">Primary Full-Day — $1,400/month</option>
+                  <option value="Primary Extended ($1,650/mo)">Primary Extended Day — $1,650/month</option>
+                  <option value="Kindergarten Full-Day ($1,400/mo)">Kindergarten Full-Day — $1,400/month</option>
+                  <option value="Kindergarten Extended ($1,650/mo)">Kindergarten Extended Day — $1,650/month</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-section-title">Parent/Guardian Information</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="parentName">Parent/Guardian Name <span class="required">*</span></label>
+                <input type="text" id="parentName" name="parentName" placeholder="Full name" required>
+              </div>
+              <div class="form-group">
+                <label for="parentEmail">Email Address <span class="required">*</span></label>
+                <input type="email" id="parentEmail" name="parentEmail" placeholder="your@email.com" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="parentPhone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="parentPhone" name="parentPhone" placeholder="(555) 000-0000" required>
+              </div>
+              <div class="form-group">
+                <label for="startDate">Preferred Start Date</label>
+                <input type="date" id="startDate" name="startDate">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="notes">Additional Notes</label>
+              <textarea id="notes" name="notes" rows="4" placeholder="Any allergies, special needs, or questions you'd like us to know about..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large btn-full">
+              <i class="fas fa-paper-plane"></i> Submit Application
+            </button>
+            <div id="enrollmentFormMessage" class="form-message"></div>
+          </form>
+        </div>
+
+        <!-- Tuition Summary -->
+        <div class="tuition-sidebar">
+          <div class="tuition-card">
+            <h3><i class="fas fa-tag"></i> Tuition Summary</h3>
+            <div class="tuition-table">
+              <div class="tuition-row header">
+                <span>Program</span>
+                <span>Monthly</span>
+              </div>
+              <div class="tuition-row">
+                <span>Toddler Half-Day</span>
+                <span>$850</span>
+              </div>
+              <div class="tuition-row">
+                <span>Toddler Full-Day</span>
+                <span>$1,200</span>
+              </div>
+              <div class="tuition-row">
+                <span>Primary Half-Day</span>
+                <span>$950</span>
+              </div>
+              <div class="tuition-row">
+                <span>Primary Full-Day</span>
+                <span>$1,400</span>
+              </div>
+              <div class="tuition-row">
+                <span>Primary Extended</span>
+                <span>$1,650</span>
+              </div>
+              <div class="tuition-row">
+                <span>Kindergarten Full-Day</span>
+                <span>$1,400</span>
+              </div>
+              <div class="tuition-row">
+                <span>Kindergarten Extended</span>
+                <span>$1,650</span>
+              </div>
+            </div>
+            <div class="tuition-notes">
+              <p><i class="fas fa-info-circle"></i> A non-refundable application fee of $75 is due upon submission.</p>
+              <p><i class="fas fa-info-circle"></i> An enrollment deposit of $500 secures your child's spot (applied to first month's tuition).</p>
+              <p><i class="fas fa-info-circle"></i> Sibling discount: 10% off for additional children.</p>
+            </div>
+          </div>
+
+          <div class="tuition-card">
+            <h3><i class="fas fa-calendar-check"></i> What's Included</h3>
+            <ul class="included-list">
+              <li><i class="fas fa-check"></i> All Montessori materials</li>
+              <li><i class="fas fa-check"></i> Nutritious lunch &amp; snacks</li>
+              <li><i class="fas fa-check"></i> Enrichment programs (full-day)</li>
+              <li><i class="fas fa-check"></i> Progress reports &amp; conferences</li>
+              <li><i class="fas fa-check"></i> Field trips</li>
+              <li><i class="fas fa-check"></i> Annual school photos</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book a Tour Section -->
+  <section class="section tour-section" id="tour">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Visit Us</span>
+        <h2>Book a Tour</h2>
+        <p>See our classrooms in action and meet our teachers. Tours are available Monday through Friday.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-form-wrapper">
+          <h2><i class="fas fa-calendar-alt"></i> Schedule Your Visit</h2>
+          <p>Pick a date and time that works for your family. Tours typically last 45 minutes to an hour.</p>
+          <form id="tourForm" class="contact-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tourParentName">Parent/Guardian Name <span class="required">*</span></label>
+                <input type="text" id="tourParentName" name="parentName" placeholder="Full name" required>
+              </div>
+              <div class="form-group">
+                <label for="tourEmail">Email Address <span class="required">*</span></label>
+                <input type="email" id="tourEmail" name="email" placeholder="your@email.com" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tourPhone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="tourPhone" name="phone" placeholder="(425) 000-0000" required>
+              </div>
+              <div class="form-group">
+                <label for="tourDate">Preferred Tour Date <span class="required">*</span></label>
+                <input type="date" id="tourDate" name="tourDate" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tourTime">Preferred Time</label>
+                <select id="tourTime" name="tourTime">
+                  <option value="">Select a time</option>
+                  <option value="9:00 AM">9:00 AM</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="11:00 AM">11:00 AM</option>
+                  <option value="1:00 PM">1:00 PM</option>
+                  <option value="2:00 PM">2:00 PM</option>
+                  <option value="3:00 PM">3:00 PM</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="tourChildAge">Child's Age</label>
+                <input type="text" id="tourChildAge" name="childAge" placeholder="e.g., 3 years old">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tourNotes">Questions or Comments</label>
+              <textarea id="tourNotes" name="notes" rows="3" placeholder="Anything you'd like us to know before your visit..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large btn-full">
+              <i class="fas fa-calendar-check"></i> Book My Tour
+            </button>
+            <div id="tourFormMessage" class="form-message"></div>
+          </form>
+        </div>
+
+        <div class="contact-info-wrapper">
+          <div class="contact-info-card">
+            <h3>What to Expect</h3>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-eye"></i></div>
+              <div>
+                <strong>Observe Classrooms</strong>
+                <p>Watch Montessori learning in action during a live classroom observation.</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-comments"></i></div>
+              <div>
+                <strong>Meet Our Team</strong>
+                <p>Chat with teachers and staff about our programs and philosophy.</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-question-circle"></i></div>
+              <div>
+                <strong>Ask Questions</strong>
+                <p>Get answers about enrollment, curriculum, schedules, and tuition.</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-walking"></i></div>
+              <div>
+                <strong>Campus Walkthrough</strong>
+                <p>Tour our classrooms, outdoor areas, garden, and play spaces.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-info-card">
+            <h3>Contact Us Directly</h3>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+              <div>
+                <strong>Call Us</strong>
+                <p>(425) 623-2684</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+              <div>
+                <strong>Email Us</strong>
+                <p>rishiekhanna@yahoo.com</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <span class="logo-icon">🌼</span>
+            <div class="logo-text">
+              <span class="logo-name">Daffodils</span>
+              <span class="logo-tagline">Montessori</span>
+            </div>
+          </div>
+          <p>Nurturing young minds through the Montessori method since 2010. Every child deserves to bloom.</p>
+          <div class="footer-social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/programs">Programs</a></li>
+            <li><a href="/staff">Our Staff</a></li>
+            <li><a href="/gallery">Gallery</a></li>
+            <li><a href="/enrollment">Enrollment</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Programs</h4>
+          <ul>
+            <li><a href="/programs">Toddler (2-3)</a></li>
+            <li><a href="/programs">Primary (3-5)</a></li>
+            <li><a href="/programs">Kindergarten (5-6)</a></li>
+            <li><a href="/programs">Summer Camp</a></li>
+            <li><a href="/programs">After School</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact Us</h4>
+          <ul>
+            <li><i class="fas fa-map-marker-alt"></i> 5051 86th Ave NE, Marysville, WA 98270</li>
+            <li><i class="fas fa-phone"></i> (425) 623-2684</li>
+            <li><i class="fas fa-envelope"></i> rishiekhanna@yahoo.com</li>
+            <li><i class="fas fa-clock"></i> Mon-Fri: 9:00 AM - 5:00 PM</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Daffodils Montessori. All rights reserved.</p>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

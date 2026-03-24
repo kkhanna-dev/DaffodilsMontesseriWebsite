@@ -7,7 +7,12 @@
       "Bash(timeout 5 node server.js)",
       "Bash(node -c server.js)",
       "Bash(node -e \"const app = require\\(''./server''\\); console.log\\(''Server loads OK''\\);\")",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(node -e \"require\\(''''./server.js''''\\); console.log\\(''''Server module loaded OK''''\\);\")",
+      "Bash(npx jest:*)",
+      "Bash(node -e \"const fs = require\\(''fs''\\); const code = fs.readFileSync\\(''./public/js/main.js'',''utf8''\\); new Function\\(code\\); console.log\\(''JS syntax OK''\\);\")",
+      "Bash(node -e \"const fs = require\\(''''fs''''\\); new Function\\(fs.readFileSync\\(''''./public/js/main.js'''',''''utf8''''\\)\\); console.log\\(''''JS OK''''\\);\")",
+      "Bash(node -e \"const e = require\\(''express''\\); console.log\\(''Express version:'', require\\(''express/package.json''\\).version\\);\")"
     ]
   }
 }

@@ -6,6 +6,7 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
+const crypto = require('crypto');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
@@ -122,7 +123,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'", "https://api.stripe.com"],
-      frameSrc: ["https://js.stripe.com"],
+      frameSrc: ["https://js.stripe.com", "https://www.google.com", "https://maps.google.com"],
     },
   },
 }));
@@ -477,6 +478,23 @@ app.delete('/api/admin/tour/:id', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+// Admin: delete a parent (user) and all related data
+app.delete('/api/admin/user/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  const userId = parseInt(req.params.id);
+  const user = data.users.find(u => u.id === userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.role === 'admin') return res.status(400).json({ error: 'Cannot delete admin accounts' });
+
+  const email = user.email;
+  data.users = data.users.filter(u => u.id !== userId);
+  data.children = data.children.filter(c => c.parentEmail !== email);
+  data.interestedLeads = data.interestedLeads.filter(l => l.email !== email);
+  data.contactSubmissions = data.contactSubmissions.filter(s => s.userEmail !== email);
+  saveData(data);
+  res.json({ success: true });
+});
+
 // --- Admin Curriculum Management ---
 
 // Upload curriculum file with metadata
@@ -566,7 +584,7 @@ app.get('/api/admin/site-content', requireAdmin, (req, res) => {
 // Update text content (key-value pairs)
 app.post('/api/admin/update-content', requireAdmin, (req, res) => {
   const allowedKeys = [
-    'heroTitle', 'heroSubtitle', 'heroDesc',
+    'heroTitle', 'heroSubtitle', 'heroTagline', 'heroDesc',
     'aboutTitle', 'aboutDesc', 'aboutDesc2',
     'announcementTitle', 'announcementText',
   ];
@@ -671,6 +689,12 @@ app.delete('/api/admin/announcement/:id', requireAdmin, (req, res) => {
 app.get('/api/announcements', (req, res) => {
   const data = loadData();
   res.json({ announcements: data.announcements || [] });
+});
+
+// Public endpoint to get site content (for inline editing and dynamic content)
+app.get('/api/site-content', (req, res) => {
+  const data = loadData();
+  res.json({ siteContent: data.siteContent || {} });
 });
 
 // --- Public Form Endpoints ---

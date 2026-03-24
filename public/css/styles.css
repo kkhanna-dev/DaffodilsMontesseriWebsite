@@ -3464,3 +3464,49 @@ h4 { font-size: 1.15rem; font-weight: 600; }
   .admin-inline-form { flex-direction: column; }
   .login-card { padding: 32px 24px; }
 }
+
+/* ============================
+   Admin Inline Editing Styles
+   ============================ */
+.admin-editable {
+  position: relative;
+  outline: 2px dashed transparent;
+  outline-offset: 4px;
+  transition: outline-color 0.2s, background-color 0.2s;
+  border-radius: 4px;
+  cursor: text;
+}
+
+.admin-edit-mode .admin-editable {
+  outline-color: rgba(74, 124, 89, 0.4);
+}
+
+.admin-edit-mode .admin-editable:hover {
+  outline-color: rgba(74, 124, 89, 0.7);
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.admin-edit-mode .admin-editable:focus {
+  outline-color: #4a7c59;
+  outline-style: solid;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Image upload overlay for edit mode */
+.admin-edit-mode [data-image-upload] {
+  cursor: pointer;
+}
+
+.admin-img-overlay:hover {
+  background: rgba(0, 0, 0, 0.65) !important;
+}
+
+[data-image-upload].has-image {
+  color: transparent;
+}
+
+/* Edit mode toggle pulse animation */
+#adminEditToggle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}

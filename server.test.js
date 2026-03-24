@@ -825,3 +825,691 @@ describe('File Upload Security', () => {
     expect(res.status).toBeGreaterThanOrEqual(400);
   });
 });
+
+// ==========================================
+// CLEANUP — Delete test parents created by unit tests
+// ==========================================
+describe('Unit Test Cleanup — Delete test parent accounts', () => {
+  let adminAgent;
+
+  const testEmails = [
+    'testparent@example.com',
+    'nonadmin@example.com',
+    'otherparent@example.com',
+    'nokids@example.com',
+  ];
+
+  beforeAll(async () => {
+    adminAgent = request.agent(app);
+    await adminAgent.post('/api/login').send({
+      email: 'vlwhite396@gmail.com', password: 'Riishii@12',
+    });
+  });
+
+  test('Admin deletes all unit-test parent accounts via delete button', async () => {
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    for (const email of testEmails) {
+      const user = dash.body.users.find(u => u.email === email);
+      if (user) {
+        const res = await adminAgent.delete(`/api/admin/user/${user.id}`);
+        expect(res.status).toBe(200);
+        expect(res.body.success).toBe(true);
+      }
+    }
+
+    const after = await adminAgent.get('/api/admin/dashboard');
+    for (const email of testEmails) {
+      expect(after.body.users.find(u => u.email === email)).toBeUndefined();
+    }
+  });
+});
+
+// ============================================================
+// END-TO-END TESTS — Full Enrollment Journey
+// ============================================================
+// These tests simulate the complete lifecycle:
+//   1. Parent registers an account
+//   2. Parent adds a child with full details
+//   3. Parent submits a contact form (interest inquiry)
+//   4. Admin reviews and approves the child for enrollment
+//   5. Parent selects a program and schedule (enrollment completes)
+//   6. Admin uploads curriculum for that program
+//   7. Parent views curriculum documents for their enrolled child
+//   8. Parent portal shows correct enrollment data throughout
+// ============================================================
+describe('E2E: Full Enrollment Journey — Register to Curriculum', () => {
+  let parentAgent;
+  let adminAgent;
+  let childId;
+  let curriculumId;
+
+  const parentEmail = 'e2e-parent@example.com';
+  const parentPassword = 'E2eTest!2026';
+  const parentName = 'E2E Test Parent';
+  const childDetails = {
+    childName: 'E2E Test Child',
+    dateOfBirth: '2022-03-15',
+    gender: 'Female',
+    allergies: 'Peanuts',
+    medicalNotes: 'Mild asthma, carries inhaler',
+    emergencyContact: 'E2E Grandparent',
+    emergencyPhone: '425-555-9999',
+    notes: 'Loves painting and outdoor play',
+  };
+
+  // ---- STEP 1: Parent registers a new account ----
+  test('Step 1: Parent registers a new account', async () => {
+    parentAgent = request.agent(app);
+    const res = await parentAgent
+      .post('/api/register')
+      .send({ name: parentName, email: parentEmail, password: parentPassword, phone: '425-555-1234' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.redirect).toBe('/portal');
+  });
+
+  // ---- STEP 2: Parent portal shows not-enrolled state ----
+  test('Step 2: Portal shows not-enrolled state with no children', async () => {
+    const res = await parentAgent.get('/api/portal/data');
+    expect(res.status).toBe(200);
+    expect(res.body.user.email).toBe(parentEmail);
+    expect(res.body.user.name).toBe(parentName);
+    expect(res.body.enrollment).toBeNull();
+    expect(res.body.children).toEqual([]);
+    expect(res.body.contactSubmitted).toBe(false);
+  });
+
+  // ---- STEP 3: Parent adds a child with full details ----
+  test('Step 3: Parent adds a child with full medical and emergency info', async () => {
+    const res = await parentAgent
+      .post('/api/portal/add-child')
+      .send(childDetails);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.child.childName).toBe('E2E Test Child');
+    expect(res.body.child.allergies).toBe('Peanuts');
+    expect(res.body.child.medicalNotes).toBe('Mild asthma, carries inhaler');
+    expect(res.body.child.emergencyContact).toBe('E2E Grandparent');
+    expect(res.body.child.emergencyPhone).toBe('425-555-9999');
+    expect(res.body.child.parentEmail).toBe(parentEmail);
+    childId = res.body.child.id;
+  });
+
+  // ---- STEP 4: Verify child appears in parent's children list ----
+  test('Step 4: Child appears in parent children list', async () => {
+    const res = await parentAgent.get('/api/portal/children');
+    expect(res.status).toBe(200);
+    expect(res.body.children.length).toBe(1);
+    const child = res.body.children[0];
+    expect(child.id).toBe(childId);
+    expect(child.childName).toBe('E2E Test Child');
+    expect(child.dateOfBirth).toBe('2022-03-15');
+    expect(child.gender).toBe('Female');
+  });
+
+  // ---- STEP 5: Parent submits contact form (inquiry) ----
+  test('Step 5: Parent submits contact form showing interest', async () => {
+    const res = await parentAgent
+      .post('/api/contact')
+      .send({
+        name: parentName,
+        email: parentEmail,
+        phone: '425-555-1234',
+        subject: 'Enrollment Question',
+        message: 'We are very interested in the Primary Program for our daughter. She turns 4 in March.',
+      });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.redirect).toBe('/portal');
+  });
+
+  // ---- STEP 6: Portal now shows contact submitted status ----
+  test('Step 6: Portal reflects contact form submitted', async () => {
+    const res = await parentAgent.get('/api/portal/data');
+    expect(res.status).toBe(200);
+    expect(res.body.contactSubmitted).toBe(true);
+    expect(res.body.contactSubmission).toBeDefined();
+    expect(res.body.contactSubmission.status).toBe('pending');
+    expect(res.body.contactSubmission.message).toContain('Primary Program');
+  });
+
+  // ---- STEP 7: Parent cannot submit contact form again ----
+  test('Step 7: Duplicate contact form submission is rejected', async () => {
+    const res = await parentAgent
+      .post('/api/contact')
+      .send({ name: parentName, email: parentEmail, message: 'Duplicate' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toContain('already submitted');
+  });
+
+  // ---- STEP 8: Curriculum is empty before enrollment ----
+  test('Step 8: Curriculum returns empty before child is enrolled', async () => {
+    const res = await parentAgent.get('/api/portal/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum).toEqual([]);
+  });
+
+  // ---- STEP 9: Program selection fails before admin approval ----
+  test('Step 9: Parent cannot select program before admin approval', async () => {
+    const res = await parentAgent
+      .post('/api/portal/select-program')
+      .send({ childId, program: 'Primary Program', schedule: 'Full Day' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toContain('not been approved');
+  });
+
+  // ---- STEP 10: Admin logs in ----
+  test('Step 10: Admin logs in successfully', async () => {
+    adminAgent = request.agent(app);
+    const res = await adminAgent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.redirect).toBe('/admin');
+  });
+
+  // ---- STEP 11: Admin sees the parent, child, and inquiry on dashboard ----
+  test('Step 11: Admin dashboard shows the new parent, child, and lead', async () => {
+    const res = await adminAgent.get('/api/admin/dashboard');
+    expect(res.status).toBe(200);
+
+    // Parent account exists
+    const parent = res.body.users.find(u => u.email === parentEmail);
+    expect(parent).toBeDefined();
+    expect(parent.name).toBe(parentName);
+    expect(parent.role).toBe('parent');
+
+    // Child profile exists
+    const child = res.body.children.find(c => c.id === childId);
+    expect(child).toBeDefined();
+    expect(child.childName).toBe('E2E Test Child');
+    expect(child.parentEmail).toBe(parentEmail);
+    expect(child.allergies).toBe('Peanuts');
+
+    // Contact submission exists
+    const submission = res.body.contactSubmissions.find(s => s.userEmail === parentEmail);
+    expect(submission).toBeDefined();
+    expect(submission.status).toBe('pending');
+    expect(submission.message).toContain('Primary Program');
+
+    // Interested lead exists
+    const lead = res.body.interestedLeads.find(l => l.email === parentEmail);
+    expect(lead).toBeDefined();
+    expect(lead.source).toBe('contact_form');
+  });
+
+  // ---- STEP 12: Admin reviews the contact submission ----
+  test('Step 12: Admin marks contact submission as reviewed', async () => {
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    const submission = dash.body.contactSubmissions.find(s => s.userEmail === parentEmail);
+    expect(submission).toBeDefined();
+
+    const res = await adminAgent
+      .post(`/api/admin/contact-submission/${submission.id}/status`)
+      .send({ status: 'reviewed' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  // ---- STEP 13: Admin approves the child for enrollment ----
+  test('Step 13: Admin approves child for enrollment', async () => {
+    const res = await adminAgent
+      .post(`/api/admin/enroll-child/${childId}`)
+      .send({});
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  // ---- STEP 14: Child status is now "approved" on admin dashboard ----
+  test('Step 14: Dashboard shows child as approved', async () => {
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    const child = dash.body.children.find(c => c.id === childId);
+    expect(child.enrollmentStatus).toBe('approved');
+    expect(child.approvedAt).toBeDefined();
+  });
+
+  // ---- STEP 15: Parent portal shows approved child with program selection ----
+  test('Step 15: Parent portal shows child as approved, awaiting program selection', async () => {
+    const res = await parentAgent.get('/api/portal/data');
+    expect(res.status).toBe(200);
+    const child = res.body.children.find(c => c.id === childId);
+    expect(child).toBeDefined();
+    expect(child.enrollmentStatus).toBe('approved');
+  });
+
+  // ---- STEP 16: Parent selects program and schedule (enrollment completes) ----
+  test('Step 16: Parent selects Primary Program / Full Day — enrollment completes', async () => {
+    const res = await parentAgent
+      .post('/api/portal/select-program')
+      .send({ childId, program: 'Primary Program', schedule: 'Full Day' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  // ---- STEP 17: Child is now fully enrolled ----
+  test('Step 17: Child status is enrolled with correct program and payment', async () => {
+    const res = await parentAgent.get('/api/portal/children');
+    const child = res.body.children.find(c => c.id === childId);
+    expect(child.enrollmentStatus).toBe('enrolled');
+    expect(child.program).toBe('Primary Program');
+    expect(child.schedule).toBe('Full Day');
+    expect(child.paymentStatus).toBe('paid');
+    expect(child.paidAt).toBeDefined();
+  });
+
+  // ---- STEP 18: Admin confirms enrollment on dashboard ----
+  test('Step 18: Admin dashboard shows child as enrolled in Primary Program', async () => {
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    const child = dash.body.children.find(c => c.id === childId);
+    expect(child.enrollmentStatus).toBe('enrolled');
+    expect(child.program).toBe('Primary Program');
+    expect(child.schedule).toBe('Full Day');
+    expect(child.paymentStatus).toBe('paid');
+  });
+
+  // ---- STEP 19: Admin uploads curriculum for Primary Program ----
+  test('Step 19: Admin uploads curriculum PDF for Primary Program', async () => {
+    const tempPdf = path.join(__dirname, 'e2e-curriculum.pdf');
+    fs.writeFileSync(tempPdf, '%PDF-1.4 E2E primary program curriculum content');
+    const res = await adminAgent
+      .post('/api/admin/upload-curriculum')
+      .field('title', 'Primary Program — Spring 2026 Lesson Plan')
+      .field('program', 'Primary Program')
+      .field('description', 'Weekly lesson plans covering practical life, sensorial, language, and math areas')
+      .attach('file', tempPdf);
+    fs.unlinkSync(tempPdf);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.curriculum.title).toBe('Primary Program — Spring 2026 Lesson Plan');
+    expect(res.body.curriculum.program).toBe('Primary Program');
+    curriculumId = res.body.curriculum.id;
+  });
+
+  // ---- STEP 20: Admin uploads another curriculum for All Programs ----
+  test('Step 20: Admin uploads a general curriculum for All Programs', async () => {
+    const tempPdf = path.join(__dirname, 'e2e-general.pdf');
+    fs.writeFileSync(tempPdf, '%PDF-1.4 General school policies');
+    const res = await adminAgent
+      .post('/api/admin/upload-curriculum')
+      .field('title', 'School Handbook & Policies 2026')
+      .field('program', 'All Programs')
+      .field('description', 'General school handbook applicable to all families')
+      .attach('file', tempPdf);
+    fs.unlinkSync(tempPdf);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  // ---- STEP 21: Admin uploads curriculum for a DIFFERENT program ----
+  test('Step 21: Admin uploads Toddler curriculum (should NOT appear for Primary parent)', async () => {
+    const tempPdf = path.join(__dirname, 'e2e-toddler.pdf');
+    fs.writeFileSync(tempPdf, '%PDF-1.4 Toddler program content');
+    const res = await adminAgent
+      .post('/api/admin/upload-curriculum')
+      .field('title', 'Toddler Spring Activities')
+      .field('program', 'Toddler Program')
+      .field('description', 'Activities for toddlers only')
+      .attach('file', tempPdf);
+    fs.unlinkSync(tempPdf);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  // ---- STEP 22: Parent sees curriculum for their enrolled program ----
+  test('Step 22: Parent sees Primary and All Programs curriculum, but NOT Toddler', async () => {
+    const res = await parentAgent.get('/api/portal/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum.length).toBe(2);
+
+    const titles = res.body.curriculum.map(c => c.title);
+    expect(titles).toContain('Primary Program — Spring 2026 Lesson Plan');
+    expect(titles).toContain('School Handbook & Policies 2026');
+    expect(titles).not.toContain('Toddler Spring Activities');
+  });
+
+  // ---- STEP 23: Portal data shows full enrollment context ----
+  test('Step 23: Portal data has complete enrollment information', async () => {
+    const res = await parentAgent.get('/api/portal/data');
+    expect(res.status).toBe(200);
+    expect(res.body.user.name).toBe(parentName);
+    expect(res.body.children.length).toBe(1);
+
+    const child = res.body.children[0];
+    expect(child.enrollmentStatus).toBe('enrolled');
+    expect(child.program).toBe('Primary Program');
+
+    expect(res.body.contactSubmitted).toBe(true);
+    expect(res.body.contactSubmission.status).toBe('reviewed');
+  });
+
+  // ---- STEP 24: Parent cannot re-select program for enrolled child ----
+  test('Step 24: Cannot re-select program for already enrolled child', async () => {
+    const res = await parentAgent
+      .post('/api/portal/select-program')
+      .send({ childId, program: 'Toddler Program', schedule: 'Half Day Morning' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toContain('not been approved');
+  });
+
+  // ---- STEP 25: Admin can unenroll child ----
+  test('Step 25: Admin unenrolls the child', async () => {
+    const res = await adminAgent
+      .post(`/api/admin/unenroll-child/${childId}`)
+      .send({});
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  // ---- STEP 26: After unenrollment, child loses program/payment data ----
+  test('Step 26: Unenrolled child has no program, schedule, or payment data', async () => {
+    const res = await parentAgent.get('/api/portal/children');
+    const child = res.body.children.find(c => c.id === childId);
+    expect(child.enrollmentStatus).toBe('none');
+    expect(child.program).toBeUndefined();
+    expect(child.schedule).toBeUndefined();
+    expect(child.paymentStatus).toBeUndefined();
+  });
+
+  // ---- STEP 27: After unenrollment, curriculum is empty again ----
+  test('Step 27: Curriculum returns empty after unenrollment', async () => {
+    const res = await parentAgent.get('/api/portal/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum).toEqual([]);
+  });
+
+  // ---- STEP 28: Admin re-approves, parent re-enrolls in different program ----
+  test('Step 28: Re-approval and re-enrollment in a different program works', async () => {
+    // Admin re-approves
+    const approveRes = await adminAgent
+      .post(`/api/admin/enroll-child/${childId}`)
+      .send({});
+    expect(approveRes.status).toBe(200);
+
+    // Parent enrolls in Toddler Program this time
+    const selectRes = await parentAgent
+      .post('/api/portal/select-program')
+      .send({ childId, program: 'Toddler Program', schedule: 'Half Day Morning' });
+    expect(selectRes.status).toBe(200);
+
+    // Verify new enrollment
+    const childrenRes = await parentAgent.get('/api/portal/children');
+    const child = childrenRes.body.children.find(c => c.id === childId);
+    expect(child.enrollmentStatus).toBe('enrolled');
+    expect(child.program).toBe('Toddler Program');
+    expect(child.schedule).toBe('Half Day Morning');
+  });
+
+  // ---- STEP 29: Now curriculum shows Toddler + All Programs ----
+  test('Step 29: Curriculum now shows Toddler and All Programs docs, not Primary', async () => {
+    const res = await parentAgent.get('/api/portal/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum.length).toBe(2);
+
+    const titles = res.body.curriculum.map(c => c.title);
+    expect(titles).toContain('Toddler Spring Activities');
+    expect(titles).toContain('School Handbook & Policies 2026');
+    expect(titles).not.toContain('Primary Program — Spring 2026 Lesson Plan');
+  });
+
+  // ---- STEP 30: Admin deletes curriculum and parent no longer sees it ----
+  test('Step 30: Admin deletes Toddler curriculum, parent stops seeing it', async () => {
+    // Find the toddler curriculum
+    const listRes = await adminAgent.get('/api/admin/curriculum');
+    const toddlerDoc = listRes.body.curriculum.find(c => c.title === 'Toddler Spring Activities');
+    expect(toddlerDoc).toBeDefined();
+
+    // Delete it
+    const delRes = await adminAgent.delete(`/api/admin/curriculum/${toddlerDoc.id}`);
+    expect(delRes.status).toBe(200);
+
+    // Parent now only sees All Programs doc
+    const parentCurrRes = await parentAgent.get('/api/portal/curriculum');
+    expect(parentCurrRes.body.curriculum.length).toBe(1);
+    expect(parentCurrRes.body.curriculum[0].title).toBe('School Handbook & Policies 2026');
+  });
+
+  // ---- STEP 31: Cleanup — admin deletes remaining test curriculum ----
+  test('Step 31: Admin cleans up remaining curriculum documents', async () => {
+    const listRes = await adminAgent.get('/api/admin/curriculum');
+    for (const doc of listRes.body.curriculum) {
+      const res = await adminAgent.delete(`/api/admin/curriculum/${doc.id}`);
+      expect(res.status).toBe(200);
+    }
+    const finalList = await adminAgent.get('/api/admin/curriculum');
+    expect(finalList.body.curriculum.length).toBe(0);
+  });
+
+  // ---- STEP 32: Cleanup — admin deletes the test parent account ----
+  test('Step 32: Admin deletes the E2E test parent account and all related data', async () => {
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    const user = dash.body.users.find(u => u.email === parentEmail);
+    expect(user).toBeDefined();
+
+    const res = await adminAgent.delete(`/api/admin/user/${user.id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+
+    // Verify parent, children, leads, and contact submissions are gone
+    const after = await adminAgent.get('/api/admin/dashboard');
+    expect(after.body.users.find(u => u.email === parentEmail)).toBeUndefined();
+    expect(after.body.children.find(c => c.parentEmail === parentEmail)).toBeUndefined();
+    expect(after.body.interestedLeads.find(l => l.email === parentEmail)).toBeUndefined();
+    expect(after.body.contactSubmissions.find(s => s.userEmail === parentEmail)).toBeUndefined();
+  });
+});
+
+// ============================================================
+// E2E: Multi-Child Family Enrollment
+// ============================================================
+// Tests a parent with multiple children in different programs
+// ============================================================
+describe('E2E: Multi-Child Family — Different Programs', () => {
+  let parentAgent;
+  let adminAgent;
+  let child1Id;
+  let child2Id;
+
+  const email = 'e2e-multi@example.com';
+  const password = 'Multi!2026';
+
+  test('Setup: Register parent and admin agents', async () => {
+    parentAgent = request.agent(app);
+    adminAgent = request.agent(app);
+
+    await parentAgent.post('/api/register').send({
+      name: 'Multi Parent', email, password, phone: '425-555-0000',
+    });
+    await adminAgent.post('/api/login').send({
+      email: 'vlwhite396@gmail.com', password: 'Riishii@12',
+    });
+  });
+
+  test('Parent adds two children', async () => {
+    const res1 = await parentAgent.post('/api/portal/add-child').send({
+      childName: 'Older Child', dateOfBirth: '2021-01-10', gender: 'Male',
+    });
+    expect(res1.body.success).toBe(true);
+    child1Id = res1.body.child.id;
+
+    const res2 = await parentAgent.post('/api/portal/add-child').send({
+      childName: 'Younger Child', dateOfBirth: '2023-06-20', gender: 'Female', allergies: 'Dairy',
+    });
+    expect(res2.body.success).toBe(true);
+    child2Id = res2.body.child.id;
+  });
+
+  test('Parent has two children listed', async () => {
+    const res = await parentAgent.get('/api/portal/children');
+    expect(res.body.children.length).toBe(2);
+  });
+
+  test('Admin approves both children', async () => {
+    const res1 = await adminAgent.post(`/api/admin/enroll-child/${child1Id}`).send({});
+    expect(res1.body.success).toBe(true);
+    const res2 = await adminAgent.post(`/api/admin/enroll-child/${child2Id}`).send({});
+    expect(res2.body.success).toBe(true);
+  });
+
+  test('Parent enrolls children in different programs', async () => {
+    const res1 = await parentAgent.post('/api/portal/select-program').send({
+      childId: child1Id, program: 'Primary Program', schedule: 'Full Day',
+    });
+    expect(res1.body.success).toBe(true);
+
+    const res2 = await parentAgent.post('/api/portal/select-program').send({
+      childId: child2Id, program: 'Toddler Program', schedule: 'Half Day Morning',
+    });
+    expect(res2.body.success).toBe(true);
+  });
+
+  test('Both children show correct enrollment data', async () => {
+    const res = await parentAgent.get('/api/portal/children');
+    const child1 = res.body.children.find(c => c.id === child1Id);
+    const child2 = res.body.children.find(c => c.id === child2Id);
+
+    expect(child1.program).toBe('Primary Program');
+    expect(child1.schedule).toBe('Full Day');
+    expect(child1.enrollmentStatus).toBe('enrolled');
+
+    expect(child2.program).toBe('Toddler Program');
+    expect(child2.schedule).toBe('Half Day Morning');
+    expect(child2.enrollmentStatus).toBe('enrolled');
+  });
+
+  test('Admin uploads curriculum for both programs', async () => {
+    const pdf1 = path.join(__dirname, 'e2e-primary-multi.pdf');
+    fs.writeFileSync(pdf1, '%PDF-1.4 primary');
+    await adminAgent.post('/api/admin/upload-curriculum')
+      .field('title', 'Primary Weekly Plan')
+      .field('program', 'Primary Program')
+      .field('description', 'Primary curriculum')
+      .attach('file', pdf1);
+    fs.unlinkSync(pdf1);
+
+    const pdf2 = path.join(__dirname, 'e2e-toddler-multi.pdf');
+    fs.writeFileSync(pdf2, '%PDF-1.4 toddler');
+    await adminAgent.post('/api/admin/upload-curriculum')
+      .field('title', 'Toddler Activity Guide')
+      .field('program', 'Toddler Program')
+      .field('description', 'Toddler curriculum')
+      .attach('file', pdf2);
+    fs.unlinkSync(pdf2);
+  });
+
+  test('Parent sees curriculum from BOTH programs (Primary + Toddler)', async () => {
+    const res = await parentAgent.get('/api/portal/curriculum');
+    expect(res.status).toBe(200);
+    expect(res.body.curriculum.length).toBe(2);
+
+    const titles = res.body.curriculum.map(c => c.title);
+    expect(titles).toContain('Primary Weekly Plan');
+    expect(titles).toContain('Toddler Activity Guide');
+  });
+
+  test('Admin dashboard shows both children under same parent email', async () => {
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    const parentChildren = dash.body.children.filter(c => c.parentEmail === email);
+    expect(parentChildren.length).toBe(2);
+
+    const programs = parentChildren.map(c => c.program).sort();
+    expect(programs).toEqual(['Primary Program', 'Toddler Program']);
+  });
+
+  test('Cleanup: Admin deletes the multi-child test parent', async () => {
+    // Clean up curriculum first
+    const listRes = await adminAgent.get('/api/admin/curriculum');
+    for (const doc of listRes.body.curriculum) {
+      await adminAgent.delete(`/api/admin/curriculum/${doc.id}`);
+    }
+
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    const user = dash.body.users.find(u => u.email === email);
+    expect(user).toBeDefined();
+
+    const res = await adminAgent.delete(`/api/admin/user/${user.id}`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+
+    const after = await adminAgent.get('/api/admin/dashboard');
+    expect(after.body.users.find(u => u.email === email)).toBeUndefined();
+    expect(after.body.children.filter(c => c.parentEmail === email).length).toBe(0);
+  });
+});
+
+// ============================================================
+// E2E: Cross-Account Security — Parents Cannot Access Others
+// ============================================================
+describe('E2E: Cross-Account Security', () => {
+  let parentAAgent;
+  let parentBAgent;
+  let parentAChildId;
+
+  test('Setup: Two parents register with children', async () => {
+    parentAAgent = request.agent(app);
+    await parentAAgent.post('/api/register').send({
+      name: 'Parent A', email: 'parenta-e2e@example.com', password: 'ParentA!2026',
+    });
+    const resA = await parentAAgent.post('/api/portal/add-child').send({
+      childName: 'Child A',
+    });
+    parentAChildId = resA.body.child.id;
+
+    parentBAgent = request.agent(app);
+    await parentBAgent.post('/api/register').send({
+      name: 'Parent B', email: 'parentb-e2e@example.com', password: 'ParentB!2026',
+    });
+    await parentBAgent.post('/api/portal/add-child').send({
+      childName: 'Child B',
+    });
+  });
+
+  test('Parent B cannot see Parent A children', async () => {
+    const res = await parentBAgent.get('/api/portal/children');
+    expect(res.body.children.length).toBe(1);
+    expect(res.body.children[0].childName).toBe('Child B');
+  });
+
+  test('Parent B cannot delete Parent A child', async () => {
+    const res = await parentBAgent.delete(`/api/portal/child/${parentAChildId}`);
+    expect(res.status).toBe(404);
+  });
+
+  test('Parent B cannot select program for Parent A child', async () => {
+    const res = await parentBAgent
+      .post('/api/portal/select-program')
+      .send({ childId: parentAChildId, program: 'Primary Program', schedule: 'Full Day' });
+    expect(res.status).toBe(404);
+  });
+
+  test('Parent A still has their child intact', async () => {
+    const res = await parentAAgent.get('/api/portal/children');
+    expect(res.body.children.length).toBe(1);
+    expect(res.body.children[0].childName).toBe('Child A');
+    expect(res.body.children[0].id).toBe(parentAChildId);
+  });
+
+  test('Cleanup: Admin deletes both cross-account test parents', async () => {
+    const adminAgent = request.agent(app);
+    await adminAgent.post('/api/login').send({
+      email: 'vlwhite396@gmail.com', password: 'Riishii@12',
+    });
+
+    const dash = await adminAgent.get('/api/admin/dashboard');
+    const parentA = dash.body.users.find(u => u.email === 'parenta-e2e@example.com');
+    const parentB = dash.body.users.find(u => u.email === 'parentb-e2e@example.com');
+
+    if (parentA) {
+      const res = await adminAgent.delete(`/api/admin/user/${parentA.id}`);
+      expect(res.status).toBe(200);
+    }
+    if (parentB) {
+      const res = await adminAgent.delete(`/api/admin/user/${parentB.id}`);
+      expect(res.status).toBe(200);
+    }
+
+    const after = await adminAgent.get('/api/admin/dashboard');
+    expect(after.body.users.find(u => u.email === 'parenta-e2e@example.com')).toBeUndefined();
+    expect(after.body.users.find(u => u.email === 'parentb-e2e@example.com')).toBeUndefined();
+  });
+});

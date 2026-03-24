@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dashIcon = isAdmin ? 'fa-tachometer-alt' : 'fa-columns';
 
         li.innerHTML = `
-          <a href="#" class="nav-user-toggle" id="navUserToggle" onclick="event.preventDefault();document.getElementById('navUserDropdown').classList.toggle('show');">
+          <a href="${dashLink}" class="nav-user-toggle" id="navUserToggle">
             <i class="fas fa-user-circle"></i> ${user.name.split(' ')[0]}
             <i class="fas fa-chevron-down" style="font-size:0.6em;margin-left:4px;"></i>
           </a>
@@ -347,9 +347,16 @@ document.addEventListener('DOMContentLoaded', () => {
             <a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
           </div>
         `;
+
+        // Dropdown toggle handler — proper event binding (not inline)
+        document.getElementById('navUserToggle').addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          document.getElementById('navUserDropdown').classList.toggle('show');
+        });
       }
 
-      // Close dropdown when clicking outside
+      // Close dropdown when clicking anywhere else on the page
       document.addEventListener('click', (e) => {
         const dropdown = document.getElementById('navUserDropdown');
         const toggle = document.getElementById('navUserToggle');
@@ -357,7 +364,175 @@ document.addEventListener('DOMContentLoaded', () => {
           dropdown.classList.remove('show');
         }
       });
+      // --- Admin Inline Editing System ---
+      if (user.role === 'admin') {
+        initInlineEditing();
+      }
     } catch { /* Not logged in, keep default nav */ }
   })();
 
+  // --- Load saved site content on page ---
+  (async function loadSiteContent() {
+    try {
+      const resp = await fetch('/api/site-content');
+      if (!resp.ok) return;
+      const { siteContent } = await resp.json();
+      if (!siteContent || Object.keys(siteContent).length === 0) return;
+
+      document.querySelectorAll('[data-editable]').forEach(el => {
+        const key = el.getAttribute('data-editable');
+        if (siteContent[key]) {
+          el.textContent = siteContent[key];
+        }
+      });
+
+      // Load saved images
+      document.querySelectorAll('[data-image-upload]').forEach(el => {
+        const key = el.getAttribute('data-image-upload');
+        if (siteContent[key]) {
+          el.style.backgroundImage = 'url(' + siteContent[key] + ')';
+          el.style.backgroundSize = 'cover';
+          el.style.backgroundPosition = 'center';
+          el.classList.add('has-image');
+          // Hide placeholder content
+          const icon = el.querySelector('i');
+          const span = el.querySelector('span');
+          if (icon) icon.style.display = 'none';
+          if (span) span.style.display = 'none';
+        }
+      });
+    } catch { /* ignore */ }
+  })();
+
 });
+
+// --- Inline Editing for Admins ---
+function initInlineEditing() {
+  // Add edit mode toggle button
+  const editToggle = document.createElement('div');
+  editToggle.id = 'adminEditToggle';
+  editToggle.innerHTML = '<i class="fas fa-pen"></i>';
+  editToggle.title = 'Toggle Edit Mode';
+  editToggle.style.cssText = 'position:fixed;bottom:24px;right:24px;width:56px;height:56px;background:linear-gradient(135deg,#2d5016,#4a7c28);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.3);font-size:20px;transition:all 0.3s;';
+  document.body.appendChild(editToggle);
+
+  // Save indicator
+  const saveIndicator = document.createElement('div');
+  saveIndicator.id = 'adminSaveIndicator';
+  saveIndicator.style.cssText = 'position:fixed;bottom:90px;right:24px;background:#2d5016;color:#fff;padding:10px 20px;border-radius:50px;font-size:13px;font-weight:600;z-index:9999;opacity:0;transition:opacity 0.3s;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,0.2);';
+  saveIndicator.textContent = 'Saved!';
+  document.body.appendChild(saveIndicator);
+
+  let editMode = false;
+  const hiddenFileInput = document.createElement('input');
+  hiddenFileInput.type = 'file';
+  hiddenFileInput.accept = 'image/*';
+  hiddenFileInput.style.display = 'none';
+  document.body.appendChild(hiddenFileInput);
+
+  editToggle.addEventListener('click', () => {
+    editMode = !editMode;
+    editToggle.innerHTML = editMode ? '<i class="fas fa-check"></i>' : '<i class="fas fa-pen"></i>';
+    editToggle.style.background = editMode ? 'linear-gradient(135deg,#e09000,#f4a825)' : 'linear-gradient(135deg,#2d5016,#4a7c28)';
+    editToggle.title = editMode ? 'Exit Edit Mode' : 'Toggle Edit Mode';
+    document.body.classList.toggle('admin-edit-mode', editMode);
+
+    // Toggle editable elements
+    document.querySelectorAll('[data-editable]').forEach(el => {
+      if (editMode) {
+        el.setAttribute('contenteditable', 'true');
+        el.classList.add('admin-editable');
+      } else {
+        el.removeAttribute('contenteditable');
+        el.classList.remove('admin-editable', 'admin-editing');
+      }
+    });
+
+    // Toggle image upload overlays
+    document.querySelectorAll('[data-image-upload]').forEach(el => {
+      if (editMode) {
+        if (!el.querySelector('.admin-img-overlay')) {
+          const overlay = document.createElement('div');
+          overlay.className = 'admin-img-overlay';
+          overlay.innerHTML = '<i class="fas fa-camera"></i><span>Click to upload image</span>';
+          overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;cursor:pointer;border-radius:inherit;gap:8px;font-size:14px;font-weight:600;z-index:10;transition:opacity 0.2s;';
+          overlay.querySelector('i').style.fontSize = '32px';
+          el.style.position = 'relative';
+          el.appendChild(overlay);
+
+          overlay.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const key = el.getAttribute('data-image-upload');
+            hiddenFileInput.setAttribute('data-target-key', key);
+            hiddenFileInput.click();
+          });
+        }
+      } else {
+        const overlay = el.querySelector('.admin-img-overlay');
+        if (overlay) overlay.remove();
+      }
+    });
+  });
+
+  // Save text on blur
+  document.addEventListener('blur', async (e) => {
+    const el = e.target;
+    if (!el.hasAttribute || !el.hasAttribute('data-editable')) return;
+    const key = el.getAttribute('data-editable');
+    const value = el.textContent.trim();
+    if (!key || !value) return;
+
+    try {
+      const resp = await fetch('/api/admin/update-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [key]: value }),
+      });
+      if (resp.ok) {
+        showSaveIndicator('Saved!');
+      }
+    } catch { /* ignore */ }
+  }, true);
+
+  // Handle image uploads
+  hiddenFileInput.addEventListener('change', async () => {
+    const file = hiddenFileInput.files[0];
+    if (!file) return;
+    const key = hiddenFileInput.getAttribute('data-target-key');
+    if (!key) return;
+
+    const formData = new FormData();
+    formData.append('key', key);
+    formData.append('image', file);
+
+    try {
+      const resp = await fetch('/api/admin/upload-site-image', {
+        method: 'POST',
+        body: formData,
+      });
+      if (resp.ok) {
+        const result = await resp.json();
+        const el = document.querySelector('[data-image-upload="' + key + '"]');
+        if (el && result.imagePath) {
+          el.style.backgroundImage = 'url(' + result.imagePath + ')';
+          el.style.backgroundSize = 'cover';
+          el.style.backgroundPosition = 'center';
+          el.classList.add('has-image');
+          const icon = el.querySelector('i:not(.admin-img-overlay i)');
+          const span = el.querySelector('span:not(.admin-img-overlay span)');
+          if (icon) icon.style.display = 'none';
+          if (span) span.style.display = 'none';
+          showSaveIndicator('Image uploaded!');
+        }
+      }
+    } catch { /* ignore */ }
+    hiddenFileInput.value = '';
+  });
+
+  function showSaveIndicator(text) {
+    const indicator = document.getElementById('adminSaveIndicator');
+    indicator.textContent = text || 'Saved!';
+    indicator.style.opacity = '1';
+    setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+  }
+}

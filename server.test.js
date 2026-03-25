@@ -25,6 +25,11 @@ beforeAll(() => {
     curriculum: [],
     siteContent: {},
     announcements: [],
+    programs: [],
+    activityReports: [],
+    events: [],
+    staff: [],
+    payments: [],
   }, null, 2));
   app = require('./server');
 });
@@ -185,14 +190,14 @@ describe('Protected Routes — Unauthenticated', () => {
     expect(res.headers.location).toBe('/login');
   });
 
-  test('GET /api/admin/dashboard redirects when not admin', async () => {
+  test('GET /api/admin/dashboard returns 403 when not admin', async () => {
     const res = await request(app).get('/api/admin/dashboard');
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 
-  test('GET /api/portal/data redirects when not logged in', async () => {
+  test('GET /api/portal/data returns 401 when not logged in', async () => {
     const res = await request(app).get('/api/portal/data');
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(401);
   });
 });
 
@@ -285,7 +290,7 @@ describe('Admin Flows', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('GET /api/admin/dashboard — returns all data', async () => {
@@ -427,7 +432,7 @@ describe('Security', () => {
     const agent = request.agent(app);
     const res = await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
     const cookies = res.headers['set-cookie'];
     if (cookies) {
       const sessionCookie = cookies.find(c => c.includes('connect.sid'));
@@ -469,9 +474,9 @@ describe('Security', () => {
     await agent.post('/api/register').send({
       name: 'Non Admin', email: 'nonadmin@example.com', password: 'TestPass123'
     });
-    
+
     const dashRes = await agent.get('/api/admin/dashboard');
-    expect(dashRes.status).toBe(302);
+    expect(dashRes.status).toBe(403);
   });
 
   test('Parent cannot access other parent\'s children', async () => {
@@ -487,7 +492,7 @@ describe('Security', () => {
 
   test('Password hashes are not exposed in API responses', async () => {
     const agent = request.agent(app);
-    const loginRes = await agent.post('/api/login').send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+    const loginRes = await agent.post('/api/login').send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
     expect(loginRes.status).toBe(200);
     
     const res = await agent.get('/api/admin/dashboard');
@@ -550,7 +555,7 @@ describe('Admin Curriculum Management', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('POST /api/admin/upload-curriculum — rejects without file', async () => {
@@ -604,22 +609,22 @@ describe('Admin Curriculum Management', () => {
 // UNIT TESTS — Admin Curriculum (non-admin rejected)
 // ==========================================
 describe('Curriculum — Non-admin rejected', () => {
-  test('POST /api/admin/upload-curriculum — redirects for unauthenticated', async () => {
+  test('POST /api/admin/upload-curriculum — returns 403 for unauthenticated', async () => {
     const res = await request(app)
       .post('/api/admin/upload-curriculum')
       .field('title', 'Hack')
       .field('program', 'Primary Program');
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 
-  test('GET /api/admin/curriculum — redirects for unauthenticated', async () => {
+  test('GET /api/admin/curriculum — returns 403 for unauthenticated', async () => {
     const res = await request(app).get('/api/admin/curriculum');
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 
-  test('DELETE /api/admin/curriculum/1 — redirects for unauthenticated', async () => {
+  test('DELETE /api/admin/curriculum/1 — returns 403 for unauthenticated', async () => {
     const res = await request(app).delete('/api/admin/curriculum/1');
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 });
 
@@ -633,7 +638,7 @@ describe('Admin Site Content Management', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('GET /api/admin/site-content — returns site content', async () => {
@@ -666,9 +671,9 @@ describe('Admin Site Content Management', () => {
     expect(contentRes.body.siteContent.hackerKey).toBeUndefined();
   });
 
-  test('GET /api/admin/site-content — rejected for unauthenticated', async () => {
+  test('GET /api/admin/site-content — returns 403 for unauthenticated', async () => {
     const res = await request(app).get('/api/admin/site-content');
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 });
 
@@ -682,7 +687,7 @@ describe('Admin Announcements', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('POST /api/admin/announcement — creates announcement', async () => {
@@ -722,11 +727,11 @@ describe('Admin Announcements', () => {
     expect(res.status).toBe(404);
   });
 
-  test('POST /api/admin/announcement — rejected for non-admin', async () => {
+  test('POST /api/admin/announcement — returns 403 for non-admin', async () => {
     const res = await request(app)
       .post('/api/admin/announcement')
       .send({ title: 'Hack', text: 'Bad' });
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 });
 
@@ -749,9 +754,9 @@ describe('Parent Portal Curriculum', () => {
     expect(res.body.curriculum).toBeDefined();
   });
 
-  test('GET /api/portal/curriculum — rejected for unauthenticated', async () => {
+  test('GET /api/portal/curriculum — returns 401 for unauthenticated', async () => {
     const res = await request(app).get('/api/portal/curriculum');
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(401);
   });
 });
 
@@ -765,7 +770,7 @@ describe('Dashboard includes new features', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('GET /api/admin/dashboard — includes curriculum array', async () => {
@@ -798,7 +803,7 @@ describe('File Upload Security', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('Curriculum upload rejects non-PDF files', async () => {
@@ -842,7 +847,7 @@ describe('Unit Test Cleanup — Delete test parent accounts', () => {
   beforeAll(async () => {
     adminAgent = request.agent(app);
     await adminAgent.post('/api/login').send({
-      email: 'vlwhite396@gmail.com', password: 'Riishii@12',
+      email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026',
     });
   });
 
@@ -1003,7 +1008,7 @@ describe('E2E: Full Enrollment Journey — Register to Curriculum', () => {
     adminAgent = request.agent(app);
     const res = await adminAgent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.redirect).toBe('/admin');
@@ -1321,7 +1326,7 @@ describe('E2E: Multi-Child Family — Different Programs', () => {
       name: 'Multi Parent', email, password, phone: '425-555-0000',
     });
     await adminAgent.post('/api/login').send({
-      email: 'vlwhite396@gmail.com', password: 'Riishii@12',
+      email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026',
     });
   });
 
@@ -1492,7 +1497,7 @@ describe('E2E: Cross-Account Security', () => {
   test('Cleanup: Admin deletes both cross-account test parents', async () => {
     const adminAgent = request.agent(app);
     await adminAgent.post('/api/login').send({
-      email: 'vlwhite396@gmail.com', password: 'Riishii@12',
+      email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026',
     });
 
     const dash = await adminAgent.get('/api/admin/dashboard');
@@ -1571,7 +1576,7 @@ describe('Admin Events CRUD', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('POST /api/admin/event — creates event', async () => {
@@ -1616,11 +1621,11 @@ describe('Admin Events CRUD', () => {
     expect(res.status).toBe(404);
   });
 
-  test('POST /api/admin/event — rejected for unauthenticated', async () => {
+  test('POST /api/admin/event — returns 403 for unauthenticated', async () => {
     const res = await request(app)
       .post('/api/admin/event')
       .send({ title: 'Hack Event', date: '2026-06-01' });
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 });
 
@@ -1636,7 +1641,7 @@ describe('Admin Activity Reports CRUD', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
 
     // We need a child to create a report for — find one or create via a parent
     const dash = await agent.get('/api/admin/dashboard');
@@ -1676,11 +1681,11 @@ describe('Admin Activity Reports CRUD', () => {
     }
   });
 
-  test('POST /api/admin/activity-report — rejected for unauthenticated', async () => {
+  test('POST /api/admin/activity-report — returns 403 for unauthenticated', async () => {
     const res = await request(app)
       .post('/api/admin/activity-report')
       .send({ childId: 1, date: '2026-03-24', mood: 'happy' });
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 });
 
@@ -1694,7 +1699,7 @@ describe('Admin Staff Management', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('POST /api/admin/staff — saves staff array', async () => {
@@ -1722,11 +1727,11 @@ describe('Admin Staff Management', () => {
     expect(res.body.staff[0].name).toBe('Kartik Khanna');
   });
 
-  test('POST /api/admin/staff — rejected for unauthenticated', async () => {
+  test('POST /api/admin/staff — returns 403 for unauthenticated', async () => {
     const res = await request(app)
       .post('/api/admin/staff')
       .send({ staff: [] });
-    expect(res.status).toBe(302);
+    expect(res.status).toBe(403);
   });
 });
 
@@ -1787,7 +1792,7 @@ describe('Admin Content — Dynamic Keys', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('Accepts valid camelCase keys', async () => {
@@ -1830,7 +1835,7 @@ describe('Final Cleanup', () => {
     agent = request.agent(app);
     await agent
       .post('/api/login')
-      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+      .send({ email: 'vlwhite396@gmail.com', password: process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026' });
   });
 
   test('Remove all test users', async () => {

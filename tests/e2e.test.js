@@ -990,42 +990,42 @@ describe('Security Tests', () => {
       expect(res.headers.location).toBe('/login');
     });
 
-    test('GET /api/admin/dashboard redirects unauthenticated users', async () => {
+    test('GET /api/admin/dashboard rejects unauthenticated users', async () => {
       const res = await request(app).get('/api/admin/dashboard');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
-    test('POST /api/admin/announcement redirects unauthenticated users', async () => {
+    test('POST /api/admin/announcement rejects unauthenticated users', async () => {
       const res = await request(app)
         .post('/api/admin/announcement')
         .send({ title: 'Hack', text: 'Should fail' });
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
-    test('POST /api/admin/event redirects unauthenticated users', async () => {
+    test('POST /api/admin/event rejects unauthenticated users', async () => {
       const res = await request(app)
         .post('/api/admin/event')
         .send({ title: 'Hack Event', date: '2026-01-01' });
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
-    test('POST /api/admin/staff redirects unauthenticated users', async () => {
+    test('POST /api/admin/staff rejects unauthenticated users', async () => {
       const res = await request(app)
         .post('/api/admin/staff')
         .send({ staff: [] });
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
-    test('POST /api/admin/update-content redirects unauthenticated users', async () => {
+    test('POST /api/admin/update-content rejects unauthenticated users', async () => {
       const res = await request(app)
         .post('/api/admin/update-content')
         .send({ heroTitle: 'Hack' });
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
-    test('DELETE /api/admin/announcement/1 redirects unauthenticated', async () => {
+    test('DELETE /api/admin/announcement/1 rejects unauthenticated', async () => {
       const res = await request(app).delete('/api/admin/announcement/1');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
     test('GET /api/admin/payments rejects unauthenticated with 403', async () => {
@@ -1051,21 +1051,21 @@ describe('Security Tests', () => {
       expect(res.headers.location).toBe('/login');
     });
 
-    test('GET /api/admin/dashboard redirects non-admin', async () => {
+    test('GET /api/admin/dashboard rejects non-admin', async () => {
       const res = await parentAgent.get('/api/admin/dashboard');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
-    test('POST /api/admin/announcement redirects non-admin', async () => {
+    test('POST /api/admin/announcement rejects non-admin', async () => {
       const res = await parentAgent
         .post('/api/admin/announcement')
         .send({ title: 'Sneaky', text: 'Nope' });
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
-    test('DELETE /api/admin/event/1 redirects non-admin', async () => {
+    test('DELETE /api/admin/event/1 rejects non-admin', async () => {
       const res = await parentAgent.delete('/api/admin/event/1');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(403);
     });
 
     test('GET /api/admin/payments rejects non-admin with 403', async () => {
@@ -1082,36 +1082,36 @@ describe('Security Tests', () => {
       expect(res.headers.location).toBe('/login');
     });
 
-    test('GET /api/portal/data redirects to login', async () => {
+    test('GET /api/portal/data rejects unauthenticated', async () => {
       const res = await request(app).get('/api/portal/data');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(401);
     });
 
-    test('POST /api/portal/add-child redirects to login', async () => {
+    test('POST /api/portal/add-child rejects unauthenticated', async () => {
       const res = await request(app)
         .post('/api/portal/add-child')
         .send({ childName: 'Hacked Child' });
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(401);
     });
 
-    test('GET /api/portal/children redirects to login', async () => {
+    test('GET /api/portal/children rejects unauthenticated', async () => {
       const res = await request(app).get('/api/portal/children');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(401);
     });
 
-    test('DELETE /api/portal/child/1 redirects to login', async () => {
+    test('DELETE /api/portal/child/1 rejects unauthenticated', async () => {
       const res = await request(app).delete('/api/portal/child/1');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(401);
     });
 
-    test('GET /api/portal/curriculum redirects to login', async () => {
+    test('GET /api/portal/curriculum rejects unauthenticated', async () => {
       const res = await request(app).get('/api/portal/curriculum');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(401);
     });
 
-    test('GET /api/portal/activity-reports redirects to login', async () => {
+    test('GET /api/portal/activity-reports rejects unauthenticated', async () => {
       const res = await request(app).get('/api/portal/activity-reports');
-      expect(res.status).toBe(302);
+      expect(res.status).toBe(401);
     });
 
     test('GET /api/auth/me returns 401 unauthenticated', async () => {

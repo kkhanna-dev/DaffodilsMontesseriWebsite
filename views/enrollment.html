@@ -109,14 +109,7 @@
               <div class="form-group">
                 <label for="program">Program of Interest <span class="required">*</span></label>
                 <select id="program" name="program" required>
-                  <option value="">Select a program</option>
-                  <option value="Toddler Half-Day ($850/mo)">Toddler Half-Day — $850/month</option>
-                  <option value="Toddler Full-Day ($1,200/mo)">Toddler Full-Day — $1,200/month</option>
-                  <option value="Primary Half-Day ($950/mo)">Primary Half-Day — $950/month</option>
-                  <option value="Primary Full-Day ($1,400/mo)">Primary Full-Day — $1,400/month</option>
-                  <option value="Primary Extended ($1,650/mo)">Primary Extended Day — $1,650/month</option>
-                  <option value="Kindergarten Full-Day ($1,400/mo)">Kindergarten Full-Day — $1,400/month</option>
-                  <option value="Kindergarten Extended ($1,650/mo)">Kindergarten Extended Day — $1,650/month</option>
+                  <option value="">Loading programs...</option>
                 </select>
               </div>
             </div>
@@ -166,31 +159,34 @@
             </div>
             <script>
               (async function() {
-                var defaults = [
-                  { name: 'Toddler Half-Day', price: '$850' },
-                  { name: 'Toddler Full-Day', price: '$1,200' },
-                  { name: 'Primary Half-Day', price: '$950' },
-                  { name: 'Primary Full-Day', price: '$1,400' },
-                  { name: 'Primary Extended', price: '$1,650' },
-                  { name: 'Kindergarten Full-Day', price: '$1,400' },
-                  { name: 'Kindergarten Extended', price: '$1,650' },
-                ];
-                var sc = {};
+                var programs = [];
                 try {
-                  var r = await fetch('/api/site-content');
-                  sc = (await r.json()).siteContent || {};
+                  var r = await fetch('/api/programs');
+                  programs = (await r.json()).programs || [];
                 } catch(e) {}
-                var count = parseInt(sc.tuitionRateCount);
-                if (isNaN(count)) count = defaults.length;
+
+                // Populate tuition sidebar table
                 var table = document.getElementById('enrollTuitionTable');
                 var html = '<div class="tuition-row header"><span>Program</span><span>Monthly</span></div>';
-                for (var i = 1; i <= count; i++) {
-                  var def = defaults[i - 1] || { name: 'Program', price: '$0' };
-                  var name = sc['tuitionRate' + i + 'Name'] || def.name;
-                  var price = sc['tuitionRate' + i + 'Price'] || def.price;
-                  html += '<div class="tuition-row"><span>' + name + '</span><span>' + price + '</span></div>';
+                if (programs.length === 0) {
+                  html += '<div class="tuition-row"><span style="color:#999;" colspan="2">No programs available yet. Contact us for details.</span></div>';
+                } else {
+                  programs.forEach(function(p) {
+                    html += '<div class="tuition-row"><span>' + p.name + '</span><span>' + p.tuitionRate + '</span></div>';
+                  });
                 }
                 table.innerHTML = html;
+
+                // Populate enrollment form program dropdown
+                var select = document.getElementById('program');
+                if (programs.length === 0) {
+                  select.innerHTML = '<option value="">No programs available yet</option>';
+                } else {
+                  select.innerHTML = '<option value="">Select a program</option>' +
+                    programs.map(function(p) {
+                      return '<option value="' + p.name + ' (' + p.tuitionRate + ')">' + p.name + ' — ' + p.tuitionRate + '</option>';
+                    }).join('');
+                }
               })();
             </script>
             <div class="tuition-notes">

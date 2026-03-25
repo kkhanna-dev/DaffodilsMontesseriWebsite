@@ -39,12 +39,13 @@ function loadData() {
       if (!data.events) data.events = [];
       if (!data.staff) data.staff = [];
       if (!data.payments) data.payments = [];
+      if (!data.programs) data.programs = [];
       return data;
     }
   } catch (e) {
     console.error('Error loading data:', e);
   }
-  return { users: [], interestedLeads: [], enrollments: [], tourRequests: [], children: [], contactSubmissions: [], curriculum: [], siteContent: {}, announcements: [], activityReports: [], events: [], staff: [], payments: [] };
+  return { users: [], interestedLeads: [], enrollments: [], tourRequests: [], children: [], contactSubmissions: [], curriculum: [], siteContent: {}, announcements: [], activityReports: [], events: [], staff: [], payments: [], programs: [] };
 }
 
 function saveData(data) {
@@ -589,6 +590,7 @@ app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
     activityReports: data.activityReports || [],
     events: data.events || [],
     staff: data.staff || [],
+    programs: data.programs || [],
   });
 });
 
@@ -1412,6 +1414,78 @@ function generateAutoReplyEmail(name) {
 </body>
 </html>`;
 }
+
+// --- Programs Management ---
+
+// Public: get all programs (for tuition page, enrollment form, etc.)
+app.get('/api/programs', (req, res) => {
+  const data = loadData();
+  res.json({ programs: data.programs || [] });
+});
+
+// Admin: create a program
+app.post('/api/admin/program', requireAdmin, (req, res) => {
+  const { name, ageRange, schedule, tuitionRate, description, icon, color } = req.body;
+  if (!name || !tuitionRate) {
+    return res.status(400).json({ error: 'Program name and tuition rate are required.' });
+  }
+
+  const data = loadData();
+  if (!data.programs) data.programs = [];
+
+  const program = {
+    id: data.programs.length > 0 ? Math.max(...data.programs.map(p => p.id)) + 1 : 1,
+    name: sanitize(name),
+    ageRange: sanitize(ageRange || ''),
+    schedule: sanitize(schedule || ''),
+    tuitionRate: sanitize(tuitionRate),
+    description: sanitize(description || ''),
+    icon: sanitize(icon || 'fa-star'),
+    color: sanitize(color || '#4a7c59'),
+    createdAt: new Date().toISOString(),
+  };
+
+  data.programs.push(program);
+  saveData(data);
+  res.json({ success: true, program });
+});
+
+// Admin: update a program
+app.put('/api/admin/program/:id', requireAdmin, (req, res) => {
+  const { name, ageRange, schedule, tuitionRate, description, icon, color } = req.body;
+  if (!name || !tuitionRate) {
+    return res.status(400).json({ error: 'Program name and tuition rate are required.' });
+  }
+
+  const data = loadData();
+  if (!data.programs) data.programs = [];
+  const program = data.programs.find(p => p.id === parseInt(req.params.id));
+  if (!program) return res.status(404).json({ error: 'Program not found.' });
+
+  program.name = sanitize(name);
+  program.ageRange = sanitize(ageRange || '');
+  program.schedule = sanitize(schedule || '');
+  program.tuitionRate = sanitize(tuitionRate);
+  program.description = sanitize(description || '');
+  program.icon = sanitize(icon || program.icon);
+  program.color = sanitize(color || program.color);
+  program.updatedAt = new Date().toISOString();
+
+  saveData(data);
+  res.json({ success: true, program });
+});
+
+// Admin: delete a program
+app.delete('/api/admin/program/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  if (!data.programs) data.programs = [];
+  const idx = data.programs.findIndex(p => p.id === parseInt(req.params.id));
+  if (idx === -1) return res.status(404).json({ error: 'Program not found.' });
+
+  data.programs.splice(idx, 1);
+  saveData(data);
+  res.json({ success: true });
+});
 
 // --- Stripe Payment Endpoints ---
 

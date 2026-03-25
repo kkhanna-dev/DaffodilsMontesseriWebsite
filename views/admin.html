@@ -67,6 +67,7 @@
         <button class="admin-tab" data-tab="tours"><i class="fas fa-calendar-check"></i> Tours</button>
         <button class="admin-tab" data-tab="children"><i class="fas fa-child"></i> Children</button>
         <button class="admin-tab" data-tab="accounts"><i class="fas fa-users-cog"></i> Accounts</button>
+        <button class="admin-tab" data-tab="programs"><i class="fas fa-graduation-cap"></i> Programs</button>
         <button class="admin-tab" data-tab="curriculum"><i class="fas fa-book"></i> Curriculum</button>
         <button class="admin-tab" data-tab="activities"><i class="fas fa-clipboard-list"></i> Daily Reports</button>
         <button class="admin-tab" data-tab="events"><i class="fas fa-calendar-alt"></i> Events</button>
@@ -236,6 +237,53 @@
         </div>
       </div>
 
+      <!-- Programs Management Tab -->
+      <div class="admin-panel" id="panel-programs">
+        <div class="admin-panel-header">
+          <h3>Programs &amp; Tuition Rates</h3>
+          <p>Define your school's programs here. These appear on the <strong>Tuition</strong> page, <strong>Enrollment</strong> form, and <strong>Curriculum</strong> uploads. Each program needs a name and tuition rate.</p>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#f9f7f4,#fff);border-radius:16px;padding:28px 32px;margin-bottom:28px;border:1px solid #e8e2d9;box-shadow:0 2px 12px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#4a7c59,#6ba832);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;"><i class="fas fa-plus"></i></div>
+            <div>
+              <h4 style="margin:0;color:#2d5016;font-size:17px;font-weight:700;">Add New Program</h4>
+              <p style="margin:2px 0 0;color:#888;font-size:13px;">This will show on the Tuition page and Enrollment form</p>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Program Name *</label>
+              <input type="text" id="programName" placeholder="e.g. Toddler Half-Day" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#4a7c59'" onblur="this.style.borderColor='#e0dcd4'">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Age Range</label>
+              <input type="text" id="programAgeRange" placeholder="e.g. Ages 2-3" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#4a7c59'" onblur="this.style.borderColor='#e0dcd4'">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Schedule</label>
+              <input type="text" id="programSchedule" placeholder="e.g. Morning Session" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#4a7c59'" onblur="this.style.borderColor='#e0dcd4'">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Tuition Rate *</label>
+              <input type="text" id="programTuitionRate" placeholder="e.g. $850/month" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#4a7c59'" onblur="this.style.borderColor='#e0dcd4'">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Description</label>
+              <input type="text" id="programDescription" placeholder="Brief description of this program" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#4a7c59'" onblur="this.style.borderColor='#e0dcd4'">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="createProgram()" style="margin-top:20px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;"><i class="fas fa-plus-circle"></i> Add Program</button>
+        </div>
+
+        <div id="programsList">
+          <p class="table-empty">Loading programs...</p>
+        </div>
+      </div>
+
       <!-- Curriculum Management Tab -->
       <div class="admin-panel" id="panel-curriculum">
         <div class="admin-panel-header">
@@ -243,33 +291,40 @@
           <p>Upload and manage curriculum documents for each program.</p>
         </div>
 
-        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
-          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-upload"></i> Upload New Curriculum</h4>
+        <div style="background:linear-gradient(135deg,#f9f7f4,#fff);border-radius:16px;padding:28px 32px;margin-bottom:28px;border:1px solid #e8e2d9;box-shadow:0 2px 12px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#1565c0,#42a5f5);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div>
+              <h4 style="margin:0;color:#2d5016;font-size:17px;font-weight:700;">Upload Curriculum Document</h4>
+              <p style="margin:2px 0 0;color:#888;font-size:13px;">Upload lesson plans, guides, or handbooks (PDF only, max 10MB)</p>
+            </div>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Title</label>
-              <input type="text" id="curriculumTitle" placeholder="e.g. Weekly Lesson Plan - March" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Document Title *</label>
+              <input type="text" id="curriculumTitle" placeholder="e.g. Weekly Lesson Plan - March" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#4a7c59'" onblur="this.style.borderColor='#e0dcd4'">
             </div>
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Program</label>
-              <select id="curriculumProgram" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
-                <option value="Toddler Program">Toddler Program</option>
-                <option value="Primary Program">Primary Program</option>
-                <option value="Kindergarten">Kindergarten</option>
-                <option value="Before & After Care">Before & After Care</option>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Program *</label>
+              <select id="curriculumProgram" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;background:#fff;">
                 <option value="All Programs">All Programs</option>
+                <!-- Populated dynamically from programs -->
               </select>
             </div>
           </div>
           <div style="margin-top:16px;">
-            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Description</label>
-            <textarea id="curriculumDescription" rows="3" placeholder="Brief description of this curriculum document..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Description</label>
+            <textarea id="curriculumDescription" rows="3" placeholder="Brief description of this curriculum document..." style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;resize:vertical;transition:border-color 0.2s;" onfocus="this.style.borderColor='#4a7c59'" onblur="this.style.borderColor='#e0dcd4'"></textarea>
           </div>
           <div style="margin-top:16px;">
-            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">File (PDF)</label>
-            <input type="file" id="curriculumFile" accept=".pdf" style="font-size:14px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">PDF File *</label>
+            <div style="border:2px dashed #d0ccc4;border-radius:10px;padding:20px;text-align:center;background:#faf8f5;cursor:pointer;" onclick="document.getElementById('curriculumFile').click()">
+              <i class="fas fa-file-pdf" style="font-size:28px;color:#e74c3c;margin-bottom:8px;display:block;"></i>
+              <p style="margin:0;color:#555;font-size:14px;font-weight:500;" id="curriculumFileLabel">Click to select a PDF file</p>
+              <input type="file" id="curriculumFile" accept=".pdf" style="display:none;" onchange="document.getElementById('curriculumFileLabel').textContent=this.files[0]?this.files[0].name:'Click to select a PDF file'">
+            </div>
           </div>
-          <button class="btn btn-primary" onclick="uploadCurriculum()" style="margin-top:16px;"><i class="fas fa-cloud-upload-alt"></i> Upload Curriculum</button>
+          <button class="btn btn-primary" onclick="uploadCurriculum()" style="margin-top:20px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;"><i class="fas fa-cloud-upload-alt"></i> Upload Curriculum</button>
         </div>
 
         <div class="admin-table-wrapper">
@@ -298,24 +353,30 @@
           <h3>Daily Activity Reports</h3>
           <p>Post daily updates for enrolled children. Parents see these on their portal.</p>
         </div>
-        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
-          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-plus-circle"></i> Create Daily Report</h4>
+        <div style="background:linear-gradient(135deg,#f9f7f4,#fff);border-radius:16px;padding:28px 32px;margin-bottom:28px;border:1px solid #e8e2d9;box-shadow:0 2px 12px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#e09000,#f4a825);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;"><i class="fas fa-clipboard-list"></i></div>
+            <div>
+              <h4 style="margin:0;color:#2d5016;font-size:17px;font-weight:700;">Create Daily Report</h4>
+              <p style="margin:2px 0 0;color:#888;font-size:13px;">Parents will see this report on their portal</p>
+            </div>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Child</label>
-              <select id="reportChildId" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Child *</label>
+              <select id="reportChildId" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;background:#fff;">
                 <option value="">Select an enrolled child...</option>
               </select>
             </div>
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Date</label>
-              <input type="date" id="reportDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Date *</label>
+              <input type="date" id="reportDate" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;">
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Mood</label>
-              <select id="reportMood" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Mood</label>
+              <select id="reportMood" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;background:#fff;">
                 <option value="Happy">Happy</option>
                 <option value="Content">Content</option>
                 <option value="Excited">Excited</option>
@@ -325,23 +386,23 @@
               </select>
             </div>
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Nap</label>
-              <input type="text" id="reportNap" placeholder="e.g. 1:00 PM - 2:30 PM" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Nap Time</label>
+              <input type="text" id="reportNap" placeholder="e.g. 1:00 PM - 2:30 PM" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;">
             </div>
           </div>
           <div style="margin-top:16px;">
-            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Activities</label>
-            <textarea id="reportActivities" rows="3" placeholder="What the child did today..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Activities</label>
+            <textarea id="reportActivities" rows="3" placeholder="What the child did today..." style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;resize:vertical;"></textarea>
           </div>
           <div style="margin-top:16px;">
-            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Meals</label>
-            <textarea id="reportMeals" rows="2" placeholder="Breakfast, lunch, snack details..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Meals</label>
+            <textarea id="reportMeals" rows="2" placeholder="Breakfast, lunch, snack details..." style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;resize:vertical;"></textarea>
           </div>
           <div style="margin-top:16px;">
-            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Teacher Notes</label>
-            <textarea id="reportNotes" rows="2" placeholder="Additional observations..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Teacher Notes</label>
+            <textarea id="reportNotes" rows="2" placeholder="Additional observations..." style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;resize:vertical;"></textarea>
           </div>
-          <button class="btn btn-primary" onclick="createActivityReport()" style="margin-top:16px;"><i class="fas fa-paper-plane"></i> Post Report</button>
+          <button class="btn btn-primary" onclick="createActivityReport()" style="margin-top:20px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;"><i class="fas fa-paper-plane"></i> Post Report</button>
         </div>
         <div class="admin-table-wrapper">
           <table class="admin-table">
@@ -361,20 +422,26 @@
           <h3>Event Calendar</h3>
           <p>Manage school events, holidays, and important dates.</p>
         </div>
-        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
-          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-plus-circle"></i> Add Event</h4>
+        <div style="background:linear-gradient(135deg,#f9f7f4,#fff);border-radius:16px;padding:28px 32px;margin-bottom:28px;border:1px solid #e8e2d9;box-shadow:0 2px 12px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#c62828,#ef5350);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;"><i class="fas fa-calendar-plus"></i></div>
+            <div>
+              <h4 style="margin:0;color:#2d5016;font-size:17px;font-weight:700;">Add New Event</h4>
+              <p style="margin:2px 0 0;color:#888;font-size:13px;">Events appear on the Events page and parent portals</p>
+            </div>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Title</label>
-              <input type="text" id="eventTitle" placeholder="Event name" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Event Title *</label>
+              <input type="text" id="eventTitle" placeholder="Event name" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#e0dcd4'">
             </div>
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Date</label>
-              <input type="date" id="eventDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Date *</label>
+              <input type="date" id="eventDate" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#e0dcd4'">
             </div>
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Type</label>
-              <select id="eventType" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Type</label>
+              <select id="eventType" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;background:#fff;">
                 <option value="general">General</option>
                 <option value="holiday">Holiday / Closure</option>
                 <option value="conference">Parent-Teacher Conference</option>
@@ -384,19 +451,19 @@
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Time (optional)</label>
-              <input type="text" id="eventTime" placeholder="e.g. 10:00 AM - 11:30 AM" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Time (optional)</label>
+              <input type="text" id="eventTime" placeholder="e.g. 10:00 AM - 11:30 AM" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#e0dcd4'">
             </div>
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">End Date (optional)</label>
-              <input type="date" id="eventEndDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">End Date (optional)</label>
+              <input type="date" id="eventEndDate" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#e0dcd4'">
             </div>
           </div>
           <div style="margin-top:16px;">
-            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Description</label>
-            <textarea id="eventDescription" rows="2" placeholder="Event details..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Description</label>
+            <textarea id="eventDescription" rows="2" placeholder="Event details..." style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;resize:vertical;transition:border-color 0.2s;" onfocus="this.style.borderColor='#c62828'" onblur="this.style.borderColor='#e0dcd4'"></textarea>
           </div>
-          <button class="btn btn-primary" onclick="createEvent()" style="margin-top:16px;"><i class="fas fa-calendar-plus"></i> Add Event</button>
+          <button class="btn btn-primary" onclick="createEvent()" style="margin-top:20px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;"><i class="fas fa-calendar-plus"></i> Add Event</button>
         </div>
         <div id="eventsListAdmin"><p class="table-empty">Loading...</p></div>
       </div>
@@ -409,23 +476,29 @@
           <p>Create and manage announcements displayed on the website.</p>
         </div>
 
-        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
-          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-plus-circle"></i> Create New Announcement</h4>
+        <div style="background:linear-gradient(135deg,#f9f7f4,#fff);border-radius:16px;padding:28px 32px;margin-bottom:28px;border:1px solid #e8e2d9;box-shadow:0 2px 12px rgba(0,0,0,0.04);">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="width:44px;height:44px;background:linear-gradient(135deg,#6a1b9a,#ab47bc);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;"><i class="fas fa-bullhorn"></i></div>
+            <div>
+              <h4 style="margin:0;color:#2d5016;font-size:17px;font-weight:700;">Create New Announcement</h4>
+              <p style="margin:2px 0 0;color:#888;font-size:13px;">Announcements are shown on the homepage and parent portals</p>
+            </div>
+          </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Title</label>
-              <input type="text" id="announcementTitle" placeholder="Announcement title..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Title *</label>
+              <input type="text" id="announcementTitle" placeholder="Announcement title..." style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#6a1b9a'" onblur="this.style.borderColor='#e0dcd4'">
             </div>
             <div>
-              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Date</label>
-              <input type="date" id="announcementDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Date</label>
+              <input type="date" id="announcementDate" style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;transition:border-color 0.2s;" onfocus="this.style.borderColor='#6a1b9a'" onblur="this.style.borderColor='#e0dcd4'">
             </div>
           </div>
           <div style="margin-top:16px;">
-            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Text</label>
-            <textarea id="announcementText" rows="4" placeholder="Announcement details..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">Announcement Text *</label>
+            <textarea id="announcementText" rows="4" placeholder="Announcement details..." style="width:100%;padding:11px 16px;border:2px solid #e0dcd4;border-radius:10px;font-size:14px;resize:vertical;transition:border-color 0.2s;" onfocus="this.style.borderColor='#6a1b9a'" onblur="this.style.borderColor='#e0dcd4'"></textarea>
           </div>
-          <button class="btn btn-primary" onclick="createAnnouncement()" style="margin-top:16px;"><i class="fas fa-bullhorn"></i> Create Announcement</button>
+          <button class="btn btn-primary" onclick="createAnnouncement()" style="margin-top:20px;padding:12px 28px;border-radius:10px;font-size:15px;font-weight:600;"><i class="fas fa-bullhorn"></i> Create Announcement</button>
         </div>
 
         <div id="announcementsList">
@@ -493,7 +566,9 @@
         renderActivityReports(dashboardData.activityReports || [], dashboardData.children || []);
         renderEvents(dashboardData.events || []);
         renderAnnouncements(dashboardData.announcements || []);
+        renderPrograms(dashboardData.programs || []);
         populateChildDropdown(dashboardData.children || []);
+        populateCurriculumProgramDropdown(dashboardData.programs || []);
       } catch { window.location.href = '/login'; }
     }
 
@@ -1019,6 +1094,76 @@
       loadDashboard();
     }
 
+
+    // --- Programs Management ---
+    function renderPrograms(programs) {
+      const container = document.getElementById('programsList');
+      if (!programs || !programs.length) {
+        container.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#999;"><i class="fas fa-graduation-cap" style="font-size:48px;margin-bottom:16px;display:block;opacity:0.3;"></i><p style="font-size:16px;margin:0;">No programs created yet.</p><p style="font-size:14px;margin:8px 0 0;">Add your first program above — it will appear on the Tuition page and Enrollment form.</p></div>';
+        return;
+      }
+      container.innerHTML = programs.map(p => `
+        <div style="background:#f9f7f4;border-radius:12px;padding:20px;margin-bottom:12px;border-left:4px solid ${escapeHtml(p.color || '#4a7c59')};display:flex;justify-content:space-between;align-items:center;">
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="width:36px;height:36px;background:${escapeHtml(p.color || '#4a7c59')}20;color:${escapeHtml(p.color || '#4a7c59')};border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;"><i class="fas ${escapeHtml(p.icon || 'fa-star')}"></i></div>
+              <h4 style="margin:0;color:#2d5016;font-size:17px;">${escapeHtml(p.name)}</h4>
+              <span style="background:#4a7c5915;color:#4a7c59;padding:4px 12px;border-radius:20px;font-size:14px;font-weight:700;">${escapeHtml(p.tuitionRate)}</span>
+            </div>
+            <div style="display:flex;gap:16px;font-size:13px;color:#888;margin-left:46px;">
+              ${p.ageRange ? '<span><i class="fas fa-child"></i> ' + escapeHtml(p.ageRange) + '</span>' : ''}
+              ${p.schedule ? '<span><i class="fas fa-clock"></i> ' + escapeHtml(p.schedule) + '</span>' : ''}
+              ${p.description ? '<span><i class="fas fa-info-circle"></i> ' + escapeHtml(p.description) + '</span>' : ''}
+            </div>
+          </div>
+          <button class="btn-icon btn-delete" onclick="deleteProgram(${p.id})" title="Delete Program"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+    }
+
+    async function createProgram() {
+      const name = document.getElementById('programName').value.trim();
+      const tuitionRate = document.getElementById('programTuitionRate').value.trim();
+      if (!name || !tuitionRate) { alert('Program name and tuition rate are required.'); return; }
+
+      try {
+        const resp = await fetch('/api/admin/program', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            ageRange: document.getElementById('programAgeRange').value.trim(),
+            schedule: document.getElementById('programSchedule').value.trim(),
+            tuitionRate,
+            description: document.getElementById('programDescription').value.trim(),
+          })
+        });
+        if (resp.ok) {
+          document.getElementById('programName').value = '';
+          document.getElementById('programAgeRange').value = '';
+          document.getElementById('programSchedule').value = '';
+          document.getElementById('programTuitionRate').value = '';
+          document.getElementById('programDescription').value = '';
+          loadDashboard();
+        } else {
+          const err = await resp.json();
+          alert(err.error || 'Failed to create program.');
+        }
+      } catch { alert('Error creating program.'); }
+    }
+
+    async function deleteProgram(id) {
+      if (!confirm('Delete this program? It will be removed from the Tuition page and Enrollment form.')) return;
+      await fetch('/api/admin/program/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
+    function populateCurriculumProgramDropdown(programs) {
+      const select = document.getElementById('curriculumProgram');
+      if (!select) return;
+      select.innerHTML = '<option value="All Programs">All Programs</option>' +
+        programs.map(p => '<option value="' + escapeHtml(p.name) + '">' + escapeHtml(p.name) + '</option>').join('');
+    }
 
     loadDashboard();
   </script>

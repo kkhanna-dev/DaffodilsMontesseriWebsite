@@ -61,9 +61,7 @@
       <div class="method-grid" id="tuitionGrid">
         <!-- Tuition cards rendered by JS from siteContent -->
       </div>
-      <div id="tuitionAdminAdd" style="display:none;text-align:center;margin-top:20px;">
-        <button onclick="addTuitionBox()" style="background:#4a7c59;color:#fff;border:none;padding:12px 28px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;"><i class="fas fa-plus"></i> Add Tuition Rate</button>
-      </div>
+    
       <div style="margin-top:32px;text-align:center;">
         <div style="display:inline-block;text-align:left;background:#f8f9fa;border-radius:12px;padding:24px 32px;max-width:600px;">
           <p style="margin:0 0 8px;color:#636e72;font-size:0.95rem;" data-editable="tuitionNote1"><i class="fas fa-info-circle" style="color:#4a7c59;margin-right:8px;"></i> A non-refundable application fee of $75 is due upon submission.</p>
@@ -233,138 +231,52 @@
   <script src="/js/main.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
   <script>
-    // --- Default tuition rates (used if no siteContent overrides exist) ---
-    var defaultTuitionRates = [
-      { key: 1, name: 'Toddler Half-Day', desc: 'Ages 2-3 &bull; Morning Session', price: '$850/month', icon: 'fa-baby', bg: '#e8f5e9', color: '#4a7c59' },
-      { key: 2, name: 'Toddler Full-Day', desc: 'Ages 2-3 &bull; Full Day', price: '$1,200/month', icon: 'fa-baby', bg: '#e8f5e9', color: '#4a7c59' },
-      { key: 3, name: 'Primary Half-Day', desc: 'Ages 3-5 &bull; Morning Session', price: '$950/month', icon: 'fa-star', bg: '#fff3d6', color: '#e09000' },
-      { key: 4, name: 'Primary Full-Day', desc: 'Ages 3-5 &bull; Full Day', price: '$1,400/month', icon: 'fa-star', bg: '#fff3d6', color: '#e09000' },
-      { key: 5, name: 'Primary Extended', desc: 'Ages 3-5 &bull; Extended Day', price: '$1,650/month', icon: 'fa-star', bg: '#fff3d6', color: '#e09000' },
-      { key: 6, name: 'Kindergarten Full-Day', desc: 'Ages 5-6 &bull; Full Day', price: '$1,400/month', icon: 'fa-graduation-cap', bg: '#e3f2fd', color: '#1565c0' },
-      { key: 7, name: 'Kindergarten Extended', desc: 'Ages 5-6 &bull; Extended Day', price: '$1,650/month', icon: 'fa-graduation-cap', bg: '#e3f2fd', color: '#1565c0' },
-    ];
-
-    var isAdminUser = false;
-
-    function getTuitionCount(sc) {
-      var count = parseInt(sc.tuitionRateCount);
-      return isNaN(count) ? defaultTuitionRates.length : count;
-    }
-
-    function renderTuitionGrid(sc) {
+    // --- Tuition grid renders from admin-created programs via /api/programs ---
+    function renderTuitionGrid(programs) {
       var grid = document.getElementById('tuitionGrid');
-      var count = getTuitionCount(sc);
-      var html = '';
-      for (var i = 1; i <= count; i++) {
-        var def = defaultTuitionRates[i - 1] || { name: 'New Rate', desc: 'Description', price: '$0/month', icon: 'fa-star', bg: '#e8f5e9', color: '#4a7c59' };
-        var name = sc['tuitionRate' + i + 'Name'] || def.name;
-        var desc = sc['tuitionRate' + i + 'Desc'] || def.desc;
-        var price = sc['tuitionRate' + i + 'Price'] || def.price;
-        var icon = def.icon;
-        var bg = def.bg;
-        var clr = def.color;
-        var removeBtn = isAdminUser ? '<button onclick="removeTuitionBox(' + i + ')" style="position:absolute;top:8px;right:8px;background:#e74c3c;color:#fff;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:none;" class="tuition-remove-btn" title="Remove this rate"><i class="fas fa-times"></i></button>' : '';
-        html += '<div class="method-card" style="text-align:center;position:relative;">' +
-          removeBtn +
-          '<div class="method-number" style="background:' + bg + ';color:' + clr + ';"><i class="fas ' + icon + '"></i></div>' +
-          '<h3 data-editable="tuitionRate' + i + 'Name">' + name + '</h3>' +
-          '<p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate' + i + 'Desc">' + desc + '</p>' +
-          '<p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate' + i + 'Price">' + price + '</p>' +
+      if (!programs || !programs.length) {
+        grid.innerHTML = '<div style="text-align:center;padding:48px 24px;color:#999;"><i class="fas fa-graduation-cap" style="font-size:56px;margin-bottom:16px;display:block;opacity:0.25;"></i><h3 style="margin:0 0 8px;color:#636e72;">No Programs Available Yet</h3><p style="margin:0;max-width:400px;margin-left:auto;margin-right:auto;">Our programs and tuition rates are being set up. Please check back soon or <a href="/contact" style="color:#4a7c59;font-weight:600;">contact us</a> for details.</p></div>';
+        return;
+      }
+      var iconMap = { 'fa-baby': { bg: '#e8f5e9', color: '#4a7c59' }, 'fa-star': { bg: '#fff3d6', color: '#e09000' }, 'fa-graduation-cap': { bg: '#e3f2fd', color: '#1565c0' } };
+      grid.innerHTML = programs.map(function(p) {
+        var icon = p.icon || 'fa-star';
+        var colors = iconMap[icon] || { bg: (p.color || '#4a7c59') + '15', color: p.color || '#4a7c59' };
+        var desc = '';
+        if (p.ageRange) desc += p.ageRange;
+        if (p.schedule) desc += (desc ? ' &bull; ' : '') + p.schedule;
+        if (!desc && p.description) desc = p.description;
+        return '<div class="method-card" style="text-align:center;">' +
+          '<div class="method-number" style="background:' + colors.bg + ';color:' + colors.color + ';"><i class="fas ' + icon + '"></i></div>' +
+          '<h3>' + (p.name || 'Program') + '</h3>' +
+          '<p style="font-size:0.95rem;color:#636e72;">' + (desc || '') + '</p>' +
+          '<p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;">' + (p.tuitionRate || '') + '</p>' +
           '</div>';
-      }
-      grid.innerHTML = html;
+      }).join('');
     }
 
-    async function addTuitionBox() {
-      var sc;
-      try {
-        var r = await fetch('/api/site-content');
-        sc = (await r.json()).siteContent || {};
-      } catch(e) { sc = {}; }
-      var count = getTuitionCount(sc);
-      count++;
-      await fetch('/api/admin/update-content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tuitionRateCount: String(count),
-          ['tuitionRate' + count + 'Name']: 'New Program',
-          ['tuitionRate' + count + 'Desc']: 'Age range &bull; Schedule',
-          ['tuitionRate' + count + 'Price']: '$0/month',
-        }),
-      });
-      sc.tuitionRateCount = String(count);
-      sc['tuitionRate' + count + 'Name'] = 'New Program';
-      sc['tuitionRate' + count + 'Desc'] = 'Age range &bull; Schedule';
-      sc['tuitionRate' + count + 'Price'] = '$0/month';
-      renderTuitionGrid(sc);
-      if (typeof initInlineEditing === 'function') {
-        // Re-trigger edit mode awareness
-        document.querySelectorAll('[data-editable]').forEach(function(el) {
-          if (document.body.classList.contains('admin-edit-mode')) {
-            el.setAttribute('contenteditable', 'true');
-            el.classList.add('admin-editable');
-          }
-        });
-      }
+    // Also populate the payment amount dropdown from programs
+    function populatePaymentAmounts(programs) {
+      var select = document.getElementById('paymentAmountSelect');
+      if (!select || !programs.length) return;
+      select.innerHTML = '<option value="">Select an amount or enter custom</option>' +
+        programs.map(function(p) {
+          var num = p.tuitionRate.replace(/[^0-9.]/g, '');
+          return '<option value="' + num + '">' + p.name + ' - ' + p.tuitionRate + '</option>';
+        }).join('') +
+        '<option value="custom">Custom Amount</option>';
     }
 
-    async function removeTuitionBox(index) {
-      if (!confirm('Remove this tuition rate?')) return;
-      var sc;
-      try {
-        var r = await fetch('/api/site-content');
-        sc = (await r.json()).siteContent || {};
-      } catch(e) { sc = {}; }
-      var count = getTuitionCount(sc);
-      // Shift all rates above index down by one
-      var updates = {};
-      for (var i = index; i < count; i++) {
-        updates['tuitionRate' + i + 'Name'] = sc['tuitionRate' + (i + 1) + 'Name'] || defaultTuitionRates[i] && defaultTuitionRates[i].name || 'Rate';
-        updates['tuitionRate' + i + 'Desc'] = sc['tuitionRate' + (i + 1) + 'Desc'] || defaultTuitionRates[i] && defaultTuitionRates[i].desc || 'Desc';
-        updates['tuitionRate' + i + 'Price'] = sc['tuitionRate' + (i + 1) + 'Price'] || defaultTuitionRates[i] && defaultTuitionRates[i].price || '$0';
-      }
-      updates.tuitionRateCount = String(count - 1);
-      await fetch('/api/admin/update-content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates),
-      });
-      Object.assign(sc, updates);
-      renderTuitionGrid(sc);
-    }
-
-    // Load and render tuition grid on page load
+    // Load programs and render
     (async function() {
-      var sc = {};
+      var programs = [];
       try {
-        var r = await fetch('/api/site-content');
+        var r = await fetch('/api/programs');
         var d = await r.json();
-        sc = d.siteContent || {};
+        programs = d.programs || [];
       } catch(e) {}
-      // Check if admin
-      try {
-        var resp = await fetch('/api/auth/me');
-        if (resp.ok) {
-          var data = await resp.json();
-          if (data.user && data.user.role === 'admin') {
-            isAdminUser = true;
-            document.getElementById('tuitionAdminAdd').style.display = '';
-          }
-        }
-      } catch(e) {}
-      renderTuitionGrid(sc);
-      // Show remove buttons when edit mode is toggled
-      if (isAdminUser) {
-        var observer = new MutationObserver(function() {
-          var editMode = document.body.classList.contains('admin-edit-mode');
-          document.querySelectorAll('.tuition-remove-btn').forEach(function(btn) {
-            btn.style.display = editMode ? 'block' : 'none';
-          });
-          document.getElementById('tuitionAdminAdd').style.display = editMode ? '' : 'none';
-        });
-        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-      }
+      renderTuitionGrid(programs);
+      populatePaymentAmounts(programs);
     })();
 
     (async function initTuitionPage() {

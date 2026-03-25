@@ -1,0 +1,30 @@
+services:
+  - type: web
+    runtime: node
+    name: daffodils-montessori
+    plan: starter
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: RENDER
+        value: "true"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PORT
+        value: "3000"
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: CONTACT_EMAIL
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+    disk:
+      name: daffodils-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

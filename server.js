@@ -24,7 +24,10 @@ if (process.env.STRIPE_SECRET_KEY) {
 }
 
 // --- Data Store (JSON file-based) ---
-const DATA_FILE = path.join(__dirname, 'data.json');
+// In production on Render, use the persistent disk mount for data that must survive deploys
+const PERSISTENT_DIR = process.env.RENDER ? path.join(__dirname, 'data') : __dirname;
+if (process.env.RENDER && !fs.existsSync(PERSISTENT_DIR)) fs.mkdirSync(PERSISTENT_DIR, { recursive: true });
+const DATA_FILE = path.join(PERSISTENT_DIR, 'data.json');
 
 function loadData() {
   try {
@@ -83,8 +86,10 @@ const isTest = process.env.NODE_ENV === 'test';
 // --- File Upload Configuration (Multer) ---
 
 // Ensure upload directories exist
-const curriculumUploadDir = path.join(__dirname, 'public', 'uploads', 'curriculum');
-const imagesUploadDir = path.join(__dirname, 'public', 'uploads', 'images');
+// On Render, uploads go to persistent disk so they survive deploys
+const uploadsBase = process.env.RENDER ? path.join(PERSISTENT_DIR, 'uploads') : path.join(__dirname, 'public', 'uploads');
+const curriculumUploadDir = path.join(uploadsBase, 'curriculum');
+const imagesUploadDir = path.join(uploadsBase, 'images');
 if (!fs.existsSync(curriculumUploadDir)) fs.mkdirSync(curriculumUploadDir, { recursive: true });
 if (!fs.existsSync(imagesUploadDir)) fs.mkdirSync(imagesUploadDir, { recursive: true });
 
@@ -226,6 +231,10 @@ app.post('/api/payment-webhook', express.raw({ type: 'application/json' }), (req
 app.use(bodyParser.json({ limit: '1mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+// On Render, serve uploads from the persistent disk
+if (process.env.RENDER) {
+  app.use('/uploads', express.static(path.join(PERSISTENT_DIR, 'uploads')));
+}
 app.use(session({
   secret: process.env.SESSION_SECRET || 'daffodils-montessori-secret-2026',
   resave: false,

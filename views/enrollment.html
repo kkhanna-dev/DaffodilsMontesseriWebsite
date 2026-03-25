@@ -33,22 +33,12 @@
         <li><a href="/events">Events</a></li>
         <li><a href="/contact">Contact</a></li>
         <li><a href="/login" class="nav-register"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-        <li><a href="/enrollment" class="nav-cta active">Enroll Now</a></li>
+
       </ul>
     </div>
   </nav>
 
-  <!-- Page Hero -->
-  <section class="page-hero">
-    <div class="page-hero-overlay"></div>
-    <div class="page-hero-content">
-      <h1 data-editable="enrollHeroTitle">Enrollment &amp; Book a Tour</h1>
-      <p data-editable="enrollHeroDesc">Begin your child's Montessori journey today. Apply for enrollment or schedule a campus tour below.</p>
-      <div class="breadcrumb">
-        <a href="/">Home</a> <i class="fas fa-chevron-right"></i> <span>Enrollment</span>
-      </div>
-    </div>
-  </section>
+
 
   <!-- Enrollment Steps -->
   <section class="section">
@@ -167,40 +157,42 @@
         <div class="tuition-sidebar">
           <div class="tuition-card">
             <h3><i class="fas fa-tag"></i> <span data-editable="enrollTuitionTitle">Tuition Summary</span></h3>
-            <div class="tuition-table">
+            <div class="tuition-table" id="enrollTuitionTable">
               <div class="tuition-row header">
                 <span>Program</span>
                 <span>Monthly</span>
               </div>
-              <div class="tuition-row">
-                <span data-editable="enrollTuition1Name">Toddler Half-Day</span>
-                <span data-editable="enrollTuition1Price">$850</span>
-              </div>
-              <div class="tuition-row">
-                <span data-editable="enrollTuition2Name">Toddler Full-Day</span>
-                <span data-editable="enrollTuition2Price">$1,200</span>
-              </div>
-              <div class="tuition-row">
-                <span data-editable="enrollTuition3Name">Primary Half-Day</span>
-                <span data-editable="enrollTuition3Price">$950</span>
-              </div>
-              <div class="tuition-row">
-                <span data-editable="enrollTuition4Name">Primary Full-Day</span>
-                <span data-editable="enrollTuition4Price">$1,400</span>
-              </div>
-              <div class="tuition-row">
-                <span data-editable="enrollTuition5Name">Primary Extended</span>
-                <span data-editable="enrollTuition5Price">$1,650</span>
-              </div>
-              <div class="tuition-row">
-                <span data-editable="enrollTuition6Name">Kindergarten Full-Day</span>
-                <span data-editable="enrollTuition6Price">$1,400</span>
-              </div>
-              <div class="tuition-row">
-                <span data-editable="enrollTuition7Name">Kindergarten Extended</span>
-                <span data-editable="enrollTuition7Price">$1,650</span>
-              </div>
+              <!-- Populated by JS from siteContent to stay in sync with tuition page -->
             </div>
+            <script>
+              (async function() {
+                var defaults = [
+                  { name: 'Toddler Half-Day', price: '$850' },
+                  { name: 'Toddler Full-Day', price: '$1,200' },
+                  { name: 'Primary Half-Day', price: '$950' },
+                  { name: 'Primary Full-Day', price: '$1,400' },
+                  { name: 'Primary Extended', price: '$1,650' },
+                  { name: 'Kindergarten Full-Day', price: '$1,400' },
+                  { name: 'Kindergarten Extended', price: '$1,650' },
+                ];
+                var sc = {};
+                try {
+                  var r = await fetch('/api/site-content');
+                  sc = (await r.json()).siteContent || {};
+                } catch(e) {}
+                var count = parseInt(sc.tuitionRateCount);
+                if (isNaN(count)) count = defaults.length;
+                var table = document.getElementById('enrollTuitionTable');
+                var html = '<div class="tuition-row header"><span>Program</span><span>Monthly</span></div>';
+                for (var i = 1; i <= count; i++) {
+                  var def = defaults[i - 1] || { name: 'Program', price: '$0' };
+                  var name = sc['tuitionRate' + i + 'Name'] || def.name;
+                  var price = sc['tuitionRate' + i + 'Price'] || def.price;
+                  html += '<div class="tuition-row"><span>' + name + '</span><span>' + price + '</span></div>';
+                }
+                table.innerHTML = html;
+              })();
+            </script>
             <div class="tuition-notes">
               <p data-editable="enrollNote1"><i class="fas fa-info-circle"></i> A non-refundable application fee of $75 is due upon submission.</p>
               <p data-editable="enrollNote2"><i class="fas fa-info-circle"></i> An enrollment deposit of $500 secures your child's spot (applied to first month's tuition).</p>
@@ -218,123 +210,6 @@
               <li><i class="fas fa-check"></i> <span data-editable="enrollIncluded5">Field trips</span></li>
               <li><i class="fas fa-check"></i> <span data-editable="enrollIncluded6">Annual school photos</span></li>
             </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Book a Tour Section -->
-  <section class="section tour-section" id="tour">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-label">Visit Us</span>
-        <h2>Book a Tour</h2>
-        <p>See our classrooms in action and meet our teachers. Tours are available Monday through Friday.</p>
-      </div>
-      <div class="contact-grid">
-        <div class="contact-form-wrapper">
-          <h2><i class="fas fa-calendar-alt"></i> Schedule Your Visit</h2>
-          <p>Pick a date and time that works for your family. Tours typically last 45 minutes to an hour.</p>
-          <form id="tourForm" class="contact-form">
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tourParentName">Parent/Guardian Name <span class="required">*</span></label>
-                <input type="text" id="tourParentName" name="parentName" placeholder="Full name" required>
-              </div>
-              <div class="form-group">
-                <label for="tourEmail">Email Address <span class="required">*</span></label>
-                <input type="email" id="tourEmail" name="email" placeholder="your@email.com" required>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tourPhone">Phone Number <span class="required">*</span></label>
-                <input type="tel" id="tourPhone" name="phone" placeholder="(425) 000-0000" required>
-              </div>
-              <div class="form-group">
-                <label for="tourDate">Preferred Tour Date <span class="required">*</span></label>
-                <input type="date" id="tourDate" name="tourDate" required>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="tourTime">Preferred Time</label>
-                <select id="tourTime" name="tourTime">
-                  <option value="">Select a time</option>
-                  <option value="9:00 AM">9:00 AM</option>
-                  <option value="10:00 AM">10:00 AM</option>
-                  <option value="11:00 AM">11:00 AM</option>
-                  <option value="1:00 PM">1:00 PM</option>
-                  <option value="2:00 PM">2:00 PM</option>
-                  <option value="3:00 PM">3:00 PM</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="tourChildAge">Child's Age</label>
-                <input type="text" id="tourChildAge" name="childAge" placeholder="e.g., 3 years old">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="tourNotes">Questions or Comments</label>
-              <textarea id="tourNotes" name="notes" rows="3" placeholder="Anything you'd like us to know before your visit..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-large btn-full">
-              <i class="fas fa-calendar-check"></i> Book My Tour
-            </button>
-            <div id="tourFormMessage" class="form-message"></div>
-          </form>
-        </div>
-
-        <div class="contact-info-wrapper">
-          <div class="contact-info-card">
-            <h3>What to Expect</h3>
-            <div class="contact-info-item">
-              <div class="contact-icon"><i class="fas fa-eye"></i></div>
-              <div>
-                <strong>Observe Classrooms</strong>
-                <p>Watch Montessori learning in action during a live classroom observation.</p>
-              </div>
-            </div>
-            <div class="contact-info-item">
-              <div class="contact-icon"><i class="fas fa-comments"></i></div>
-              <div>
-                <strong>Meet Our Team</strong>
-                <p>Chat with teachers and staff about our programs and philosophy.</p>
-              </div>
-            </div>
-            <div class="contact-info-item">
-              <div class="contact-icon"><i class="fas fa-question-circle"></i></div>
-              <div>
-                <strong>Ask Questions</strong>
-                <p>Get answers about enrollment, curriculum, schedules, and tuition.</p>
-              </div>
-            </div>
-            <div class="contact-info-item">
-              <div class="contact-icon"><i class="fas fa-walking"></i></div>
-              <div>
-                <strong>Campus Walkthrough</strong>
-                <p>Tour our classrooms, outdoor areas, garden, and play spaces.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="contact-info-card">
-            <h3>Contact Us Directly</h3>
-            <div class="contact-info-item">
-              <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
-              <div>
-                <strong>Call Us</strong>
-                <p>(425) 623-2684</p>
-              </div>
-            </div>
-            <div class="contact-info-item">
-              <div class="contact-icon"><i class="fas fa-envelope"></i></div>
-              <div>
-                <strong>Email Us</strong>
-                <p>rishiekhanna@yahoo.com</p>
-              </div>
-            </div>
           </div>
         </div>
       </div>

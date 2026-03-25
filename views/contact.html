@@ -33,7 +33,7 @@
         <li><a href="/events">Events</a></li>
         <li><a href="/contact" class="active">Contact</a></li>
         <li><a href="/login" class="nav-register"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-        <li><a href="/enrollment" class="nav-cta">Enroll Now</a></li>
+    
       </ul>
     </div>
   </nav>
@@ -146,6 +146,105 @@
               <a href="#" class="social-btn facebook"><i class="fab fa-facebook-f"></i> Facebook</a>
               <a href="#" class="social-btn instagram"><i class="fab fa-instagram"></i> Instagram</a>
               <a href="#" class="social-btn youtube"><i class="fab fa-youtube"></i> YouTube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book a Tour Section -->
+  <section class="section tour-section" id="tour" style="background:#f8f9fa;">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Visit Us</span>
+        <h2>Book a Tour</h2>
+        <p>See our classrooms in action and meet our teachers. Tours are available Monday through Friday.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-form-wrapper">
+          <h2><i class="fas fa-calendar-alt"></i> Schedule Your Visit</h2>
+          <p>Pick a date and time that works for your family. Tours typically last 45 minutes to an hour.</p>
+          <form id="tourForm" class="contact-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tourParentName">Parent/Guardian Name <span class="required">*</span></label>
+                <input type="text" id="tourParentName" name="parentName" placeholder="Full name" required>
+              </div>
+              <div class="form-group">
+                <label for="tourEmail">Email Address <span class="required">*</span></label>
+                <input type="email" id="tourEmail" name="email" placeholder="your@email.com" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tourPhone">Phone Number <span class="required">*</span></label>
+                <input type="tel" id="tourPhone" name="phone" placeholder="(425) 000-0000" required>
+              </div>
+              <div class="form-group">
+                <label for="tourDate">Preferred Tour Date <span class="required">*</span></label>
+                <input type="date" id="tourDate" name="tourDate" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="tourTime">Preferred Time</label>
+                <select id="tourTime" name="tourTime">
+                  <option value="">Select a time</option>
+                  <option value="9:00 AM">9:00 AM</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="11:00 AM">11:00 AM</option>
+                  <option value="1:00 PM">1:00 PM</option>
+                  <option value="2:00 PM">2:00 PM</option>
+                  <option value="3:00 PM">3:00 PM</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="tourChildAge">Child's Age</label>
+                <input type="text" id="tourChildAge" name="childAge" placeholder="e.g., 3 years old">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="tourNotes">Questions or Comments</label>
+              <textarea id="tourNotes" name="notes" rows="3" placeholder="Anything you'd like us to know before your visit..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-large btn-full">
+              <i class="fas fa-calendar-check"></i> Book My Tour
+            </button>
+            <div id="tourFormMessage" class="form-message"></div>
+          </form>
+        </div>
+
+        <div class="contact-info-wrapper">
+          <div class="contact-info-card">
+            <h3>What to Expect</h3>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-eye"></i></div>
+              <div>
+                <strong>Observe Classrooms</strong>
+                <p>Watch Montessori learning in action during a live classroom observation.</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-comments"></i></div>
+              <div>
+                <strong>Meet Our Team</strong>
+                <p>Chat with teachers and staff about our programs and philosophy.</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-question-circle"></i></div>
+              <div>
+                <strong>Ask Questions</strong>
+                <p>Get answers about enrollment, curriculum, schedules, and tuition.</p>
+              </div>
+            </div>
+            <div class="contact-info-item">
+              <div class="contact-icon"><i class="fas fa-walking"></i></div>
+              <div>
+                <strong>Campus Walkthrough</strong>
+                <p>Tour our classrooms, outdoor areas, garden, and play spaces.</p>
+              </div>
             </div>
           </div>
         </div>

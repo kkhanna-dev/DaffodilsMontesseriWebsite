@@ -33,7 +33,7 @@
         <li><a href="/events">Events</a></li>
         <li><a href="/contact">Contact</a></li>
         <li><a href="/login" class="nav-register"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-        <li><a href="/enrollment" class="nav-cta">Enroll Now</a></li>
+        
       </ul>
     </div>
   </nav>
@@ -58,49 +58,11 @@
         <h2>Monthly Tuition Rates</h2>
         <p>We offer competitive rates for our high-quality Montessori programs. All rates are billed monthly.</p>
       </div>
-      <div class="method-grid">
-        <div class="method-card" style="text-align:center;">
-          <div class="method-number" style="background:#e8f5e9;color:#4a7c59;"><i class="fas fa-baby"></i></div>
-          <h3 data-editable="tuitionRate1Name">Toddler Half-Day</h3>
-          <p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate1Desc">Ages 2-3 &bull; Morning Session</p>
-          <p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate1Price">$850/month</p>
-        </div>
-        <div class="method-card" style="text-align:center;">
-          <div class="method-number" style="background:#e8f5e9;color:#4a7c59;"><i class="fas fa-baby"></i></div>
-          <h3 data-editable="tuitionRate2Name">Toddler Full-Day</h3>
-          <p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate2Desc">Ages 2-3 &bull; Full Day</p>
-          <p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate2Price">$1,200/month</p>
-        </div>
-        <div class="method-card" style="text-align:center;">
-          <div class="method-number" style="background:#fff3d6;color:#e09000;"><i class="fas fa-star"></i></div>
-          <h3 data-editable="tuitionRate3Name">Primary Half-Day</h3>
-          <p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate3Desc">Ages 3-5 &bull; Morning Session</p>
-          <p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate3Price">$950/month</p>
-        </div>
-        <div class="method-card" style="text-align:center;">
-          <div class="method-number" style="background:#fff3d6;color:#e09000;"><i class="fas fa-star"></i></div>
-          <h3 data-editable="tuitionRate4Name">Primary Full-Day</h3>
-          <p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate4Desc">Ages 3-5 &bull; Full Day</p>
-          <p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate4Price">$1,400/month</p>
-        </div>
-        <div class="method-card" style="text-align:center;">
-          <div class="method-number" style="background:#fff3d6;color:#e09000;"><i class="fas fa-star"></i></div>
-          <h3 data-editable="tuitionRate5Name">Primary Extended</h3>
-          <p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate5Desc">Ages 3-5 &bull; Extended Day</p>
-          <p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate5Price">$1,650/month</p>
-        </div>
-        <div class="method-card" style="text-align:center;">
-          <div class="method-number" style="background:#e3f2fd;color:#1565c0;"><i class="fas fa-graduation-cap"></i></div>
-          <h3 data-editable="tuitionRate6Name">Kindergarten Full-Day</h3>
-          <p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate6Desc">Ages 5-6 &bull; Full Day</p>
-          <p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate6Price">$1,400/month</p>
-        </div>
-        <div class="method-card" style="text-align:center;">
-          <div class="method-number" style="background:#e3f2fd;color:#1565c0;"><i class="fas fa-graduation-cap"></i></div>
-          <h3 data-editable="tuitionRate7Name">Kindergarten Extended</h3>
-          <p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate7Desc">Ages 5-6 &bull; Extended Day</p>
-          <p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate7Price">$1,650/month</p>
-        </div>
+      <div class="method-grid" id="tuitionGrid">
+        <!-- Tuition cards rendered by JS from siteContent -->
+      </div>
+      <div id="tuitionAdminAdd" style="display:none;text-align:center;margin-top:20px;">
+        <button onclick="addTuitionBox()" style="background:#4a7c59;color:#fff;border:none;padding:12px 28px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600;"><i class="fas fa-plus"></i> Add Tuition Rate</button>
       </div>
       <div style="margin-top:32px;text-align:center;">
         <div style="display:inline-block;text-align:left;background:#f8f9fa;border-radius:12px;padding:24px 32px;max-width:600px;">
@@ -202,7 +164,7 @@
         <p>Our admissions team is happy to discuss payment plans, financial assistance, and sibling discounts.</p>
         <div class="cta-buttons">
           <a href="/contact" class="btn btn-primary btn-large">Contact Us</a>
-          <a href="/enrollment" class="btn btn-outline btn-large">Apply Now</a>
+          <a href="/contact#tour" class="btn btn-outline btn-large">Book a Tour</a>
         </div>
       </div>
     </div>
@@ -235,7 +197,7 @@
             <li><a href="/programs">Programs</a></li>
             <li><a href="/staff">Our Staff</a></li>
             <li><a href="/gallery">Gallery</a></li>
-            <li><a href="/enrollment">Enrollment</a></li>
+            <li><a href="/contact#tour">Book a Tour</a></li>
           </ul>
         </div>
         <div class="footer-links">
@@ -271,6 +233,140 @@
   <script src="/js/main.js"></script>
   <script src="https://js.stripe.com/v3/"></script>
   <script>
+    // --- Default tuition rates (used if no siteContent overrides exist) ---
+    var defaultTuitionRates = [
+      { key: 1, name: 'Toddler Half-Day', desc: 'Ages 2-3 &bull; Morning Session', price: '$850/month', icon: 'fa-baby', bg: '#e8f5e9', color: '#4a7c59' },
+      { key: 2, name: 'Toddler Full-Day', desc: 'Ages 2-3 &bull; Full Day', price: '$1,200/month', icon: 'fa-baby', bg: '#e8f5e9', color: '#4a7c59' },
+      { key: 3, name: 'Primary Half-Day', desc: 'Ages 3-5 &bull; Morning Session', price: '$950/month', icon: 'fa-star', bg: '#fff3d6', color: '#e09000' },
+      { key: 4, name: 'Primary Full-Day', desc: 'Ages 3-5 &bull; Full Day', price: '$1,400/month', icon: 'fa-star', bg: '#fff3d6', color: '#e09000' },
+      { key: 5, name: 'Primary Extended', desc: 'Ages 3-5 &bull; Extended Day', price: '$1,650/month', icon: 'fa-star', bg: '#fff3d6', color: '#e09000' },
+      { key: 6, name: 'Kindergarten Full-Day', desc: 'Ages 5-6 &bull; Full Day', price: '$1,400/month', icon: 'fa-graduation-cap', bg: '#e3f2fd', color: '#1565c0' },
+      { key: 7, name: 'Kindergarten Extended', desc: 'Ages 5-6 &bull; Extended Day', price: '$1,650/month', icon: 'fa-graduation-cap', bg: '#e3f2fd', color: '#1565c0' },
+    ];
+
+    var isAdminUser = false;
+
+    function getTuitionCount(sc) {
+      var count = parseInt(sc.tuitionRateCount);
+      return isNaN(count) ? defaultTuitionRates.length : count;
+    }
+
+    function renderTuitionGrid(sc) {
+      var grid = document.getElementById('tuitionGrid');
+      var count = getTuitionCount(sc);
+      var html = '';
+      for (var i = 1; i <= count; i++) {
+        var def = defaultTuitionRates[i - 1] || { name: 'New Rate', desc: 'Description', price: '$0/month', icon: 'fa-star', bg: '#e8f5e9', color: '#4a7c59' };
+        var name = sc['tuitionRate' + i + 'Name'] || def.name;
+        var desc = sc['tuitionRate' + i + 'Desc'] || def.desc;
+        var price = sc['tuitionRate' + i + 'Price'] || def.price;
+        var icon = def.icon;
+        var bg = def.bg;
+        var clr = def.color;
+        var removeBtn = isAdminUser ? '<button onclick="removeTuitionBox(' + i + ')" style="position:absolute;top:8px;right:8px;background:#e74c3c;color:#fff;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:none;" class="tuition-remove-btn" title="Remove this rate"><i class="fas fa-times"></i></button>' : '';
+        html += '<div class="method-card" style="text-align:center;position:relative;">' +
+          removeBtn +
+          '<div class="method-number" style="background:' + bg + ';color:' + clr + ';"><i class="fas ' + icon + '"></i></div>' +
+          '<h3 data-editable="tuitionRate' + i + 'Name">' + name + '</h3>' +
+          '<p style="font-size:0.95rem;color:#636e72;" data-editable="tuitionRate' + i + 'Desc">' + desc + '</p>' +
+          '<p style="font-size:2rem;font-weight:700;color:#4a7c59;margin:12px 0;" data-editable="tuitionRate' + i + 'Price">' + price + '</p>' +
+          '</div>';
+      }
+      grid.innerHTML = html;
+    }
+
+    async function addTuitionBox() {
+      var sc;
+      try {
+        var r = await fetch('/api/site-content');
+        sc = (await r.json()).siteContent || {};
+      } catch(e) { sc = {}; }
+      var count = getTuitionCount(sc);
+      count++;
+      await fetch('/api/admin/update-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tuitionRateCount: String(count),
+          ['tuitionRate' + count + 'Name']: 'New Program',
+          ['tuitionRate' + count + 'Desc']: 'Age range &bull; Schedule',
+          ['tuitionRate' + count + 'Price']: '$0/month',
+        }),
+      });
+      sc.tuitionRateCount = String(count);
+      sc['tuitionRate' + count + 'Name'] = 'New Program';
+      sc['tuitionRate' + count + 'Desc'] = 'Age range &bull; Schedule';
+      sc['tuitionRate' + count + 'Price'] = '$0/month';
+      renderTuitionGrid(sc);
+      if (typeof initInlineEditing === 'function') {
+        // Re-trigger edit mode awareness
+        document.querySelectorAll('[data-editable]').forEach(function(el) {
+          if (document.body.classList.contains('admin-edit-mode')) {
+            el.setAttribute('contenteditable', 'true');
+            el.classList.add('admin-editable');
+          }
+        });
+      }
+    }
+
+    async function removeTuitionBox(index) {
+      if (!confirm('Remove this tuition rate?')) return;
+      var sc;
+      try {
+        var r = await fetch('/api/site-content');
+        sc = (await r.json()).siteContent || {};
+      } catch(e) { sc = {}; }
+      var count = getTuitionCount(sc);
+      // Shift all rates above index down by one
+      var updates = {};
+      for (var i = index; i < count; i++) {
+        updates['tuitionRate' + i + 'Name'] = sc['tuitionRate' + (i + 1) + 'Name'] || defaultTuitionRates[i] && defaultTuitionRates[i].name || 'Rate';
+        updates['tuitionRate' + i + 'Desc'] = sc['tuitionRate' + (i + 1) + 'Desc'] || defaultTuitionRates[i] && defaultTuitionRates[i].desc || 'Desc';
+        updates['tuitionRate' + i + 'Price'] = sc['tuitionRate' + (i + 1) + 'Price'] || defaultTuitionRates[i] && defaultTuitionRates[i].price || '$0';
+      }
+      updates.tuitionRateCount = String(count - 1);
+      await fetch('/api/admin/update-content', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      Object.assign(sc, updates);
+      renderTuitionGrid(sc);
+    }
+
+    // Load and render tuition grid on page load
+    (async function() {
+      var sc = {};
+      try {
+        var r = await fetch('/api/site-content');
+        var d = await r.json();
+        sc = d.siteContent || {};
+      } catch(e) {}
+      // Check if admin
+      try {
+        var resp = await fetch('/api/auth/me');
+        if (resp.ok) {
+          var data = await resp.json();
+          if (data.user && data.user.role === 'admin') {
+            isAdminUser = true;
+            document.getElementById('tuitionAdminAdd').style.display = '';
+          }
+        }
+      } catch(e) {}
+      renderTuitionGrid(sc);
+      // Show remove buttons when edit mode is toggled
+      if (isAdminUser) {
+        var observer = new MutationObserver(function() {
+          var editMode = document.body.classList.contains('admin-edit-mode');
+          document.querySelectorAll('.tuition-remove-btn').forEach(function(btn) {
+            btn.style.display = editMode ? 'block' : 'none';
+          });
+          document.getElementById('tuitionAdminAdd').style.display = editMode ? '' : 'none';
+        });
+        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      }
+    })();
+
     (async function initTuitionPage() {
       // Check if user is logged in
       let currentUser = null;

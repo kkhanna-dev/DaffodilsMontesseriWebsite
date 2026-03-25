@@ -29,6 +29,8 @@
         <li><a href="/programs">Programs</a></li>
         <li><a href="/staff" class="active">Our Staff</a></li>
         <li><a href="/gallery">Gallery</a></li>
+        <li><a href="/tuition">Tuition</a></li>
+        <li><a href="/events">Events</a></li>
         <li><a href="/contact">Contact</a></li>
         <li><a href="/login" class="nav-register"><i class="fas fa-sign-in-alt"></i> Login</a></li>
         <li><a href="/enrollment" class="nav-cta">Enroll Now</a></li>
@@ -53,58 +55,254 @@
     <div class="container">
       <div class="section-header">
         <span class="section-label">Our Team</span>
-        <h2>Meet the Khanna Family</h2>
-        <p>The passionate team behind Daffodils Montessori.</p>
+        <h2 data-editable="staffTitle">Meet the Khanna Family</h2>
+        <p data-editable="staffSubtitle">The passionate team behind Daffodils Montessori.</p>
       </div>
-      <div class="staff-leadership">
-        <div class="staff-card leadership-card">
-          <div class="staff-photo">
-            <div class="staff-avatar" style="background: linear-gradient(135deg, #f6d365, #fda085);">
-              <span>KK</span>
-            </div>
-          </div>
-          <div class="staff-info">
-            <h3>Kartik Khanna</h3>
-            <span class="staff-title"><!-- Title to be added --></span>
-            <p><!-- Bio to be added --></p>
-            <div class="staff-credentials">
-              <!-- Credentials to be added -->
-            </div>
-          </div>
-        </div>
-        <div class="staff-card leadership-card">
-          <div class="staff-photo">
-            <div class="staff-avatar" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb);">
-              <span>SK</span>
-            </div>
-          </div>
-          <div class="staff-info">
-            <h3>Shruti Khanna</h3>
-            <span class="staff-title"><!-- Title to be added --></span>
-            <p><!-- Bio to be added --></p>
-            <div class="staff-credentials">
-              <!-- Credentials to be added -->
-            </div>
-          </div>
-        </div>
-        <div class="staff-card leadership-card">
-          <div class="staff-photo">
-            <div class="staff-avatar" style="background: linear-gradient(135deg, #d4fc79, #96e6a1);">
-              <span>RK</span>
-            </div>
-          </div>
-          <div class="staff-info">
-            <h3>Rishi Khanna</h3>
-            <span class="staff-title"><!-- Title to be added --></span>
-            <p><!-- Bio to be added --></p>
-            <div class="staff-credentials">
-              <!-- Credentials to be added -->
-            </div>
-          </div>
-        </div>
+      <div class="staff-leadership" id="staffContainer">
+        <!-- Staff cards loaded dynamically -->
       </div>
     </div>
   </section>
+
+  <script>
+    const gradients = [
+      'linear-gradient(135deg, #f6d365, #fda085)',
+      'linear-gradient(135deg, #a1c4fd, #c2e9fb)',
+      'linear-gradient(135deg, #d4fc79, #96e6a1)',
+      'linear-gradient(135deg, #fbc2eb, #a6c1ee)',
+      'linear-gradient(135deg, #ffecd2, #fcb69f)',
+    ];
+
+    let currentStaff = [];
+    let isAdminEditMode = false;
+
+    const defaultStaff = [
+      { name: 'Kartik Khanna', title: '', bio: '', image: '', credentials: '' },
+      { name: 'Shruti Khanna', title: '', bio: '', image: '', credentials: '' },
+      { name: 'Rishi Khanna', title: '', bio: '', image: '', credentials: '' },
+    ];
+
+    async function loadStaff() {
+      const container = document.getElementById('staffContainer');
+      try {
+        const resp = await fetch('/api/staff');
+        if (!resp.ok) throw new Error();
+        const { staff } = await resp.json();
+        currentStaff = (staff && staff.length > 0) ? staff : [...defaultStaff];
+      } catch {
+        currentStaff = [...defaultStaff];
+      }
+      renderAllStaff();
+    }
+
+    function renderAllStaff() {
+      const container = document.getElementById('staffContainer');
+      container.innerHTML = currentStaff.map((s, i) => renderStaffCard(s, i)).join('');
+
+      // Add the "Add Staff" button area (hidden by default, shown in edit mode)
+      let addBtn = document.getElementById('addStaffBtn');
+      if (!addBtn) {
+        addBtn = document.createElement('div');
+        addBtn.id = 'addStaffBtn';
+        addBtn.style.cssText = 'display:none;text-align:center;margin-top:24px;';
+        addBtn.innerHTML = '<button class="btn btn-primary" style="font-size:16px;padding:14px 32px;"><i class="fas fa-plus"></i> Add Staff Member</button>';
+        container.parentNode.appendChild(addBtn);
+        addBtn.querySelector('button').addEventListener('click', () => {
+          currentStaff.push({ name: 'New Member', title: '', bio: '', image: '', credentials: '' });
+          renderAllStaff();
+          if (isAdminEditMode) enableStaffEditMode();
+          saveStaffToServer();
+        });
+      }
+      if (isAdminEditMode) enableStaffEditMode();
+    }
+
+    function renderStaffCard(s, i) {
+      const initials = (s.name || '?').split(' ').map(w => w[0]).join('').toUpperCase();
+      const gradient = gradients[i % gradients.length];
+      const hasImage = s.image && s.image.trim();
+
+      return `
+        <div class="staff-card leadership-card" data-staff-idx="${i}">
+          <div class="staff-photo" style="position:relative;">
+            ${hasImage
+              ? '<img src="' + escapeAttr(s.image) + '" alt="' + escapeAttr(s.name || '') + '" style="width:140px;height:140px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 4px 15px rgba(0,0,0,0.1);">'
+              : '<div class="staff-avatar" style="background:' + gradient + ';"><span>' + initials + '</span></div>'
+            }
+          </div>
+          <div class="staff-info">
+            <h3 class="staff-edit-name">${escapeHtml(s.name || 'Team Member')}</h3>
+            <span class="staff-title staff-edit-title">${escapeHtml(s.title || '')}</span>
+            <p class="staff-edit-bio">${escapeHtml(s.bio || '')}</p>
+            <div class="staff-credentials staff-edit-credentials">${s.credentials ? '<i class="fas fa-certificate"></i> ' + escapeHtml(s.credentials) : ''}</div>
+          </div>
+          <button class="staff-remove-btn" style="display:none;position:absolute;top:8px;right:8px;background:#e53935;color:#fff;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:14px;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,0.2);" title="Remove staff member"><i class="fas fa-trash"></i></button>
+        </div>`;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return (str || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function enableStaffEditMode() {
+      isAdminEditMode = true;
+      const addBtn = document.getElementById('addStaffBtn');
+      if (addBtn) addBtn.style.display = 'block';
+
+      document.querySelectorAll('.staff-card[data-staff-idx]').forEach(card => {
+        const idx = parseInt(card.getAttribute('data-staff-idx'));
+        card.style.position = 'relative';
+
+        // Make text fields editable
+        const nameEl = card.querySelector('.staff-edit-name');
+        const titleEl = card.querySelector('.staff-edit-title');
+        const bioEl = card.querySelector('.staff-edit-bio');
+        const credEl = card.querySelector('.staff-edit-credentials');
+
+        [nameEl, titleEl, bioEl, credEl].forEach(el => {
+          if (el) {
+            el.setAttribute('contenteditable', 'true');
+            el.style.outline = 'none';
+            el.style.borderBottom = '2px dashed #4a7c28';
+            el.style.minHeight = '1.2em';
+            if (!el.textContent.trim()) el.style.minWidth = '120px';
+          }
+        });
+
+        // Set placeholder text for empty fields
+        if (titleEl && !titleEl.textContent.trim()) titleEl.textContent = 'Click to add title';
+        if (bioEl && !bioEl.textContent.trim()) bioEl.textContent = 'Click to add bio';
+        if (credEl && !credEl.textContent.trim()) credEl.innerHTML = '<i class="fas fa-certificate"></i> Click to add credentials';
+
+        // Save on blur
+        const saveOnBlur = () => {
+          const cred = credEl.textContent.trim();
+          currentStaff[idx] = {
+            ...currentStaff[idx],
+            name: nameEl.textContent.trim(),
+            title: titleEl.textContent.trim().replace('Click to add title', ''),
+            bio: bioEl.textContent.trim().replace('Click to add bio', ''),
+            credentials: cred.replace('Click to add credentials', ''),
+          };
+          saveStaffToServer();
+        };
+        [nameEl, titleEl, bioEl, credEl].forEach(el => {
+          if (el) el.addEventListener('blur', saveOnBlur);
+        });
+
+        // Show remove button
+        const removeBtn = card.querySelector('.staff-remove-btn');
+        if (removeBtn) {
+          removeBtn.style.display = 'block';
+          removeBtn.addEventListener('click', () => {
+            if (!confirm('Remove ' + (currentStaff[idx].name || 'this staff member') + '?')) return;
+            currentStaff.splice(idx, 1);
+            renderAllStaff();
+            saveStaffToServer();
+          });
+        }
+
+        // Photo upload overlay
+        const photoDiv = card.querySelector('.staff-photo');
+        if (photoDiv && !photoDiv.querySelector('.staff-photo-overlay')) {
+          const overlay = document.createElement('div');
+          overlay.className = 'staff-photo-overlay';
+          overlay.innerHTML = '<i class="fas fa-camera"></i>';
+          overlay.style.cssText = 'position:absolute;inset:0;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;border-radius:inherit;font-size:24px;z-index:10;opacity:0;transition:opacity 0.2s;';
+          photoDiv.appendChild(overlay);
+          photoDiv.addEventListener('mouseenter', () => overlay.style.opacity = '1');
+          photoDiv.addEventListener('mouseleave', () => overlay.style.opacity = '0');
+
+          overlay.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.addEventListener('change', async () => {
+              const file = input.files[0];
+              if (!file) return;
+              const formData = new FormData();
+              formData.append('key', 'staffPhoto_' + idx);
+              formData.append('image', file);
+              try {
+                const resp = await fetch('/api/admin/upload-site-image', { method: 'POST', body: formData });
+                if (resp.ok) {
+                  const result = await resp.json();
+                  if (result.imagePath) {
+                    currentStaff[idx].image = result.imagePath;
+                    renderAllStaff();
+                    saveStaffToServer();
+                  }
+                }
+              } catch { alert('Failed to upload image.'); }
+            });
+            input.click();
+          });
+        }
+      });
+    }
+
+    function disableStaffEditMode() {
+      isAdminEditMode = false;
+      const addBtn = document.getElementById('addStaffBtn');
+      if (addBtn) addBtn.style.display = 'none';
+
+      document.querySelectorAll('.staff-card[data-staff-idx]').forEach(card => {
+        const nameEl = card.querySelector('.staff-edit-name');
+        const titleEl = card.querySelector('.staff-edit-title');
+        const bioEl = card.querySelector('.staff-edit-bio');
+        const credEl = card.querySelector('.staff-edit-credentials');
+
+        [nameEl, titleEl, bioEl, credEl].forEach(el => {
+          if (el) {
+            el.removeAttribute('contenteditable');
+            el.style.borderBottom = '';
+          }
+        });
+
+        const removeBtn = card.querySelector('.staff-remove-btn');
+        if (removeBtn) removeBtn.style.display = 'none';
+
+        const overlay = card.querySelector('.staff-photo-overlay');
+        if (overlay) overlay.remove();
+      });
+    }
+
+    async function saveStaffToServer() {
+      try {
+        const resp = await fetch('/api/admin/staff', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ staff: currentStaff }),
+        });
+        if (resp.ok) {
+          const indicator = document.getElementById('adminSaveIndicator');
+          if (indicator) {
+            indicator.textContent = 'Staff saved!';
+            indicator.style.opacity = '1';
+            setTimeout(() => { indicator.style.opacity = '0'; }, 2000);
+          }
+        }
+      } catch { /* ignore */ }
+    }
+
+    // Hook into the admin edit toggle from main.js
+    const origObserver = new MutationObserver(() => {
+      if (document.body.classList.contains('admin-edit-mode')) {
+        if (!isAdminEditMode) enableStaffEditMode();
+      } else {
+        if (isAdminEditMode) disableStaffEditMode();
+      }
+    });
+    origObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    loadStaff();
+  </script>
 
   <!-- Join Our Team -->
   <section class="section cta-section">

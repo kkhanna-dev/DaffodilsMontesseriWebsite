@@ -14,6 +14,15 @@ const multer = require('multer');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// --- Stripe Initialization ---
+let stripe = null;
+if (process.env.STRIPE_SECRET_KEY) {
+  const Stripe = require('stripe');
+  stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+} else {
+  console.warn('WARNING: STRIPE_SECRET_KEY is not set. Payment features will be disabled.');
+}
+
 // --- Data Store (JSON file-based) ---
 const DATA_FILE = path.join(__dirname, 'data.json');
 
@@ -26,12 +35,16 @@ function loadData() {
       if (!data.curriculum) data.curriculum = [];
       if (!data.siteContent) data.siteContent = {};
       if (!data.announcements) data.announcements = [];
+      if (!data.activityReports) data.activityReports = [];
+      if (!data.events) data.events = [];
+      if (!data.staff) data.staff = [];
+      if (!data.payments) data.payments = [];
       return data;
     }
   } catch (e) {
     console.error('Error loading data:', e);
   }
-  return { users: [], interestedLeads: [], enrollments: [], tourRequests: [], children: [], contactSubmissions: [], curriculum: [], siteContent: {}, announcements: [] };
+  return { users: [], interestedLeads: [], enrollments: [], tourRequests: [], children: [], contactSubmissions: [], curriculum: [], siteContent: {}, announcements: [], activityReports: [], events: [], staff: [], payments: [] };
 }
 
 function saveData(data) {
@@ -119,6 +132,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://js.stripe.com"],
+      scriptSrcAttr: ["'unsafe-inline'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
       fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       imgSrc: ["'self'", "data:", "https:"],
@@ -154,6 +168,53 @@ const formLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many form submissions. Please try again later.' },
+});
+
+// --- Stripe Webhook (must be before body parser for raw body) ---
+app.post('/api/payment-webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  if (!stripe) {
+    return res.status(503).json({ error: 'Payment system is not configured.' });
+  }
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!endpointSecret) {
+    console.warn('WARNING: STRIPE_WEBHOOK_SECRET is not set. Cannot verify webhook signatures.');
+    return res.status(400).json({ error: 'Webhook secret not configured.' });
+  }
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).json({ error: 'Webhook signature verification failed.' });
+  }
+
+  // Handle payment intent events
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+    const data = loadData();
+    if (!data.payments) data.payments = [];
+    const payment = data.payments.find(p => p.stripePaymentIntentId === paymentIntent.id);
+    if (payment) {
+      payment.status = 'succeeded';
+      payment.updatedAt = new Date().toISOString();
+      saveData(data);
+    }
+  } else if (event.type === 'payment_intent.payment_failed') {
+    const paymentIntent = event.data.object;
+    const data = loadData();
+    if (!data.payments) data.payments = [];
+    const payment = data.payments.find(p => p.stripePaymentIntentId === paymentIntent.id);
+    if (payment) {
+      payment.status = 'failed';
+      payment.updatedAt = new Date().toISOString();
+      saveData(data);
+    }
+  }
+
+  res.json({ received: true });
 });
 
 // --- Middleware ---
@@ -207,6 +268,8 @@ app.get('/staff', (req, res) => res.sendFile(path.join(__dirname, 'views', 'staf
 app.get('/contact', (req, res) => res.sendFile(path.join(__dirname, 'views', 'contact.html')));
 app.get('/enrollment', (req, res) => res.sendFile(path.join(__dirname, 'views', 'enrollment.html')));
 app.get('/gallery', (req, res) => res.sendFile(path.join(__dirname, 'views', 'gallery.html')));
+app.get('/tuition', (req, res) => res.sendFile(path.join(__dirname, 'views', 'tuition.html')));
+app.get('/events', (req, res) => res.sendFile(path.join(__dirname, 'views', 'events.html')));
 
 // --- Auth Pages ---
 app.get('/login', (req, res) => {
@@ -272,6 +335,99 @@ app.post('/api/register', authLimiter, (req, res) => {
 
   req.session.user = { id: newUser.id, email: newUser.email, name: newUser.name, role: newUser.role };
   res.json({ success: true, redirect: '/portal' });
+});
+
+// Forgot password - request reset
+app.post('/api/forgot-password', formLimiter, async (req, res) => {
+  const { email } = req.body;
+  if (!email || !isValidEmail(email)) {
+    return res.status(400).json({ error: 'Please provide a valid email address.' });
+  }
+
+  const data = loadData();
+  const user = data.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+  // Always return success to prevent email enumeration
+  if (!user) {
+    return res.json({ success: true, message: 'If an account with that email exists, a password reset link has been sent.' });
+  }
+
+  // Generate reset token
+  const token = crypto.randomBytes(32).toString('hex');
+  user.resetToken = token;
+  user.resetTokenExpiry = Date.now() + 3600000; // 1 hour
+  saveData(data);
+
+  // Send reset email (non-blocking)
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+
+    const resetUrl = `${req.protocol}://${req.get('host')}/reset-password?token=${token}`;
+    const escapedName = (user.name || 'there').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    await transporter.sendMail({
+      from: `"Daffodils Montessori" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: 'Password Reset - Daffodils Montessori',
+      html: `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#f4f1ec;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ec;padding:30px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+  <tr><td style="background:linear-gradient(135deg,#2d5016 0%,#4a7c28 50%,#6ba832 100%);padding:30px 40px;text-align:center;">
+    <div style="font-size:40px;margin-bottom:8px;">🌼</div>
+    <h1 style="color:#fff;margin:0;font-size:22px;">Password Reset Request</h1>
+    <p style="color:rgba(255,255,255,0.85);margin:8px 0 0;font-size:14px;">Daffodils Montessori</p>
+  </td></tr>
+  <tr><td style="padding:30px 40px;">
+    <h2 style="margin:0 0 16px;color:#2d5016;font-size:18px;">Hi ${escapedName},</h2>
+    <p style="color:#555;font-size:15px;line-height:1.6;margin:0 0 20px;">We received a request to reset your password. Click the button below to set a new password. This link expires in 1 hour.</p>
+    <div style="text-align:center;margin:24px 0;">
+      <a href="${resetUrl}" style="display:inline-block;background:#2d5016;color:#fff;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:600;font-size:15px;">Reset My Password</a>
+    </div>
+    <p style="color:#999;font-size:13px;line-height:1.5;">If you didn't request this, you can safely ignore this email. Your password will remain unchanged.</p>
+  </td></tr>
+  <tr><td style="background:#f4f1ec;padding:16px 40px;text-align:center;border-top:1px solid #e0dcd4;">
+    <p style="margin:0;color:#aaa;font-size:11px;">Daffodils Montessori - Nurturing Young Minds</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>`,
+    });
+  } catch (e) { console.log('Password reset email error:', e.message); }
+
+  res.json({ success: true, message: 'If an account with that email exists, a password reset link has been sent.' });
+});
+
+// Reset password page
+app.get('/reset-password', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'reset-password.html'));
+});
+
+// Reset password - set new password
+app.post('/api/reset-password', authLimiter, (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return res.status(400).json({ error: 'Token and new password are required.' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters.' });
+  }
+
+  const data = loadData();
+  const user = data.users.find(u => u.resetToken === token && u.resetTokenExpiry > Date.now());
+  if (!user) {
+    return res.status(400).json({ error: 'Invalid or expired reset link. Please request a new one.' });
+  }
+
+  user.password = bcrypt.hashSync(password, 10);
+  delete user.resetToken;
+  delete user.resetTokenExpiry;
+  saveData(data);
+
+  res.json({ success: true, message: 'Password reset successfully! You can now log in with your new password.' });
 });
 
 app.get('/logout', (req, res) => {
@@ -409,6 +565,9 @@ app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
     curriculum: data.curriculum || [],
     siteContent: data.siteContent || {},
     announcements: data.announcements || [],
+    activityReports: data.activityReports || [],
+    events: data.events || [],
+    staff: data.staff || [],
   });
 });
 
@@ -478,19 +637,35 @@ app.delete('/api/admin/tour/:id', requireAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+// Admin: delete enrollment
+app.delete('/api/admin/enrollment/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  data.enrollments = data.enrollments.filter(e => e.id !== parseInt(req.params.id));
+  saveData(data);
+  res.json({ success: true });
+});
+
+// Admin: delete contact submission
+app.delete('/api/admin/contact-submission/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  data.contactSubmissions = (data.contactSubmissions || []).filter(s => s.id !== parseInt(req.params.id));
+  saveData(data);
+  res.json({ success: true });
+});
+
 // Admin: delete a parent (user) and all related data
 app.delete('/api/admin/user/:id', requireAdmin, (req, res) => {
   const data = loadData();
   const userId = parseInt(req.params.id);
   const user = data.users.find(u => u.id === userId);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-  if (user.role === 'admin') return res.status(400).json({ error: 'Cannot delete admin accounts' });
+  if (!user || user.role === 'admin') return res.status(404).json({ error: 'User not found or cannot delete admin.' });
 
-  const email = user.email;
+  // Remove user's children
+  data.children = (data.children || []).filter(c => c.parentEmail.toLowerCase() !== user.email.toLowerCase());
+  // Remove user's contact submissions
+  data.contactSubmissions = (data.contactSubmissions || []).filter(s => s.userId !== userId);
+  // Remove user
   data.users = data.users.filter(u => u.id !== userId);
-  data.children = data.children.filter(c => c.parentEmail !== email);
-  data.interestedLeads = data.interestedLeads.filter(l => l.email !== email);
-  data.contactSubmissions = data.contactSubmissions.filter(s => s.userEmail !== email);
   saveData(data);
   res.json({ success: true });
 });
@@ -587,6 +762,31 @@ app.post('/api/admin/update-content', requireAdmin, (req, res) => {
     'heroTitle', 'heroSubtitle', 'heroTagline', 'heroDesc',
     'aboutTitle', 'aboutDesc', 'aboutDesc2',
     'announcementTitle', 'announcementText',
+    // About page
+    'aboutStoryTitle', 'aboutStoryP1', 'aboutStoryP2', 'aboutStoryP3',
+    'aboutMission', 'aboutVision', 'aboutValues',
+    'aboutMethodTitle', 'aboutMethodDesc',
+    'aboutCtaTitle', 'aboutCtaDesc',
+    // Programs page
+    'programToddlerTitle', 'programToddlerDesc',
+    'programPrimaryTitle', 'programPrimaryDesc',
+    'programKinderTitle', 'programKinderDesc',
+    'programEnrichTitle', 'programEnrichDesc',
+    'programCtaTitle', 'programCtaDesc',
+    // Gallery page
+    'galleryCtaTitle', 'galleryCtaDesc',
+    // Contact page
+    'contactFormTitle', 'contactFormDesc',
+    // Enrollment page
+    'enrollProcessTitle', 'enrollProcessDesc',
+    // Staff page
+    'staffTitle', 'staffSubtitle',
+    // Homepage news & events section
+    'newsEventsTitle', 'newsEventsDesc',
+    // Tuition page
+    'tuitionTitle', 'tuitionDesc',
+    // Events page
+    'eventsTitle', 'eventsDesc',
   ];
 
   const updates = req.body;
@@ -689,6 +889,135 @@ app.delete('/api/admin/announcement/:id', requireAdmin, (req, res) => {
 app.get('/api/announcements', (req, res) => {
   const data = loadData();
   res.json({ announcements: data.announcements || [] });
+});
+
+// --- Daily Activity Reports ---
+
+// Admin: create activity report for a child
+app.post('/api/admin/activity-report', requireAdmin, (req, res) => {
+  const { childId, date, activities, meals, mood, nap, notes } = req.body;
+  if (!childId || !date) {
+    return res.status(400).json({ error: 'Child and date are required.' });
+  }
+
+  const data = loadData();
+  if (!data.activityReports) data.activityReports = [];
+
+  const child = (data.children || []).find(c => c.id === parseInt(childId));
+  if (!child) return res.status(404).json({ error: 'Child not found.' });
+
+  const report = {
+    id: data.activityReports.length > 0 ? Math.max(...data.activityReports.map(r => r.id)) + 1 : 1,
+    childId: parseInt(childId),
+    childName: child.childName,
+    parentEmail: child.parentEmail,
+    date,
+    activities: activities || '',
+    meals: meals || '',
+    mood: mood || '',
+    nap: nap || '',
+    notes: notes || '',
+    createdAt: new Date().toISOString(),
+  };
+
+  data.activityReports.push(report);
+  saveData(data);
+  res.json({ success: true, report });
+});
+
+// Admin: get all activity reports
+app.get('/api/admin/activity-reports', requireAdmin, (req, res) => {
+  const data = loadData();
+  res.json({ activityReports: data.activityReports || [] });
+});
+
+// Admin: delete activity report
+app.delete('/api/admin/activity-report/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  if (!data.activityReports) data.activityReports = [];
+  data.activityReports = data.activityReports.filter(r => r.id !== parseInt(req.params.id));
+  saveData(data);
+  res.json({ success: true });
+});
+
+// Parent: get activity reports for their children
+app.get('/api/portal/activity-reports', requireAuth, (req, res) => {
+  const data = loadData();
+  const reports = (data.activityReports || []).filter(
+    r => r.parentEmail.toLowerCase() === req.session.user.email.toLowerCase()
+  );
+  res.json({ activityReports: reports });
+});
+
+// --- Event Calendar ---
+
+// Admin: create event
+app.post('/api/admin/event', requireAdmin, (req, res) => {
+  const { title, description, date, endDate, time, type } = req.body;
+  if (!title || !date) {
+    return res.status(400).json({ error: 'Title and date are required.' });
+  }
+
+  const data = loadData();
+  if (!data.events) data.events = [];
+
+  const event = {
+    id: data.events.length > 0 ? Math.max(...data.events.map(e => e.id)) + 1 : 1,
+    title: sanitize(title),
+    description: sanitize(description || ''),
+    date,
+    endDate: endDate || date,
+    time: time || '',
+    type: type || 'general', // general, holiday, conference, field-trip
+    createdAt: new Date().toISOString(),
+  };
+
+  data.events.push(event);
+  saveData(data);
+  res.json({ success: true, event });
+});
+
+// Admin: delete event
+app.delete('/api/admin/event/:id', requireAdmin, (req, res) => {
+  const data = loadData();
+  if (!data.events) data.events = [];
+  data.events = data.events.filter(e => e.id !== parseInt(req.params.id));
+  saveData(data);
+  res.json({ success: true });
+});
+
+// Public: get events
+app.get('/api/events', (req, res) => {
+  const data = loadData();
+  res.json({ events: data.events || [] });
+});
+
+// --- Staff Management ---
+
+// Admin: update staff
+app.post('/api/admin/staff', requireAdmin, (req, res) => {
+  const { staff } = req.body;
+  if (!Array.isArray(staff)) {
+    return res.status(400).json({ error: 'Staff must be an array.' });
+  }
+
+  const data = loadData();
+  data.staff = staff.map((s, i) => ({
+    id: i + 1,
+    name: sanitize(s.name || ''),
+    title: sanitize(s.title || ''),
+    bio: sanitize(s.bio || ''),
+    image: s.image || '',
+    credentials: sanitize(s.credentials || ''),
+  }));
+  saveData(data);
+  res.json({ success: true, staff: data.staff });
+});
+
+// Public: get staff
+app.get('/api/staff', (req, res) => {
+  const data = loadData();
+  res.json({ staff: data.staff || [] });
 });
 
 // Public endpoint to get site content (for inline editing and dynamic content)
@@ -1078,6 +1407,91 @@ function generateAutoReplyEmail(name) {
 </body>
 </html>`;
 }
+
+// --- Stripe Payment Endpoints ---
+
+// Get Stripe publishable key for client-side
+app.get('/api/stripe-config', (req, res) => {
+  res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY || null });
+});
+
+// Create a payment intent (requires logged-in parent)
+app.post('/api/create-payment-intent', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'You must be logged in to make a payment.' });
+  }
+  if (!stripe) {
+    return res.status(503).json({ error: 'Payment system is not currently available. Please contact the school office.' });
+  }
+
+  const { amount, description, childId } = req.body;
+  if (!amount || isNaN(amount) || amount < 1) {
+    return res.status(400).json({ error: 'Please provide a valid payment amount.' });
+  }
+  if (amount > 999999) {
+    return res.status(400).json({ error: 'Payment amount exceeds the maximum allowed.' });
+  }
+
+  const amountInCents = Math.round(parseFloat(amount) * 100);
+
+  stripe.paymentIntents.create({
+    amount: amountInCents,
+    currency: 'usd',
+    metadata: {
+      userId: String(req.session.user.id),
+      userEmail: req.session.user.email,
+      childId: childId ? String(childId) : '',
+      description: description || 'Tuition Payment',
+    },
+  }).then(paymentIntent => {
+    // Store payment record
+    const data = loadData();
+    if (!data.payments) data.payments = [];
+    data.payments.push({
+      id: data.payments.length > 0 ? Math.max(...data.payments.map(p => p.id || 0)) + 1 : 1,
+      userId: req.session.user.id,
+      userEmail: req.session.user.email,
+      userName: req.session.user.name,
+      childId: childId || null,
+      amount: parseFloat(amount),
+      description: sanitize(description || 'Tuition Payment'),
+      stripePaymentIntentId: paymentIntent.id,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    saveData(data);
+
+    res.json({ clientSecret: paymentIntent.client_secret });
+  }).catch(err => {
+    console.error('Stripe payment intent creation failed:', err.message);
+    res.status(500).json({ error: 'Failed to create payment. Please try again.' });
+  });
+});
+
+// Get payment history for logged-in parent
+app.get('/api/portal/payments', (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ error: 'You must be logged in to view payments.' });
+  }
+  const data = loadData();
+  if (!data.payments) data.payments = [];
+  const userPayments = data.payments
+    .filter(p => p.userId === req.session.user.id)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  res.json({ payments: userPayments });
+});
+
+// Get all payments for admin
+app.get('/api/admin/payments', (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required.' });
+  }
+  const data = loadData();
+  if (!data.payments) data.payments = [];
+  const allPayments = data.payments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  res.json({ payments: allPayments });
+});
 
 if (require.main === module) {
   app.listen(PORT, () => {

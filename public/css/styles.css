@@ -752,6 +752,224 @@ h4 { font-size: 1.15rem; font-weight: 600; }
 }
 
 /* ========================================
+   HOME ANNOUNCEMENTS BANNER
+   ======================================== */
+.home-announcements-bar {
+  background: linear-gradient(135deg, #2d5016 0%, #4a7c28 100%);
+  color: #fff;
+  padding: 16px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.home-announcements-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.home-announcements-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.home-announcements-content {
+  flex: 1;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.home-announcements-content strong {
+  color: #ffd54f;
+}
+
+.home-ann-item {
+  padding: 4px 0;
+}
+
+.home-ann-item span {
+  opacity: 0.85;
+  margin-left: 6px;
+}
+
+.home-announcements-link {
+  flex-shrink: 0;
+  color: #fff;
+  background: rgba(255,255,255,0.15);
+  padding: 8px 18px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.home-announcements-link:hover {
+  background: rgba(255,255,255,0.28);
+}
+
+.home-announcements-link i {
+  margin-left: 6px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 768px) {
+  .home-announcements-inner {
+    flex-wrap: wrap;
+  }
+  .home-announcements-link {
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
+  }
+}
+
+/* Kept for events page / reuse */
+.news-events-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.news-column {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--border);
+}
+
+.news-column-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.3rem;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.news-column-title i {
+  font-size: 1.1rem;
+  color: var(--primary);
+}
+
+.news-card {
+  padding: 18px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.news-card:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.news-card:first-child {
+  padding-top: 0;
+}
+
+.news-card h4 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.news-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.news-card-date {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.news-card-date i {
+  margin-right: 6px;
+  font-size: 0.7rem;
+}
+
+/* Event card with calendar block */
+.news-card.event-type {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.news-card-calendar {
+  min-width: 60px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--primary-light), #e8f5e9);
+  border-radius: 12px;
+  padding: 10px 8px;
+  flex-shrink: 0;
+}
+
+.news-card-calendar .cal-month {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.news-card-calendar .cal-day {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  line-height: 1.2;
+}
+
+.news-card-details h4 {
+  margin-bottom: 4px;
+}
+
+.news-card-details .event-meta {
+  font-size: 0.82rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.news-card-details .event-meta i {
+  margin-right: 4px;
+  font-size: 0.75rem;
+}
+
+.news-empty {
+  color: var(--text-light);
+  font-style: italic;
+  font-size: 0.92rem;
+  text-align: center;
+  padding: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .news-events-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+/* ========================================
    CTA SECTION
    ======================================== */
 .cta-section {

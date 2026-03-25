@@ -29,6 +29,8 @@
         <li><a href="/programs">Programs</a></li>
         <li><a href="/staff">Our Staff</a></li>
         <li><a href="/gallery">Gallery</a></li>
+        <li><a href="/tuition">Tuition</a></li>
+        <li><a href="/events">Events</a></li>
         <li><a href="/contact">Contact</a></li>
         <li><a href="/login" class="nav-register"><i class="fas fa-sign-in-alt"></i> Login</a></li>
         <li><a href="/enrollment" class="nav-cta">Enroll Now</a></li>
@@ -52,6 +54,19 @@
     <div class="hero-scroll">
       <span>Scroll to discover</span>
       <i class="fas fa-chevron-down"></i>
+    </div>
+  </section>
+
+  <!-- Announcements Banner -->
+  <section class="home-announcements-bar" id="homeAnnouncementsBar" style="display:none;">
+    <div class="container">
+      <div class="home-announcements-inner">
+        <div class="home-announcements-icon">
+          <i class="fas fa-bullhorn"></i>
+        </div>
+        <div class="home-announcements-content" id="homeAnnouncementsContent"></div>
+        <a href="/events" class="home-announcements-link">View Events <i class="fas fa-arrow-right"></i></a>
+      </div>
     </div>
   </section>
 
@@ -442,5 +457,30 @@
   </footer>
 
   <script src="/js/main.js"></script>
+  <script>
+    // Load announcements into top banner
+    (async function loadAnnouncements() {
+      try {
+        const resp = await fetch('/api/announcements');
+        if (!resp.ok) return;
+        const { announcements } = await resp.json();
+        if (!announcements || announcements.length === 0) return;
+
+        const sorted = announcements
+          .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
+          .slice(0, 3);
+
+        const container = document.getElementById('homeAnnouncementsContent');
+        if (sorted.length === 1) {
+          container.innerHTML = '<strong>' + sorted[0].title + '</strong> — ' + (sorted[0].text || '');
+        } else {
+          container.innerHTML = sorted.map(a =>
+            '<div class="home-ann-item"><strong>' + a.title + '</strong> <span>' + (a.text || '') + '</span></div>'
+          ).join('');
+        }
+        document.getElementById('homeAnnouncementsBar').style.display = '';
+      } catch { /* ignore */ }
+    })();
+  </script>
 </body>
 </html>

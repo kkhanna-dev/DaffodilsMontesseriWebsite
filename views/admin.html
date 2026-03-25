@@ -61,13 +61,15 @@
 
       <!-- Tabs -->
       <div class="admin-tabs">
-        <button class="admin-tab active" data-tab="leads"><i class="fas fa-user-plus"></i> Interested Leads</button>
-        <button class="admin-tab" data-tab="submissions"><i class="fas fa-envelope-open-text"></i> Contact Submissions</button>
+        <button class="admin-tab active" data-tab="leads"><i class="fas fa-user-plus"></i> Leads</button>
+        <button class="admin-tab" data-tab="submissions"><i class="fas fa-envelope-open-text"></i> Contact</button>
         <button class="admin-tab" data-tab="enrollments"><i class="fas fa-file-alt"></i> Enrollments</button>
-        <button class="admin-tab" data-tab="tours"><i class="fas fa-calendar-check"></i> Tour Requests</button>
-        <button class="admin-tab" data-tab="children"><i class="fas fa-child"></i> Children Profiles</button>
-        <button class="admin-tab" data-tab="accounts"><i class="fas fa-users-cog"></i> Parent Accounts</button>
+        <button class="admin-tab" data-tab="tours"><i class="fas fa-calendar-check"></i> Tours</button>
+        <button class="admin-tab" data-tab="children"><i class="fas fa-child"></i> Children</button>
+        <button class="admin-tab" data-tab="accounts"><i class="fas fa-users-cog"></i> Accounts</button>
         <button class="admin-tab" data-tab="curriculum"><i class="fas fa-book"></i> Curriculum</button>
+        <button class="admin-tab" data-tab="activities"><i class="fas fa-clipboard-list"></i> Daily Reports</button>
+        <button class="admin-tab" data-tab="events"><i class="fas fa-calendar-alt"></i> Events</button>
         <button class="admin-tab" data-tab="announcements"><i class="fas fa-bullhorn"></i> Announcements</button>
       </div>
 
@@ -290,6 +292,116 @@
       </div>
 
 
+      <!-- Daily Activity Reports Tab -->
+      <div class="admin-panel" id="panel-activities">
+        <div class="admin-panel-header">
+          <h3>Daily Activity Reports</h3>
+          <p>Post daily updates for enrolled children. Parents see these on their portal.</p>
+        </div>
+        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-plus-circle"></i> Create Daily Report</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Child</label>
+              <select id="reportChildId" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                <option value="">Select an enrolled child...</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Date</label>
+              <input type="date" id="reportDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Mood</label>
+              <select id="reportMood" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                <option value="Happy">Happy</option>
+                <option value="Content">Content</option>
+                <option value="Excited">Excited</option>
+                <option value="Calm">Calm</option>
+                <option value="Tired">Tired</option>
+                <option value="Fussy">Fussy</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Nap</label>
+              <input type="text" id="reportNap" placeholder="e.g. 1:00 PM - 2:30 PM" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Activities</label>
+            <textarea id="reportActivities" rows="3" placeholder="What the child did today..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+          </div>
+          <div style="margin-top:16px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Meals</label>
+            <textarea id="reportMeals" rows="2" placeholder="Breakfast, lunch, snack details..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+          </div>
+          <div style="margin-top:16px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Teacher Notes</label>
+            <textarea id="reportNotes" rows="2" placeholder="Additional observations..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="createActivityReport()" style="margin-top:16px;"><i class="fas fa-paper-plane"></i> Post Report</button>
+        </div>
+        <div class="admin-table-wrapper">
+          <table class="admin-table">
+            <thead>
+              <tr><th>Child</th><th>Date</th><th>Mood</th><th>Activities</th><th>Meals</th><th>Nap</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="activityReportsTableBody">
+              <tr><td colspan="7" class="table-empty">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Events Calendar Tab -->
+      <div class="admin-panel" id="panel-events">
+        <div class="admin-panel-header">
+          <h3>Event Calendar</h3>
+          <p>Manage school events, holidays, and important dates.</p>
+        </div>
+        <div style="background:#f9f7f4;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <h4 style="margin:0 0 16px;color:#2d5016;"><i class="fas fa-plus-circle"></i> Add Event</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Title</label>
+              <input type="text" id="eventTitle" placeholder="Event name" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Date</label>
+              <input type="date" id="eventDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Type</label>
+              <select id="eventType" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+                <option value="general">General</option>
+                <option value="holiday">Holiday / Closure</option>
+                <option value="conference">Parent-Teacher Conference</option>
+                <option value="field-trip">Field Trip</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Time (optional)</label>
+              <input type="text" id="eventTime" placeholder="e.g. 10:00 AM - 11:30 AM" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">End Date (optional)</label>
+              <input type="date" id="eventEndDate" style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;">
+            </div>
+          </div>
+          <div style="margin-top:16px;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;color:#555;font-size:14px;">Description</label>
+            <textarea id="eventDescription" rows="2" placeholder="Event details..." style="width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="createEvent()" style="margin-top:16px;"><i class="fas fa-calendar-plus"></i> Add Event</button>
+        </div>
+        <div id="eventsListAdmin"><p class="table-empty">Loading...</p></div>
+      </div>
+
+
       <!-- Announcements Tab -->
       <div class="admin-panel" id="panel-announcements">
         <div class="admin-panel-header">
@@ -378,7 +490,10 @@
         renderChildren(dashboardData.children || [], dashboardData.contactSubmissions || []);
         renderUsers(dashboardData.users, dashboardData.children || [], dashboardData.contactSubmissions || []);
         renderCurriculum(dashboardData.curriculum || []);
+        renderActivityReports(dashboardData.activityReports || [], dashboardData.children || []);
+        renderEvents(dashboardData.events || []);
         renderAnnouncements(dashboardData.announcements || []);
+        populateChildDropdown(dashboardData.children || []);
       } catch { window.location.href = '/login'; }
     }
 
@@ -536,6 +651,7 @@
           <td>${contactBadge}</td>
           <td>${userChildren.length > 0 ? userChildren.map(c => escapeHtml(c.childName)).join(', ') : '<em>None</em>'}</td>
           <td>${formatDate(u.createdAt)}</td>
+          <td><button class="btn-icon btn-delete" onclick="deleteUser(${u.id})" title="Delete Account"><i class="fas fa-trash"></i></button></td>
         </tr>
       `}).join('');
     }
@@ -552,7 +668,7 @@
           <td><strong>${escapeHtml(c.title)}</strong></td>
           <td>${escapeHtml(c.program)}</td>
           <td class="msg-cell">${escapeHtml(c.description)}</td>
-          <td><a href="${escapeHtml(c.fileUrl)}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a></td>
+          <td><a href="${escapeHtml(c.filepath)}" target="_blank" class="btn btn-primary btn-sm"><i class="fas fa-download"></i> Download</a></td>
           <td>${formatDate(c.createdAt)}</td>
           <td><button class="btn-icon btn-delete" onclick="deleteCurriculum(${c.id})" title="Delete"><i class="fas fa-trash"></i></button></td>
         </tr>
@@ -764,6 +880,145 @@
     function closeParentModal() {
       document.getElementById('parentProfileModal').style.display = 'none';
     }
+
+    // --- Delete User ---
+    async function deleteUser(id) {
+      if (!confirm('Delete this parent account and all their data (children, submissions)? This cannot be undone.')) return;
+      await fetch('/api/admin/user/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
+    // --- Activity Reports ---
+    function populateChildDropdown(children) {
+      const select = document.getElementById('reportChildId');
+      if (!select) return;
+      const enrolled = children.filter(c => c.enrollmentStatus === 'enrolled' || c.enrollmentStatus === 'approved');
+      select.innerHTML = '<option value="">Select an enrolled child...</option>' +
+        enrolled.map(c => '<option value="' + c.id + '">' + escapeHtml(c.childName) + ' (' + escapeHtml(c.parentEmail) + ')</option>').join('');
+      // Set today's date as default
+      const dateInput = document.getElementById('reportDate');
+      if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+    }
+
+    function renderActivityReports(reports, children) {
+      const tbody = document.getElementById('activityReportsTableBody');
+      if (!reports || !reports.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="table-empty">No daily reports yet. Create one above for enrolled children.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = reports.sort((a,b) => new Date(b.date) - new Date(a.date)).map(r => `
+        <tr>
+          <td><strong>${escapeHtml(r.childName)}</strong><br><small style="color:#999;">${escapeHtml(r.parentEmail)}</small></td>
+          <td>${escapeHtml(r.date)}</td>
+          <td><span class="badge badge-${r.mood === 'Happy' || r.mood === 'Excited' ? 'enrolled' : r.mood === 'Tired' || r.mood === 'Fussy' ? 'pending' : 'waitlisted'}">${escapeHtml(r.mood)}</span></td>
+          <td class="msg-cell">${escapeHtml(r.activities)}</td>
+          <td class="msg-cell">${escapeHtml(r.meals)}</td>
+          <td>${escapeHtml(r.nap || '—')}</td>
+          <td><button class="btn-icon btn-delete" onclick="deleteActivityReport(${r.id})" title="Delete"><i class="fas fa-trash"></i></button></td>
+        </tr>
+      `).join('');
+    }
+
+    async function createActivityReport() {
+      const childId = document.getElementById('reportChildId').value;
+      const date = document.getElementById('reportDate').value;
+      if (!childId) { alert('Please select a child.'); return; }
+      if (!date) { alert('Please select a date.'); return; }
+
+      try {
+        const resp = await fetch('/api/admin/activity-report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            childId, date,
+            activities: document.getElementById('reportActivities').value,
+            meals: document.getElementById('reportMeals').value,
+            mood: document.getElementById('reportMood').value,
+            nap: document.getElementById('reportNap').value,
+            notes: document.getElementById('reportNotes').value,
+          })
+        });
+        if (resp.ok) {
+          document.getElementById('reportActivities').value = '';
+          document.getElementById('reportMeals').value = '';
+          document.getElementById('reportNap').value = '';
+          document.getElementById('reportNotes').value = '';
+          loadDashboard();
+        } else {
+          const err = await resp.json();
+          alert(err.error || 'Failed to create report.');
+        }
+      } catch { alert('Error creating report.'); }
+    }
+
+    async function deleteActivityReport(id) {
+      if (!confirm('Delete this activity report?')) return;
+      await fetch('/api/admin/activity-report/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
+    // --- Events ---
+    function renderEvents(events) {
+      const container = document.getElementById('eventsListAdmin');
+      if (!events || !events.length) {
+        container.innerHTML = '<p class="table-empty">No events yet. Create one above.</p>';
+        return;
+      }
+      const typeColors = { general: '#2d5016', holiday: '#c62828', conference: '#1565c0', 'field-trip': '#e09000' };
+      const typeIcons = { general: 'fa-calendar', holiday: 'fa-umbrella-beach', conference: 'fa-handshake', 'field-trip': 'fa-bus' };
+      container.innerHTML = events.sort((a,b) => new Date(a.date) - new Date(b.date)).map(e => `
+        <div style="background:#f9f7f4;border-radius:12px;padding:20px;margin-bottom:12px;border-left:4px solid ${typeColors[e.type] || '#2d5016'};display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <i class="fas ${typeIcons[e.type] || 'fa-calendar'}" style="color:${typeColors[e.type] || '#2d5016'};"></i>
+              <h4 style="margin:0;color:#2d5016;font-size:16px;">${escapeHtml(e.title)}</h4>
+              <span class="badge" style="background:${typeColors[e.type] || '#2d5016'}20;color:${typeColors[e.type] || '#2d5016'};font-size:11px;">${escapeHtml(e.type)}</span>
+            </div>
+            <p style="margin:0 0 4px;color:#555;font-size:14px;">${escapeHtml(e.description || '')}</p>
+            <span style="color:#999;font-size:12px;"><i class="fas fa-clock"></i> ${escapeHtml(e.date)}${e.endDate && e.endDate !== e.date ? ' - ' + escapeHtml(e.endDate) : ''} ${e.time ? '| ' + escapeHtml(e.time) : ''}</span>
+          </div>
+          <button class="btn-icon btn-delete" onclick="deleteEvent(${e.id})" title="Delete"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('');
+    }
+
+    async function createEvent() {
+      const title = document.getElementById('eventTitle').value.trim();
+      const date = document.getElementById('eventDate').value;
+      if (!title || !date) { alert('Title and date are required.'); return; }
+
+      try {
+        const resp = await fetch('/api/admin/event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title, date,
+            description: document.getElementById('eventDescription').value,
+            endDate: document.getElementById('eventEndDate').value,
+            time: document.getElementById('eventTime').value,
+            type: document.getElementById('eventType').value,
+          })
+        });
+        if (resp.ok) {
+          document.getElementById('eventTitle').value = '';
+          document.getElementById('eventDate').value = '';
+          document.getElementById('eventDescription').value = '';
+          document.getElementById('eventEndDate').value = '';
+          document.getElementById('eventTime').value = '';
+          loadDashboard();
+        } else {
+          const err = await resp.json();
+          alert(err.error || 'Failed to create event.');
+        }
+      } catch { alert('Error creating event.'); }
+    }
+
+    async function deleteEvent(id) {
+      if (!confirm('Delete this event?')) return;
+      await fetch('/api/admin/event/' + id, { method: 'DELETE' });
+      loadDashboard();
+    }
+
 
     loadDashboard();
   </script>

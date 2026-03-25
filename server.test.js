@@ -1513,3 +1513,339 @@ describe('E2E: Cross-Account Security', () => {
     expect(after.body.users.find(u => u.email === 'parentb-e2e@example.com')).toBeUndefined();
   });
 });
+
+// ============================================================
+// NEW: Additional Page & API Tests
+// ============================================================
+describe('Additional Public Pages', () => {
+  test('GET /tuition returns 200', async () => {
+    const res = await request(app).get('/tuition');
+    expect(res.status).toBe(200);
+  });
+
+  test('GET /events returns 200', async () => {
+    const res = await request(app).get('/events');
+    expect(res.status).toBe(200);
+  });
+
+  test('GET /reset-password returns 200', async () => {
+    const res = await request(app).get('/reset-password');
+    expect(res.status).toBe(200);
+  });
+});
+
+describe('Public API Endpoints', () => {
+  test('GET /api/announcements returns array', async () => {
+    const res = await request(app).get('/api/announcements');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.announcements)).toBe(true);
+  });
+
+  test('GET /api/events returns array', async () => {
+    const res = await request(app).get('/api/events');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.events)).toBe(true);
+  });
+
+  test('GET /api/staff returns array', async () => {
+    const res = await request(app).get('/api/staff');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.staff)).toBe(true);
+  });
+
+  test('GET /api/site-content returns object', async () => {
+    const res = await request(app).get('/api/site-content');
+    expect(res.status).toBe(200);
+    expect(res.body.siteContent).toBeDefined();
+  });
+});
+
+// ============================================================
+// NEW: Admin Events CRUD
+// ============================================================
+describe('Admin Events CRUD', () => {
+  let agent;
+  let createdEventId;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('POST /api/admin/event — creates event', async () => {
+    const res = await agent
+      .post('/api/admin/event')
+      .send({ title: 'Test Open House', date: '2026-05-01', time: '10:00 AM', description: 'Visit our campus!' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.event.title).toBe('Test Open House');
+    createdEventId = res.body.event.id;
+  });
+
+  test('POST /api/admin/event — rejects missing title', async () => {
+    const res = await agent
+      .post('/api/admin/event')
+      .send({ title: '', date: '2026-05-01' });
+    expect(res.status).toBe(400);
+  });
+
+  test('POST /api/admin/event — rejects missing date', async () => {
+    const res = await agent
+      .post('/api/admin/event')
+      .send({ title: 'No Date Event', date: '' });
+    expect(res.status).toBe(400);
+  });
+
+  test('GET /api/events — returns created event', async () => {
+    const res = await request(app).get('/api/events');
+    expect(res.status).toBe(200);
+    const found = res.body.events.find(e => e.title === 'Test Open House');
+    expect(found).toBeDefined();
+  });
+
+  test('DELETE /api/admin/event/:id — deletes event', async () => {
+    const res = await agent.delete(`/api/admin/event/${createdEventId}`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  test('DELETE /api/admin/event/9999 — 404 for nonexistent', async () => {
+    const res = await agent.delete('/api/admin/event/9999');
+    expect(res.status).toBe(404);
+  });
+
+  test('POST /api/admin/event — rejected for unauthenticated', async () => {
+    const res = await request(app)
+      .post('/api/admin/event')
+      .send({ title: 'Hack Event', date: '2026-06-01' });
+    expect(res.status).toBe(302);
+  });
+});
+
+// ============================================================
+// NEW: Admin Activity Reports CRUD
+// ============================================================
+describe('Admin Activity Reports CRUD', () => {
+  let agent;
+  let createdReportId;
+  let testChildId;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+
+    // We need a child to create a report for — find one or create via a parent
+    const dash = await agent.get('/api/admin/dashboard');
+    if (dash.body.children && dash.body.children.length > 0) {
+      testChildId = dash.body.children[0].id;
+    }
+  });
+
+  test('POST /api/admin/activity-report — creates report', async () => {
+    const res = await agent
+      .post('/api/admin/activity-report')
+      .send({
+        childId: testChildId || 1,
+        date: '2026-03-24',
+        mood: 'happy',
+        activities: 'Painting, reading, outdoor play',
+        meals: 'Ate lunch and snack well',
+        napTime: '1:00 PM - 2:30 PM',
+        notes: 'Had a great day!'
+      });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    createdReportId = res.body.report.id;
+  });
+
+  test('GET /api/admin/activity-report — lists reports', async () => {
+    const res = await agent.get('/api/admin/activity-report');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body.reports)).toBe(true);
+  });
+
+  test('DELETE /api/admin/activity-report/:id — deletes report', async () => {
+    if (createdReportId) {
+      const res = await agent.delete(`/api/admin/activity-report/${createdReportId}`);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+    }
+  });
+
+  test('POST /api/admin/activity-report — rejected for unauthenticated', async () => {
+    const res = await request(app)
+      .post('/api/admin/activity-report')
+      .send({ childId: 1, date: '2026-03-24', mood: 'happy' });
+    expect(res.status).toBe(302);
+  });
+});
+
+// ============================================================
+// NEW: Admin Staff Management
+// ============================================================
+describe('Admin Staff Management', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('POST /api/admin/staff — saves staff array', async () => {
+    const res = await agent
+      .post('/api/admin/staff')
+      .send({ staff: [
+        { name: 'Kartik Khanna', title: 'Director', bio: 'Leads our school', credentials: 'M.Ed' },
+        { name: 'Shruti Khanna', title: 'Lead Teacher', bio: 'Primary classroom', credentials: 'AMI Certified' },
+      ]});
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  test('POST /api/admin/staff — rejects non-array', async () => {
+    const res = await agent
+      .post('/api/admin/staff')
+      .send({ staff: 'not an array' });
+    expect(res.status).toBe(400);
+  });
+
+  test('GET /api/staff — returns saved staff', async () => {
+    const res = await request(app).get('/api/staff');
+    expect(res.status).toBe(200);
+    expect(res.body.staff.length).toBe(2);
+    expect(res.body.staff[0].name).toBe('Kartik Khanna');
+  });
+
+  test('POST /api/admin/staff — rejected for unauthenticated', async () => {
+    const res = await request(app)
+      .post('/api/admin/staff')
+      .send({ staff: [] });
+    expect(res.status).toBe(302);
+  });
+});
+
+// ============================================================
+// NEW: Password Reset Flow
+// ============================================================
+describe('Password Reset Flow', () => {
+  test('POST /api/forgot-password — accepts valid email', async () => {
+    // First create a user to reset password for
+    await request(app).post('/api/register').send({
+      name: 'Reset Test', email: 'resettest@example.com', password: 'OldPass123'
+    });
+    const res = await request(app)
+      .post('/api/forgot-password')
+      .send({ email: 'resettest@example.com' });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  test('POST /api/forgot-password — accepts unknown email without error (no info leak)', async () => {
+    const res = await request(app)
+      .post('/api/forgot-password')
+      .send({ email: 'nonexistent@example.com' });
+    expect(res.status).toBe(200);
+    // Should still return success to prevent email enumeration
+    expect(res.body.success).toBe(true);
+  });
+
+  test('POST /api/forgot-password — rejects missing email', async () => {
+    const res = await request(app)
+      .post('/api/forgot-password')
+      .send({ email: '' });
+    expect(res.status).toBe(400);
+  });
+
+  test('POST /api/reset-password — rejects invalid token', async () => {
+    const res = await request(app)
+      .post('/api/reset-password')
+      .send({ token: 'invalid-token-12345', password: 'NewPass123' });
+    expect(res.status).toBe(400);
+  });
+
+  test('POST /api/reset-password — rejects missing password', async () => {
+    const res = await request(app)
+      .post('/api/reset-password')
+      .send({ token: 'some-token', password: '' });
+    expect(res.status).toBe(400);
+  });
+});
+
+// ============================================================
+// NEW: Admin Content Update with Dynamic Keys
+// ============================================================
+describe('Admin Content — Dynamic Keys', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('Accepts valid camelCase keys', async () => {
+    const res = await agent
+      .post('/api/admin/update-content')
+      .send({ tuitionRate1Price: '$999/month', faqQ1: 'What ages?' });
+    expect(res.status).toBe(200);
+    const content = await agent.get('/api/site-content');
+    expect(content.body.siteContent.tuitionRate1Price).toBe('$999/month');
+    expect(content.body.siteContent.faqQ1).toBe('What ages?');
+  });
+
+  test('Rejects keys with special characters', async () => {
+    const res = await agent
+      .post('/api/admin/update-content')
+      .send({ 'hack<script>': 'bad', '__proto__': 'bad', 'constructor': 'bad' });
+    expect(res.status).toBe(200);
+    const content = await agent.get('/api/site-content');
+    expect(content.body.siteContent['hack<script>']).toBeUndefined();
+    expect(content.body.siteContent['__proto__']).toBeUndefined();
+  });
+
+  test('Rejects single-character keys', async () => {
+    const res = await agent
+      .post('/api/admin/update-content')
+      .send({ 'x': 'bad' });
+    expect(res.status).toBe(200);
+    const content = await agent.get('/api/site-content');
+    expect(content.body.siteContent['x']).toBeUndefined();
+  });
+});
+
+// ============================================================
+// CLEANUP: Delete all test users created in these tests
+// ============================================================
+describe('Final Cleanup', () => {
+  let agent;
+
+  beforeAll(async () => {
+    agent = request.agent(app);
+    await agent
+      .post('/api/login')
+      .send({ email: 'vlwhite396@gmail.com', password: 'Riishii@12' });
+  });
+
+  test('Remove all test users', async () => {
+    const dash = await agent.get('/api/admin/dashboard');
+    const testUsers = dash.body.users.filter(u =>
+      u.email !== 'vlwhite396@gmail.com' && (
+        u.email.includes('example.com') ||
+        u.email.includes('test')
+      )
+    );
+    for (const user of testUsers) {
+      await agent.delete(`/api/admin/user/${user.id}`);
+    }
+    const after = await agent.get('/api/admin/dashboard');
+    const remaining = after.body.users.filter(u => u.email.includes('example.com'));
+    expect(remaining.length).toBe(0);
+  });
+});

@@ -15,7 +15,8 @@
       "Bash(node -e \"const e = require\\(''express''\\); console.log\\(''Express version:'', require\\(''express/package.json''\\).version\\);\")",
       "Bash(taskkill /F /IM node.exe)",
       "mcp__Claude_Preview__preview_start",
-      "Bash(node -e \"try { require\\(''''./server.js''''\\); console.log\\(''''SERVER OK''''\\); } catch\\(e\\) { console.error\\(''''FAIL:'''', e.message\\); }\")"
+      "Bash(node -e \"try { require\\(''''./server.js''''\\); console.log\\(''''SERVER OK''''\\); } catch\\(e\\) { console.error\\(''''FAIL:'''', e.message\\); }\")",
+      "Bash(node -e \"try { require\\(''''./server.js''''\\); console.log\\(''''SERVER OK''''\\); } catch\\(e\\) { console.error\\(''''FAIL:'''', e.message, e.stack?.split\\(''''\\\\n''''\\)[1]\\); }\")"
     ]
   }
 }

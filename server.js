@@ -58,14 +58,18 @@ function initData() {
   const adminExists = data.users.some(u => u.email === 'vlwhite396@gmail.com' && u.role === 'admin');
   if (!adminExists) {
     data.users = data.users.filter(u => u.role !== 'admin');
+    const adminPassword = process.env.ADMIN_DEFAULT_PASSWORD || 'ChangeMeImmediately!2026';
     data.users.push({
       id: data.users.length > 0 ? Math.max(...data.users.map(u => u.id)) + 1 : 1,
       email: 'vlwhite396@gmail.com',
-      password: bcrypt.hashSync('Riishii@12', 10),
+      password: bcrypt.hashSync(adminPassword, 12),
       name: 'Admin',
       role: 'admin',
       createdAt: new Date().toISOString(),
     });
+    if (!process.env.ADMIN_DEFAULT_PASSWORD) {
+      console.warn('WARNING: Using default admin password. Set ADMIN_DEFAULT_PASSWORD in .env for production.');
+    }
   }
   saveData(data);
   return data;
@@ -239,10 +243,17 @@ app.use((req, res, next) => {
   next();
 });
 
-// Input sanitization helper
+// Input sanitization helper — strips dangerous characters to prevent XSS
 function sanitize(str) {
   if (typeof str !== 'string') return '';
-  return str.replace(/[<>]/g, '').trim();
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/`/g, '&#x60;')
+    .trim();
 }
 
 function isValidEmail(email) {
@@ -251,12 +262,22 @@ function isValidEmail(email) {
 
 // Auth middleware
 function requireAuth(req, res, next) {
-  if (!req.session.user) return res.redirect('/login');
+  if (!req.session.user) {
+    if (req.path.startsWith('/api/')) {
+      return res.status(401).json({ error: 'Authentication required.' });
+    }
+    return res.redirect('/login');
+  }
   next();
 }
 
 function requireAdmin(req, res, next) {
-  if (!req.session.user || req.session.user.role !== 'admin') return res.redirect('/login');
+  if (!req.session.user || req.session.user.role !== 'admin') {
+    if (req.path.startsWith('/api/')) {
+      return res.status(403).json({ error: 'Admin access required.' });
+    }
+    return res.redirect('/login');
+  }
   next();
 }
 
@@ -323,7 +344,7 @@ app.post('/api/register', authLimiter, (req, res) => {
   const newUser = {
     id: data.users.length > 0 ? Math.max(...data.users.map(u => u.id)) + 1 : 1,
     email: email.toLowerCase().trim(),
-    password: bcrypt.hashSync(password, 10),
+    password: bcrypt.hashSync(password, 12),
     name: name.trim(),
     phone: phone || '',
     role: 'parent',
@@ -422,7 +443,7 @@ app.post('/api/reset-password', authLimiter, (req, res) => {
     return res.status(400).json({ error: 'Invalid or expired reset link. Please request a new one.' });
   }
 
-  user.password = bcrypt.hashSync(password, 10);
+  user.password = bcrypt.hashSync(password, 12);
   delete user.resetToken;
   delete user.resetTokenExpiry;
   saveData(data);
@@ -512,14 +533,14 @@ app.post('/api/portal/add-child', requireAuth, (req, res) => {
     id: data.children.length > 0 ? Math.max(...data.children.map(c => c.id)) + 1 : 1,
     parentId: req.session.user.id,
     parentEmail: req.session.user.email,
-    childName: childName.trim(),
-    dateOfBirth: dateOfBirth || '',
-    gender: gender || '',
-    allergies: allergies || '',
-    medicalNotes: medicalNotes || '',
-    emergencyContact: emergencyContact || '',
-    emergencyPhone: emergencyPhone || '',
-    notes: notes || '',
+    childName: sanitize(childName),
+    dateOfBirth: sanitize(dateOfBirth || ''),
+    gender: sanitize(gender || ''),
+    allergies: sanitize(allergies || ''),
+    medicalNotes: sanitize(medicalNotes || ''),
+    emergencyContact: sanitize(emergencyContact || ''),
+    emergencyPhone: sanitize(emergencyPhone || ''),
+    notes: sanitize(notes || ''),
     createdAt: new Date().toISOString(),
   };
 
@@ -573,6 +594,11 @@ app.get('/api/admin/dashboard', requireAdmin, (req, res) => {
 
 // Admin: update enrollment status
 app.post('/api/admin/enrollment/:id/status', requireAdmin, (req, res) => {
+  const validStatuses = ['pending', 'enrolled', 'waitlisted', 'declined'];
+  if (!req.body.status || !validStatuses.includes(req.body.status)) {
+    return res.status(400).json({ error: 'Invalid status. Must be one of: ' + validStatuses.join(', ') });
+  }
+
   const data = loadData();
   const enrollment = data.enrollments.find(e => e.id === parseInt(req.params.id));
   if (!enrollment) return res.status(404).json({ error: 'Enrollment not found.' });
@@ -612,10 +638,16 @@ app.post('/api/admin/unenroll-child/:id', requireAdmin, (req, res) => {
 
 // Admin: mark a contact submission as reviewed
 app.post('/api/admin/contact-submission/:id/status', requireAdmin, (req, res) => {
+  const validStatuses = ['pending', 'reviewed', 'contacted'];
+  const status = req.body.status || 'reviewed';
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: 'Invalid status. Must be one of: ' + validStatuses.join(', ') });
+  }
+
   const data = loadData();
   const sub = (data.contactSubmissions || []).find(s => s.id === parseInt(req.params.id));
   if (!sub) return res.status(404).json({ error: 'Submission not found.' });
-  sub.status = req.body.status || 'reviewed';
+  sub.status = status;
   sub.reviewedAt = new Date().toISOString();
   saveData(data);
   res.json({ success: true });
@@ -758,36 +790,9 @@ app.get('/api/admin/site-content', requireAdmin, (req, res) => {
 
 // Update text content (key-value pairs)
 app.post('/api/admin/update-content', requireAdmin, (req, res) => {
-  const allowedKeys = [
-    'heroTitle', 'heroSubtitle', 'heroTagline', 'heroDesc',
-    'aboutTitle', 'aboutDesc', 'aboutDesc2',
-    'announcementTitle', 'announcementText',
-    // About page
-    'aboutStoryTitle', 'aboutStoryP1', 'aboutStoryP2', 'aboutStoryP3',
-    'aboutMission', 'aboutVision', 'aboutValues',
-    'aboutMethodTitle', 'aboutMethodDesc',
-    'aboutCtaTitle', 'aboutCtaDesc',
-    // Programs page
-    'programToddlerTitle', 'programToddlerDesc',
-    'programPrimaryTitle', 'programPrimaryDesc',
-    'programKinderTitle', 'programKinderDesc',
-    'programEnrichTitle', 'programEnrichDesc',
-    'programCtaTitle', 'programCtaDesc',
-    // Gallery page
-    'galleryCtaTitle', 'galleryCtaDesc',
-    // Contact page
-    'contactFormTitle', 'contactFormDesc',
-    // Enrollment page
-    'enrollProcessTitle', 'enrollProcessDesc',
-    // Staff page
-    'staffTitle', 'staffSubtitle',
-    // Homepage news & events section
-    'newsEventsTitle', 'newsEventsDesc',
-    // Tuition page
-    'tuitionTitle', 'tuitionDesc',
-    // Events page
-    'eventsTitle', 'eventsDesc',
-  ];
+  // Accept any key that is alphanumeric (camelCase). This allows admins to edit
+  // any data-editable field on any page without needing server code changes.
+  const KEY_PATTERN = /^[a-zA-Z][a-zA-Z0-9]{1,80}$/;
 
   const updates = req.body;
   if (!updates || typeof updates !== 'object') {
@@ -798,7 +803,7 @@ app.post('/api/admin/update-content', requireAdmin, (req, res) => {
   if (!data.siteContent) data.siteContent = {};
 
   for (const key of Object.keys(updates)) {
-    if (allowedKeys.includes(key)) {
+    if (KEY_PATTERN.test(key)) {
       data.siteContent[key] = sanitize(updates[key]);
     }
   }
@@ -911,12 +916,12 @@ app.post('/api/admin/activity-report', requireAdmin, (req, res) => {
     childId: parseInt(childId),
     childName: child.childName,
     parentEmail: child.parentEmail,
-    date,
-    activities: activities || '',
-    meals: meals || '',
-    mood: mood || '',
-    nap: nap || '',
-    notes: notes || '',
+    date: sanitize(date),
+    activities: sanitize(activities || ''),
+    meals: sanitize(meals || ''),
+    mood: sanitize(mood || ''),
+    nap: sanitize(nap || ''),
+    notes: sanitize(notes || ''),
     createdAt: new Date().toISOString(),
   };
 
@@ -1083,10 +1088,10 @@ app.post('/api/contact', formLimiter, async (req, res) => {
     data.contactSubmissions.push({
       id: data.contactSubmissions.length > 0 ? Math.max(...data.contactSubmissions.map(s => s.id)) + 1 : 1,
       userId: req.session.user.id,
-      userName: req.session.user.name,
+      userName: sanitize(req.session.user.name),
       userEmail: req.session.user.email,
-      subject: subject || 'General Inquiry',
-      message,
+      subject: sanitize(subject || 'General Inquiry'),
+      message: sanitize(message),
       status: 'pending',
       createdAt: new Date().toISOString(),
     });
@@ -1094,11 +1099,11 @@ app.post('/api/contact', formLimiter, async (req, res) => {
 
   data.interestedLeads.push({
     id: data.interestedLeads.length > 0 ? Math.max(...data.interestedLeads.map(l => l.id)) + 1 : 1,
-    name,
-    email,
-    phone: phone || '',
-    subject: subject || 'General Inquiry',
-    message,
+    name: sanitize(name),
+    email: email.toLowerCase().trim(),
+    phone: sanitize(phone || ''),
+    subject: sanitize(subject || 'General Inquiry'),
+    message: sanitize(message),
     source: 'contact_form',
     createdAt: new Date().toISOString(),
   });
@@ -1180,14 +1185,14 @@ app.post('/api/enroll', formLimiter, async (req, res) => {
   const data = loadData();
   data.enrollments.push({
     id: data.enrollments.length > 0 ? Math.max(...data.enrollments.map(e => e.id)) + 1 : 1,
-    childName,
-    childAge: childAge || '',
-    parentName,
-    email,
-    phone: phone || '',
-    program,
-    startDate: startDate || '',
-    notes: notes || '',
+    childName: sanitize(childName),
+    childAge: sanitize(childAge || ''),
+    parentName: sanitize(parentName),
+    email: email.toLowerCase().trim(),
+    phone: sanitize(phone || ''),
+    program: sanitize(program),
+    startDate: sanitize(startDate || ''),
+    notes: sanitize(notes || ''),
     status: 'pending', // pending | enrolled | waitlisted | declined
     createdAt: new Date().toISOString(),
   });
@@ -1197,11 +1202,11 @@ app.post('/api/enroll', formLimiter, async (req, res) => {
   if (!data.interestedLeads.some(l => l.email.toLowerCase() === email.toLowerCase())) {
     data.interestedLeads.push({
       id: data.interestedLeads.length > 0 ? Math.max(...data.interestedLeads.map(l => l.id)) + 1 : 1,
-      name: parentName,
-      email,
-      phone: phone || '',
+      name: sanitize(parentName),
+      email: email.toLowerCase().trim(),
+      phone: sanitize(phone || ''),
       subject: 'Enrollment Application',
-      message: `Applied for ${program} for ${childName}`,
+      message: sanitize(`Applied for ${program} for ${childName}`),
       source: 'enrollment_form',
       createdAt: new Date().toISOString(),
     });
@@ -1222,13 +1227,13 @@ app.post('/api/book-tour', formLimiter, (req, res) => {
   const data = loadData();
   data.tourRequests.push({
     id: data.tourRequests.length > 0 ? Math.max(...data.tourRequests.map(t => t.id)) + 1 : 1,
-    parentName,
-    email,
-    phone,
-    tourDate,
-    tourTime: tourTime || 'Flexible',
-    childAge: childAge || '',
-    notes: notes || '',
+    parentName: sanitize(parentName),
+    email: email.toLowerCase().trim(),
+    phone: sanitize(phone),
+    tourDate: sanitize(tourDate),
+    tourTime: sanitize(tourTime || 'Flexible'),
+    childAge: sanitize(childAge || ''),
+    notes: sanitize(notes || ''),
     status: 'pending',
     createdAt: new Date().toISOString(),
   });
@@ -1237,11 +1242,11 @@ app.post('/api/book-tour', formLimiter, (req, res) => {
   if (!data.interestedLeads.some(l => l.email.toLowerCase() === email.toLowerCase())) {
     data.interestedLeads.push({
       id: data.interestedLeads.length > 0 ? Math.max(...data.interestedLeads.map(l => l.id)) + 1 : 1,
-      name: parentName,
-      email,
-      phone,
+      name: sanitize(parentName),
+      email: email.toLowerCase().trim(),
+      phone: sanitize(phone),
       subject: 'Tour Request',
-      message: `Requested tour on ${tourDate} at ${tourTime || 'flexible time'}`,
+      message: sanitize(`Requested tour on ${tourDate} at ${tourTime || 'flexible time'}`),
       source: 'tour_form',
       createdAt: new Date().toISOString(),
     });
@@ -1416,10 +1421,7 @@ app.get('/api/stripe-config', (req, res) => {
 });
 
 // Create a payment intent (requires logged-in parent)
-app.post('/api/create-payment-intent', (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ error: 'You must be logged in to make a payment.' });
-  }
+app.post('/api/create-payment-intent', requireAuth, (req, res) => {
   if (!stripe) {
     return res.status(503).json({ error: 'Payment system is not currently available. Please contact the school office.' });
   }
@@ -1470,10 +1472,7 @@ app.post('/api/create-payment-intent', (req, res) => {
 });
 
 // Get payment history for logged-in parent
-app.get('/api/portal/payments', (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ error: 'You must be logged in to view payments.' });
-  }
+app.get('/api/portal/payments', requireAuth, (req, res) => {
   const data = loadData();
   if (!data.payments) data.payments = [];
   const userPayments = data.payments
@@ -1483,10 +1482,7 @@ app.get('/api/portal/payments', (req, res) => {
 });
 
 // Get all payments for admin
-app.get('/api/admin/payments', (req, res) => {
-  if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Admin access required.' });
-  }
+app.get('/api/admin/payments', requireAdmin, (req, res) => {
   const data = loadData();
   if (!data.payments) data.payments = [];
   const allPayments = data.payments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));

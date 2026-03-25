@@ -632,6 +632,44 @@
             tooltip.className = 'day-tooltip';
             tooltip.textContent = monthEvents[d].map(e => e.title).join(', ');
             el.appendChild(tooltip);
+
+            // Click to scroll to event in list
+            const dayEvents = monthEvents[d];
+            el.addEventListener('click', () => {
+              // Find matching event card and scroll to it
+              const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+              const cards = document.querySelectorAll('.event-card[data-event-date]');
+              for (const card of cards) {
+                if (card.getAttribute('data-event-date') === dateStr) {
+                  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  card.style.transition = 'box-shadow 0.3s, transform 0.3s';
+                  card.style.boxShadow = '0 0 0 3px #4a7c28, 0 6px 20px rgba(0,0,0,0.15)';
+                  card.style.transform = 'translateY(-4px)';
+                  setTimeout(() => {
+                    card.style.boxShadow = '';
+                    card.style.transform = '';
+                  }, 2000);
+                  break;
+                }
+              }
+              // If it's a past event, expand past events first
+              const isPast = new Date(dateStr) < new Date(new Date().toDateString());
+              if (isPast && !pastContainer.classList.contains('show')) {
+                pastToggle.click();
+                setTimeout(() => {
+                  const pastCards = document.querySelectorAll('.past-event-card[data-event-date]');
+                  for (const card of pastCards) {
+                    if (card.getAttribute('data-event-date') === dateStr) {
+                      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      card.style.boxShadow = '0 0 0 3px #4a7c28, 0 6px 20px rgba(0,0,0,0.15)';
+                      card.style.transform = 'translateY(-4px)';
+                      setTimeout(() => { card.style.boxShadow = ''; card.style.transform = ''; }, 2000);
+                      break;
+                    }
+                  }
+                }, 300);
+              }
+            });
           }
 
           calendarGrid.appendChild(el);
@@ -671,6 +709,7 @@
         const d = new Date(evt.date);
         const month = MONTH_ABBR[d.getMonth()];
         const day = d.getDate();
+        const dateAttr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         const cardClass = isPast ? 'event-card past-event-card' : 'event-card';
 
         let metaHTML = '';
@@ -689,7 +728,7 @@
           descHTML = '<p class="event-description">' + escHTML(evt.description) + '</p>';
         }
 
-        return '<div class="' + cardClass + '">' +
+        return '<div class="' + cardClass + '" data-event-date="' + dateAttr + '">' +
           '<div class="event-date-block"><span class="month">' + month + '</span><span class="day">' + day + '</span></div>' +
           '<div class="event-info"><h3>' + escHTML(evt.title || 'Untitled Event') + '</h3>' +
           '<div class="event-meta">' + metaHTML + '</div>' +

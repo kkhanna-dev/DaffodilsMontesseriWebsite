@@ -11,8 +11,8 @@
    ========================================================== */
 
 window.DAFFODILS_CONFIG = {
-  supabaseUrl: "",        // e.g. "https://abcdefghijkl.supabase.co"
-  supabaseAnonKey: "",    // the long "anon public" key
+  supabaseUrl: "https://hsdiyalhzgdbswmimsjz.supabase.co",        // e.g. "https://abcdefghijkl.supabase.co"
+  supabaseAnonKey: "sb_publishable_BOzFMDV9kPey8JZgOCyAcw_gOREC8Up",    // the long "anon public" key
 
   // Turn on after deploying the Stripe functions (see SETUP.md, step 6)
   stripeEnabled: false

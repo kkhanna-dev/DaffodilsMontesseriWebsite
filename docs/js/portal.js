@@ -22,12 +22,12 @@
     var params = new URLSearchParams(location.search);
     if (params.get('paid')) {
       DM.toast('Thank you! Your payment went through. It may take a moment to appear below.');
-      history.replaceState(null, '', 'portal.html#payments');
+      history.replaceState(null, '', 'portal#payments');
     } else if (params.get('canceled')) {
       DM.toast('Payment canceled. No charge was made.', 'error');
-      history.replaceState(null, '', 'portal.html#payments');
+      history.replaceState(null, '', 'portal#payments');
     } else if (params.get('welcome')) {
-      history.replaceState(null, '', 'portal.html#children');
+      history.replaceState(null, '', 'portal#children');
     }
 
     shell = DM.appShell({
@@ -52,7 +52,7 @@
 
     if (me.role === 'admin') {
       var side = document.querySelector('.app-side-foot');
-      side.insertAdjacentHTML('afterbegin', '<a class="app-tab" href="admin.html"><i class="fas fa-gauge" aria-hidden="true"></i> Admin dashboard</a>');
+      side.insertAdjacentHTML('afterbegin', '<a class="app-tab" href="admin"><i class="fas fa-gauge" aria-hidden="true"></i> Admin dashboard</a>');
     }
   });
 
@@ -131,7 +131,7 @@
     }
     var extras = '';
     if (menu && (menu.lunch || menu.morning_snack || menu.afternoon_snack)) {
-      extras += '<section class="app-card"><div class="app-card-head"><h2><i class="fas fa-utensils" style="color:var(--primary-dark);margin-right:8px"></i>Today\'s menu</h2><a class="btn btn-ghost btn-xs" href="menu.html">Full week</a></div>' +
+      extras += '<section class="app-card"><div class="app-card-head"><h2><i class="fas fa-utensils" style="color:var(--primary-dark);margin-right:8px"></i>Today\'s menu</h2><a class="btn btn-ghost btn-xs" href="menu">Full week</a></div>' +
         '<div class="report-grid">' + [['Morning snack', menu.morning_snack], ['Lunch', menu.lunch], ['Afternoon snack', menu.afternoon_snack]].filter(function (x) { return x[1]; })
           .map(function (x) { return '<div><b>' + x[0] + '</b>' + esc(x[1]) + '</div>'; }).join('') + '</div></section>';
     }
@@ -171,7 +171,7 @@
       '<section class="app-card"><div class="app-card-head"><h2>Latest daily report</h2></div>' + reportHtml + '</section>' +
       '</div><div class="app-grid-2" style="margin-top:18px">' +
       '<section class="app-card"><div class="app-card-head"><h2>Announcements</h2></div><div class="app-list">' + annHtml + '</div></section>' +
-      '<section class="app-card"><div class="app-card-head"><h2>Upcoming events</h2><a class="btn btn-ghost btn-xs" href="events.html">Calendar</a></div><div class="app-list">' + evHtml + '</div></section>' +
+      '<section class="app-card"><div class="app-card-head"><h2>Upcoming events</h2><a class="btn btn-ghost btn-xs" href="events">Calendar</a></div><div class="app-list">' + evHtml + '</div></section>' +
       '</div>';
   }
 
@@ -452,7 +452,7 @@
       btn.disabled = true;
       main.querySelector('#payBtnText').textContent = 'Opening checkout...';
       try {
-        var body = { child_id: form.child.value, kind: kindSel.value, return_url: DM.url('portal.html') };
+        var body = { child_id: form.child.value, kind: kindSel.value, return_url: DM.url('portal') };
         if (kindSel.value === 'custom') { body.amount_cents = DM.toCents(form.amount.value); body.description = form.note.value.trim(); }
         var r = await sb.functions.invoke('create-checkout', { body: body });
         if (r.error) {
@@ -534,7 +534,7 @@
     ef.onsubmit = async function (e) {
       e.preventDefault();
       if (!ef.checkValidity()) { ef.reportValidity(); return; }
-      var r = await sb.auth.updateUser({ email: ef.email.value.trim() }, { emailRedirectTo: DM.url('portal.html#account') });
+      var r = await sb.auth.updateUser({ email: ef.email.value.trim() }, { emailRedirectTo: DM.url('portal#account') });
       if (r.error) DM.toast(DM.friendlyError(r.error), 'error');
       else DM.toast('Check your new inbox for a confirmation link.');
     };

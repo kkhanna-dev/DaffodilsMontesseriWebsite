@@ -37,8 +37,8 @@
   function nextUrl(profile) {
     var next = new URLSearchParams(window.location.search).get('next');
     // only allow same-site relative pages
-    if (next && /^[a-z0-9-]+\.html(\?[^#]*)?$/i.test(next)) return DM.url(next);
-    return DM.url(profile && profile.role === 'admin' ? 'admin.html' : 'portal.html');
+    if (next && /^[a-z0-9-]+(\.html)?(\?[^#]*)?$/i.test(next)) return DM.url(next.replace(/\.html/, ''));
+    return DM.url(profile && profile.role === 'admin' ? 'admin' : 'portal');
   }
 
   document.addEventListener('DOMContentLoaded', async function () {
@@ -103,7 +103,7 @@
   async function initRegister() {
     var form = $('#registerForm');
     var session = await DM.getSession();
-    if (session) { window.location.replace(DM.url('portal.html')); return; }
+    if (session) { window.location.replace(DM.url('portal')); return; }
 
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -119,7 +119,7 @@
         email: form.email.value.trim(),
         password: form.password.value,
         options: {
-          emailRedirectTo: DM.url('login.html'),
+          emailRedirectTo: DM.url('login'),
           data: { full_name: form.fullName.value.trim(), phone: form.phone.value.trim() }
         }
       });
@@ -129,13 +129,13 @@
         return;
       }
       if (r.data && r.data.session) {
-        window.location.replace(DM.url('portal.html?welcome=1'));
+        window.location.replace(DM.url('portal?welcome=1'));
         return;
       }
       // Email confirmation is on
       form.hidden = true;
       notice('info', '<strong>Check your email.</strong> We sent a confirmation link to ' + DM.esc(form.email.value.trim()) +
-        '. Click it to finish setting up your account, then <a href="login.html">log in</a>.');
+        '. Click it to finish setting up your account, then <a href="login">log in</a>.');
     });
   }
 
@@ -162,7 +162,7 @@
       e.preventDefault();
       if (!requestForm.checkValidity()) { requestForm.reportValidity(); return; }
       busy(requestForm, true, 'Sending...');
-      var r = await DM.sb.auth.resetPasswordForEmail(requestForm.email.value.trim(), { redirectTo: DM.url('reset-password.html') });
+      var r = await DM.sb.auth.resetPasswordForEmail(requestForm.email.value.trim(), { redirectTo: DM.url('reset-password') });
       busy(requestForm, false);
       if (r.error && /rate|too many/i.test(r.error.message || '')) {
         notice('err', DM.esc(DM.friendlyError(r.error)));
@@ -192,7 +192,7 @@
         return;
       }
       await DM.sb.auth.signOut();
-      window.location.replace(DM.url('login.html?reset=1'));
+      window.location.replace(DM.url('login?reset=1'));
     });
   }
 })();

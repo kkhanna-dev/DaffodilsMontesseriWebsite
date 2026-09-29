@@ -23,7 +23,7 @@ function json(body: unknown, status = 200) {
 
 function portalUrl(requested: unknown): string {
   const site = Deno.env.get("SITE_URL");
-  if (site) return new URL("portal.html", site.endsWith("/") ? site : site + "/").href;
+  if (site) return new URL("portal", site.endsWith("/") ? site : site + "/").href;
   // No SITE_URL set: accept the page the parent came from, https only (or localhost for testing)
   const u = new URL(String(requested ?? ""));
   if (u.protocol !== "https:" && u.hostname !== "localhost") throw new Error("bad return url");

@@ -84,7 +84,7 @@
     var profile = await DM.getProfile();
     if (!profile) return;
     var isAdmin = profile.role === 'admin';
-    link.href = isAdmin ? 'admin.html' : 'portal.html';
+    link.href = isAdmin ? 'admin' : 'portal';
     link.innerHTML = '<i class="fas ' + (isAdmin ? 'fa-gauge' : 'fa-user-circle') + '" aria-hidden="true"></i> ' + (isAdmin ? 'Admin' : 'My Portal');
     if (isAdmin) initInlineEditing();
   }
@@ -152,7 +152,7 @@
         '<h3>' + esc(p.name) + '</h3>' +
         '<p class="plan-ages">' + esc(p.ages) + '</p>' +
         '<ul class="plan-rates">' + rates + '</ul>' +
-        '<a class="btn ' + (p.featured ? 'btn-primary' : 'btn-soft') + ' btn-full" href="enrollment.html?program=' + encodeURIComponent(p.slug || p.id || '') + '">Apply for ' + esc(short) + '</a>' +
+        '<a class="btn ' + (p.featured ? 'btn-primary' : 'btn-soft') + ' btn-full" href="enrollment?program=' + encodeURIComponent(p.slug || p.id || '') + '">Apply for ' + esc(short) + '</a>' +
         '</article>';
     }).join('');
   }

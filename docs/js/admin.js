@@ -56,7 +56,7 @@
     });
 
     var foot = document.querySelector('.app-side-foot');
-    foot.insertAdjacentHTML('afterbegin', '<a class="app-tab" href="index.html"><i class="fas fa-globe" aria-hidden="true"></i> View website</a>');
+    foot.insertAdjacentHTML('afterbegin', '<a class="app-tab" href="./"><i class="fas fa-globe" aria-hidden="true"></i> View website</a>');
     refreshCounts();
   });
 
@@ -791,8 +791,8 @@
   }
 
   /* =========================== WEBSITE =========================== */
-  var PAGES = [['index.html', 'Home'], ['about.html', 'About'], ['programs.html', 'Programs'], ['gallery.html', 'Gallery'],
-    ['tuition.html', 'Tuition'], ['events.html', 'Events'], ['contact.html', 'Contact'], ['enrollment.html', 'Apply']];
+  var PAGES = [['./', 'Home'], ['about', 'About'], ['programs', 'Programs'], ['gallery', 'Gallery'],
+    ['tuition', 'Tuition'], ['events', 'Events'], ['contact', 'Contact'], ['enrollment', 'Apply']];
 
   async function renderWebsite(main) {
     var rows = await DM.q(sb.from('site_content').select('*').order('updated_at', { ascending: false }));

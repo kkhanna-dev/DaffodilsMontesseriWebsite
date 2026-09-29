@@ -1,8 +1,13 @@
 User-agent: *
+Disallow: /admin
 Disallow: /admin.html
+Disallow: /login
 Disallow: /login.html
+Disallow: /portal
 Disallow: /portal.html
+Disallow: /register
 Disallow: /register.html
+Disallow: /reset-password
 Disallow: /reset-password.html
 
 Sitemap: https://daffodilsmontessori.com/sitemap.xml

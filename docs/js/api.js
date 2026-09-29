@@ -6,6 +6,15 @@
 (function () {
   'use strict';
 
+  // Show clean addresses: /about instead of /about.html, / instead of /index.html
+  try {
+    var path = window.location.pathname;
+    if (/\.html$/.test(path) && !/404\.html$/.test(path)) {
+      var clean = path.replace(/index\.html$/, '').replace(/\.html$/, '');
+      window.history.replaceState(null, '', clean + window.location.search + window.location.hash);
+    }
+  } catch (e) { /* ignore */ }
+
   var cfg = window.DAFFODILS_CONFIG || {};
   var configured = !!(cfg.supabaseUrl && cfg.supabaseAnonKey && window.supabase && window.supabase.createClient);
   var sb = null;
@@ -109,7 +118,7 @@
   DM.signOut = async function () {
     if (configured) { try { await sb.auth.signOut(); } catch (e) { /* ignore */ } }
     profilePromise = null;
-    window.location.href = DM.url('index.html');
+    window.location.href = DM.url('./');
   };
 
   // Redirects to login if needed. Returns the profile.
@@ -118,12 +127,12 @@
     if (!configured) return null;
     var profile = await DM.getProfile();
     if (!profile) {
-      var here = window.location.pathname.split('/').pop() + window.location.search;
-      window.location.replace(DM.url('login.html?next=' + encodeURIComponent(here)));
+      var here = (window.location.pathname.split('/').pop() || '').replace(/\.html$/, '') + window.location.search;
+      window.location.replace(DM.url('login?next=' + encodeURIComponent(here)));
       return null;
     }
     if (opts.admin && profile.role !== 'admin') {
-      window.location.replace(DM.url('portal.html'));
+      window.location.replace(DM.url('portal'));
       return null;
     }
     return profile;
@@ -501,7 +510,7 @@
     app.outerHTML = '<div class="container offline-card"><div class="app-card"><h2 style="margin-bottom:8px;">Accounts are not connected yet</h2>' +
       '<p style="color:var(--text-light)">The family portal and admin dashboard need the Supabase keys in <code>js/config.js</code>. ' +
       'See <strong>SETUP.md</strong> in the project folder for the 10-minute setup.</p>' +
-      '<p style="margin-top:14px"><a class="btn btn-primary" href="index.html">Back to the website</a></p></div></div>';
+      '<p style="margin-top:14px"><a class="btn btn-primary" href="./">Back to the website</a></p></div></div>';
   };
 
   DM.empty = function (icon, text, actionHtml) {

@@ -39,9 +39,8 @@ Run it only once. If you ever need to start over, create a fresh project instead
 
 In **Authentication > URL Configuration**:
 
-- **Site URL:** your live site, for example `https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/`
-- **Redirect URLs:** add the same address followed by `**`, for example `https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/**`
-  - Add your custom domain too if you use one, e.g. `https://daffodilsmontessori.com/**`
+- **Site URL:** `https://daffodilsmontessori.com/`
+- **Redirect URLs:** `https://daffodilsmontessori.com/**` and `https://www.daffodilsmontessori.com/**` (keep `https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/**` too while the domain switches over)
 
 This is what lets the "confirm your email" and "reset password" links land back on your site.
 
@@ -101,7 +100,7 @@ Parents pay on Stripe's secure checkout page; the payment then shows up automati
 
    ```bash
    npx supabase secrets set STRIPE_SECRET_KEY=sk_test_...
-   npx supabase secrets set SITE_URL=https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/
+   npx supabase secrets set SITE_URL=https://daffodilsmontessori.com/
    ```
 
 4. **Deploy the two functions:**
@@ -144,7 +143,7 @@ This repo includes a small GitHub Action that pings the database twice a week so
 
 1. Push this repo to GitHub.
 2. **Settings > Pages > Deploy from a branch**, branch **main**, folder **/docs**, then **Save**.
-3. In about a minute the site is live at `https://<username>.github.io/DaffodilsMontesseriWebsite/`.
+3. In about a minute the site is live. The custom domain `daffodilsmontessori.com` comes from the `docs/CNAME` file; its DNS lives in Wix (four A records for `@` pointing to GitHub, and `www` as a CNAME to `kkhanna-dev.github.io`).
 
 Private repos need GitHub Pro (free with the Student Developer Pack) to use Pages. A public repo is fine too: `docs/` contains nothing secret, and family data lives only in Supabase behind the security rules.
 
@@ -163,7 +162,7 @@ These are yours to supply; the site is built to show them as soon as they exist.
 - **Policies and privacy:** read the Handbook & Policies and Privacy Policy pages and adjust anything that does not match how the school runs (log in as admin and use **Edit this page**). They are sensible defaults, not legal advice.
 - **Summer camp dates and rates:** edit the yellow box on the Summer Camp page each spring.
 - **Hours:** the footer hours and the Programs page schedules should agree.
-- **Custom domain:** if you move to your own domain, replace `kkhanna-dev.github.io/DaffodilsMontesseriWebsite` in `docs/sitemap.xml`, `docs/robots.txt`, and the page headers (search the repo for it).
+- **Domain:** the site address `https://daffodilsmontessori.com/` is written into `docs/sitemap.xml`, `docs/robots.txt`, `docs/CNAME`, and the page headers. If it ever changes, search the repo for it.
 
 ## How the pieces fit
 

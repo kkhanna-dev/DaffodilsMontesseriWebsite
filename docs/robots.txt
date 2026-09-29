@@ -5,4 +5,4 @@ Disallow: /portal.html
 Disallow: /register.html
 Disallow: /reset-password.html
 
-Sitemap: https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/sitemap.xml
+Sitemap: https://daffodilsmontessori.com/sitemap.xml

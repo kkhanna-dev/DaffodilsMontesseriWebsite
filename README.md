@@ -1,79 +1,94 @@
 # Daffodils Montessori Website
 
-> **Live Site:** [https://daffodilsmontessori.com](https://daffodilsmontessori.com) *(update this link after deployment)*
+The public website for Daffodils Montessori, 5051 86th Ave NE, Marysville, WA 98270.
 
-The official website for Daffodils Montessori school located at 5051 86th Ave NE, Marysville, WA 98270.
+The site is hosted free on GitHub Pages. Logins, family records, files, and payments live in **Supabase** (a free hosted database with built-in accounts), and card payments go through **Stripe**. There is no server to run.
 
----
+**First time? Follow [SETUP.md](SETUP.md)** to connect Supabase, make yourself an admin, and (optionally) switch on Stripe.
 
-## What This Website Does
+## What it does
 
-The website serves three audiences:
+**Public website:** Home, About, Staff, Programs, Summer Camp, Tuition, Gallery, Events calendar, Lunch Menu, Handbook & Policies, Careers, Contact with tour booking, an online application, and a Privacy Policy. Prices, events, staff, photos, the menu, job openings, and testimonials come live from the database. Pages include search and link-preview tags, a sitemap, and Google Maps business details.
 
-1. **Families** -- Browse the school, view programs and tuition, check events, book a tour, and apply for enrollment.
-2. **Parents** -- Log in to a portal to manage children, view daily activity reports, download curriculum, and pay tuition online.
-3. **Admins** -- Manage everything from a dashboard: leads, enrollments, tours, programs, curriculum, events, announcements, and daily reports.
+**Family portal** (`portal.html`), for parents with an account:
 
----
+- Children: allergies, medical notes, emergency contacts, pickup list
+- Documents: upload immunization records and signed forms, with a checklist of what is still needed
+- Daily reports, check-in/check-out history, and absence reporting
+- Lesson progress by Montessori area (introduced, practicing, mastered)
+- Book parent-teacher conferences
+- Classroom photos, including families-only photos
+- Curriculum, handbook, and blank forms to download
+- Pay tuition by card and see payment history
+- Today's menu, announcements, events, and messages to the office
 
-## Public Pages
+**Admin dashboard** (`admin.html`), for school staff:
 
-| Page | Description |
-|------|-------------|
-| Home | Hero section, announcements banner, trust badges, program overview, testimonials |
-| About | School story and Montessori philosophy |
-| Programs | Toddler (2-3), Primary (3-5), and Kindergarten (5-6) program details |
-| Our Staff | Team bios, photos, and credentials |
-| Gallery | Photo gallery of the school and activities |
-| Tuition | Tuition rates pulled from admin-created programs, plus online payment for logged-in parents |
-| Events | School calendar with holidays, conferences, and field trips |
-| Contact | Contact form, tour booking, FAQ, Google Map, and school info |
-| Enrollment | Application form with program dropdown populated from admin-created programs |
+- Today: check children in and out (with the pickup list and allergies on screen), daily reports, absences
+- Inbox: applications, tour requests, messages, job applications
+- Families: children and enrollment, family accounts, document review, payments
+- Learning: lesson progress, conference time slots, curriculum files
+- School: programs and tuition, events, announcements, lunch menu, photos, staff, testimonials, job postings
+- **Edit this page**: change any text or photo directly on the public pages
 
----
+## Where things live
 
-## Parent Portal
+```
+docs/                     the website (GitHub Pages serves this folder)
+  index.html ...          public pages (about, programs, summer-camp, tuition,
+                          gallery, events, menu, policies, careers, privacy, ...)
+  login.html              parent/admin login
+  register.html           create a family account
+  reset-password.html     forgot password
+  portal.html             family portal
+  admin.html              admin dashboard
+  js/config.js            << Supabase keys + Stripe switch
+  js/site-data.js         contact info, social links, form email, backup content
+  js/api.js               shared login/database helpers
+  js/main.js              public pages
+  js/auth.js, portal.js, admin.js, menu.js, careers.js
+  sitemap.xml, robots.txt search engine files (update the address if you move domains)
+  css/styles.css          site styling
+  css/app.css             portal, admin, and login styling
+  vendor/                 self-hosted icons and the Supabase library
+supabase/
+  schema.sql              database tables + security rules (run once)
+  functions/              Stripe checkout + webhook
+.github/workflows/        keeps the free Supabase project from pausing
+SETUP.md                  step-by-step setup
+```
 
-When parents register and log in they can:
+## Everyday updates
 
-- Add children with DOB, allergies, medical notes, and emergency contacts
-- View daily activity reports from teachers
-- Download curriculum PDFs for their child's program
-- See upcoming events and announcements
-- Pay tuition online via Stripe and view payment history
+Log in, open the **Admin dashboard**, and use its tabs. For wording and photos on the public pages, open the page while logged in as an admin and click **Edit this page** at the bottom.
 
----
+Contact details, social links, and the address that receives form emails are in `docs/js/site-data.js` (edit on GitHub with the pencil icon).
 
-## Admin Dashboard
+## Forms
 
-Accessible at `/admin` after logging in as an admin. Tabs include:
+Contact, tour, and application forms are saved to the Admin dashboard inbox. A copy is also emailed through [FormSubmit](https://formsubmit.co) to the address in `forms.endpoint` in `site-data.js`. The first submission sends a one-time **"Activate Form"** email to that inbox; click it once. To turn email copies off, set `endpoint: ""`.
 
-| Tab | What It Does |
-|-----|-------------|
-| Leads | Contact form submissions and interested families |
-| Contact | Inquiries from logged-in parents -- mark as reviewed or contacted |
-| Enrollments | Manage applications -- approve, waitlist, or decline |
-| Tours | Tour booking requests from the contact page |
-| Children | Approve or unenroll children |
-| Accounts | View and manage parent accounts |
-| Programs | Create programs with name, age range, schedule, and tuition rate. These drive the Tuition page, Enrollment form, and Curriculum uploads. |
-| Curriculum | Upload PDF documents per program |
-| Daily Reports | Post daily activity reports for enrolled children |
-| Events | Create calendar events (general, holiday, conference, field trip) |
-| Announcements | Post news that appears on the homepage and parent portals |
+## Publishing on GitHub Pages (one-time setup)
 
-### Inline Editing
+1. Push this repo to GitHub.
+2. Go to **Settings > Pages**.
+3. Under **Build and deployment**, choose **Deploy from a branch**, branch **main**, folder **/docs**, and click **Save**.
+4. After a minute the site is live at `https://<your-username>.github.io/DaffodilsMontesseriWebsite/`.
 
-Admins see a green pen button on every public page. Click it to enter edit mode -- then click any text to change it or click camera icons to upload new images. Changes save automatically.
+Private repos need GitHub Pro (free with the GitHub Student Developer Pack) to use Pages. A public repo works on any plan; nothing secret lives in `docs/`.
 
----
+### Custom domain (optional)
 
-## Tech Stack
+To use a domain like `daffodilsmontessori.com`, enter it under **Settings > Pages > Custom domain**, then add the DNS records GitHub shows you at your domain registrar. Tick **Enforce HTTPS** once it is available.
 
-- **Backend:** Node.js + Express 5
-- **Data:** JSON file-based storage (`data.json`)
-- **Auth:** Session-based with bcrypt password hashing
-- **Payments:** Stripe integration
-- **Email:** Nodemailer with Gmail
-- **Security:** Helmet CSP, rate limiting, input sanitization, file upload validation
-- **Tests:** Jest + Supertest (130 E2E tests)
+## Previewing locally
+
+Open `docs/index.html` in a browser, or run a tiny local server from the repo folder:
+
+```
+npx serve docs
+```
+
+## What changed from the old version
+
+The earlier version ran a Node/Express server on Render with a JSON file for data. It now runs on GitHub Pages + Supabase with the same features (parent logins, admin dashboard, daily reports, curriculum files, Stripe payments, inline editing) plus absences, pickup lists, family messages, and waitlists. Every table is protected by row level security, so parents only ever see their own family's records. The old server code is still in the git history.

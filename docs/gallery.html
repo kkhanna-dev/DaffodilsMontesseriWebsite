@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery - Daffodils Montessori</title>
+  <!-- seo -->
+  <meta name="description" content="Photos of classrooms, outdoor play, and activities at Daffodils Montessori.">
+  <link rel="canonical" href="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/gallery.html">
+  <meta name="theme-color" content="#f4a825">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Daffodils Montessori">
+  <meta property="og:title" content="Gallery - Daffodils Montessori">
+  <meta property="og:description" content="Photos of classrooms, outdoor play, and activities at Daffodils Montessori.">
+  <meta property="og:url" content="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/gallery.html">
+  <meta property="og:image" content="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/images/og-card.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- /seo -->
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar" aria-label="Main">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" aria-label="Daffodils Montessori home">
+        <span class="logo-icon" aria-hidden="true">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Montessori</span>
+        </div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li class="has-sub">
+          <a href="about.html">About</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-0" aria-label="About pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-0">
+            <li><a href="about.html">Our Story</a></li>
+            <li><a href="staff.html">Our Staff</a></li>
+            <li><a href="careers.html">Careers</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <a href="programs.html">Programs</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-1" aria-label="Programs pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-1">
+            <li><a href="programs.html">All Programs</a></li>
+            <li><a href="summer-camp.html">Summer Camp</a></li>
+          </ul>
+        </li>
+        <li><a href="tuition.html">Tuition</a></li>
+        <li><a href="gallery.html" class="active" aria-current="page">Gallery</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li class="has-sub">
+          <a href="policies.html">Families</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-5" aria-label="Families pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-5">
+            <li><a href="policies.html">Handbook & Policies</a></li>
+            <li><a href="menu.html">Lunch Menu</a></li>
+            <li><a href="portal.html">Family Portal</a></li>
+          </ul>
+        </li>
+        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-account-item"><a href="login.html" id="navAccount" class="nav-account"><i class="fas fa-user-circle" aria-hidden="true"></i> Parent Login</a></li>
+        <li class="nav-cta-item"><a href="enrollment.html" class="nav-cta">Apply Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <h1 data-editable="galleryHeroTitle">Our Gallery</h1>
+      <p data-editable="galleryHeroDesc">A glimpse into the daily joy, learning, and discovery at Daffodils Montessori.</p>
+      <div class="breadcrumb">
+        <a href="index.html">Home</a> <i class="fas fa-chevron-right"></i> <span>Gallery</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Filters -->
+  <section class="section">
+    <div class="container">
+      <div class="gallery-filters">
+        <button class="gallery-filter active" data-filter="all">All</button>
+        <button class="gallery-filter" data-filter="classrooms">Classrooms</button>
+        <button class="gallery-filter" data-filter="outdoor">Outdoor</button>
+        <button class="gallery-filter" data-filter="activities">Activities</button>
+        <button class="gallery-filter" data-filter="events">Events</button>
+        <button class="gallery-filter" data-filter="campus">Campus</button>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Classrooms -->
+        <div class="gallery-item" data-category="classrooms">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2);" data-image-upload="galleryImg1">
+            <i class="fas fa-chalkboard"></i>
+            <span>Toddler Classroom</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay1Title">Toddler Classroom</h4>
+            <p data-editable="galleryOverlay1Desc">A warm, inviting space designed for our youngest learners</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="classrooms">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9);" data-image-upload="galleryImg2">
+            <i class="fas fa-shapes"></i>
+            <span>Primary Classroom</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay2Title">Primary Classroom</h4>
+            <p data-editable="galleryOverlay2Desc">Beautifully organized Montessori materials on child-height shelves</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="classrooms">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb);" data-image-upload="galleryImg3">
+            <i class="fas fa-book-open"></i>
+            <span>Reading Corner</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay3Title">Reading Corner</h4>
+            <p data-editable="galleryOverlay3Desc">A cozy nook where children explore the world through books</p>
+          </div>
+        </div>
+        <div class="gallery-item large" data-category="classrooms">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #fce4ec, #f8bbd0);" data-image-upload="galleryImg4">
+            <i class="fas fa-pencil-alt"></i>
+            <span>Art Studio</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay4Title">Art Studio</h4>
+            <p data-editable="galleryOverlay4Desc">Creative expression through painting, drawing, and sculpture</p>
+          </div>
+        </div>
+
+        <!-- Outdoor -->
+        <div class="gallery-item large" data-category="outdoor">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #e8f5e9, #a5d6a7);" data-image-upload="galleryImg5">
+            <i class="fas fa-tree"></i>
+            <span>Playground</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay5Title">Natural Playground</h4>
+            <p data-editable="galleryOverlay5Desc">Designed with natural materials for imaginative play</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="outdoor">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #f1f8e9, #dcedc8);" data-image-upload="galleryImg6">
+            <i class="fas fa-seedling"></i>
+            <span>Children's Garden</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay6Title">Children's Garden</h4>
+            <p data-editable="galleryOverlay6Desc">Growing vegetables, herbs, and flowers together</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="outdoor">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #fff8e1, #ffecb3);" data-image-upload="galleryImg7">
+            <i class="fas fa-sun"></i>
+            <span>Outdoor Classroom</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay7Title">Outdoor Classroom</h4>
+            <p data-editable="galleryOverlay7Desc">Learning under the trees with fresh air and sunshine</p>
+          </div>
+        </div>
+
+        <!-- Activities -->
+        <div class="gallery-item" data-category="activities">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #ede7f6, #d1c4e9);" data-image-upload="galleryImg8">
+            <i class="fas fa-puzzle-piece"></i>
+            <span>Montessori Work</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay8Title">Montessori Work</h4>
+            <p data-editable="galleryOverlay8Desc">Concentrated, purposeful work with beautiful materials</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="activities">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #fff3e0, #ffcc80);" data-image-upload="galleryImg9">
+            <i class="fas fa-cookie-bite"></i>
+            <span>Cooking Activity</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay9Title">Cooking Together</h4>
+            <p data-editable="galleryOverlay9Desc">Practical life skills through food preparation</p>
+          </div>
+        </div>
+        <div class="gallery-item large" data-category="activities">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #e0f7fa, #b2ebf2);" data-image-upload="galleryImg10">
+            <i class="fas fa-flask"></i>
+            <span>Science Exploration</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay10Title">Science Exploration</h4>
+            <p data-editable="galleryOverlay10Desc">Hands-on experiments that spark wonder and curiosity</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="activities">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #fce4ec, #ef9a9a);" data-image-upload="galleryImg11">
+            <i class="fas fa-music"></i>
+            <span>Music Time</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay11Title">Music &amp; Movement</h4>
+            <p data-editable="galleryOverlay11Desc">Rhythm, singing, and joyful expression through music</p>
+          </div>
+        </div>
+
+        <!-- Events -->
+        <div class="gallery-item" data-category="events">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #f3e5f5, #ce93d8);" data-image-upload="galleryImg12">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Graduation Day</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay12Title">Graduation Ceremony</h4>
+            <p data-editable="galleryOverlay12Desc">Celebrating our kindergarten graduates' achievements</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="events">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #e8eaf6, #9fa8da);" data-image-upload="galleryImg13">
+            <i class="fas fa-globe-americas"></i>
+            <span>Cultural Festival</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay13Title">Cultural Festival</h4>
+            <p data-editable="galleryOverlay13Desc">Celebrating diversity through food, art, and performances</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="events">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #fff9c4, #fff176);" data-image-upload="galleryImg14">
+            <i class="fas fa-campground"></i>
+            <span>Summer Camp</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay14Title">Summer Camp</h4>
+            <p data-editable="galleryOverlay14Desc">Themed weekly adventures during summer break</p>
+          </div>
+        </div>
+
+        <!-- Campus -->
+        <div class="gallery-item large" data-category="campus">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #efebe9, #d7ccc8);" data-image-upload="galleryImg15">
+            <i class="fas fa-school"></i>
+            <span>Main Building</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay15Title">Our Campus</h4>
+            <p data-editable="galleryOverlay15Desc">A welcoming, purpose-built Montessori learning environment</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="campus">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #e0f2f1, #b2dfdb);" data-image-upload="galleryImg16">
+            <i class="fas fa-door-open"></i>
+            <span>Welcome Entrance</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay16Title">Welcome Entrance</h4>
+            <p data-editable="galleryOverlay16Desc">Bright and friendly entry with secure check-in</p>
+          </div>
+        </div>
+        <div class="gallery-item" data-category="campus">
+          <div class="gallery-placeholder" style="background: linear-gradient(135deg, #fbe9e7, #ffccbc);" data-image-upload="galleryImg17">
+            <i class="fas fa-utensils"></i>
+            <span>Dining Area</span>
+          </div>
+          <div class="gallery-overlay">
+            <h4 data-editable="galleryOverlay17Title">Dining Area</h4>
+            <p data-editable="galleryOverlay17Desc">Where children enjoy nutritious family-style meals together</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Virtual Tour CTA -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 data-editable="galleryCtaTitle">Want to See More? Schedule a Tour!</h2>
+        <p data-editable="galleryCtaDesc">Photos can only capture so much. Visit us in person and experience the warmth and energy of Daffodils Montessori firsthand.</p>
+        <div class="cta-buttons">
+          <a href="contact.html#tour" class="btn btn-primary btn-large">Book a Campus Tour</a>
+  
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <span class="logo-icon" aria-hidden="true">🌼</span>
+            <div class="logo-text">
+              <span class="logo-name">Daffodils</span>
+              <span class="logo-tagline">Montessori</span>
+            </div>
+          </div>
+          <p data-editable="footerBlurb">Nurturing young minds through the Montessori method. Every child deserves to bloom.</p>
+          <div class="footer-social" id="footerSocial" hidden></div>
+        </div>
+        <div class="footer-links">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="staff.html">Our Staff</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="careers.html">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Programs</h4>
+          <ul>
+            <li><a href="programs.html#toddler">Toddler (2-3)</a></li>
+            <li><a href="programs.html#primary">Primary (3-5)</a></li>
+            <li><a href="programs.html#kindergarten">Kindergarten (5-6)</a></li>
+            <li><a href="summer-camp.html">Summer Camp</a></li>
+            <li><a href="tuition.html">Tuition</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Families</h4>
+          <ul>
+            <li><a href="contact.html#tour">Book a Tour</a></li>
+            <li><a href="enrollment.html">Apply</a></li>
+            <li><a href="policies.html">Handbook &amp; Policies</a></li>
+            <li><a href="menu.html">Lunch Menu</a></li>
+            <li><a href="login.html">Parent Login</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact Us</h4>
+          <ul>
+            <li><i class="fas fa-map-marker-alt" aria-hidden="true"></i> <a href="https://maps.google.com/?q=5051+86th+Ave+NE,+Marysville,+WA+98270" target="_blank" rel="noopener">5051 86th Ave NE, Marysville, WA 98270</a></li>
+            <li><i class="fas fa-phone" aria-hidden="true"></i> <a href="tel:+14256232684">(425) 623-2684</a></li>
+            <li><i class="fas fa-envelope" aria-hidden="true"></i> <a href="mailto:rishiekhanna@yahoo.com">rishiekhanna@yahoo.com</a></li>
+            <li><i class="fas fa-clock" aria-hidden="true"></i> <span data-editable="footerHours">Mon-Fri: 9:00 AM - 5:00 PM</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> Daffodils Montessori. <span data-license></span></p>
+        <div class="footer-bottom-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="policies.html#nondiscrimination">Nondiscrimination</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/site-data.js"></script>
+  <script src="js/config.js"></script>
+  <script src="vendor/supabase/supabase.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

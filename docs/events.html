@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events Calendar - Daffodils Montessori</title>
+  <!-- seo -->
+  <meta name="description" content="School calendar with events, holidays, and closures at Daffodils Montessori.">
+  <link rel="canonical" href="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/events.html">
+  <meta name="theme-color" content="#f4a825">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Daffodils Montessori">
+  <meta property="og:title" content="Events Calendar - Daffodils Montessori">
+  <meta property="og:description" content="School calendar with events, holidays, and closures at Daffodils Montessori.">
+  <meta property="og:url" content="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/events.html">
+  <meta property="og:image" content="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/images/og-card.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- /seo -->
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/app.css">
+  <style>
+    /* ===== Calendar Styles ===== */
+    .calendar-section {
+      padding: 60px 0;
+    }
+    .calendar-wrapper {
+      max-width: 900px;
+      margin: 0 auto 60px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 32px;
+      background: linear-gradient(135deg, var(--secondary), var(--secondary-dark));
+      color: #fff;
+    }
+    .calendar-header h2 {
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      margin: 0;
+      font-weight: 600;
+    }
+    .calendar-nav-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: #fff;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .calendar-nav-btn:hover {
+      background: rgba(255,255,255,0.35);
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0;
+    }
+    .calendar-day-label {
+      padding: 12px 8px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .calendar-day {
+      position: relative;
+      padding: 10px 8px;
+      text-align: center;
+      min-height: 56px;
+      border: 1px solid #f0f0f0;
+      cursor: default;
+      transition: background 0.2s;
+    }
+    .calendar-day:hover {
+      background: #f8fdf8;
+    }
+    .calendar-day.empty {
+      background: #fafafa;
+      cursor: default;
+    }
+    .calendar-day.empty:hover {
+      background: #fafafa;
+    }
+    .calendar-day.today {
+      background: #e8f5e9;
+    }
+    .calendar-day.today .day-number {
+      background: #2e7d32;
+      color: #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .day-number {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #333;
+    }
+    .calendar-day.empty .day-number {
+      color: #ccc;
+    }
+    .event-dots {
+      display: flex;
+      gap: 3px;
+      justify-content: center;
+      margin-top: 4px;
+      flex-wrap: wrap;
+    }
+    .event-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f9a825;
+    }
+    .event-dot.green { background: #2e7d32; }
+    .event-dot.orange { background: #f57c00; }
+    .event-dot.blue { background: #1565c0; }
+    .event-dot.pink { background: #c2185b; }
+    .calendar-day.has-events {
+      cursor: pointer;
+    }
+    .calendar-day.has-events:hover {
+      background: #e8f5e9;
+    }
+
+    /* Day tooltip */
+    .day-tooltip {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      pointer-events: none;
+    }
+    .day-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #333;
+    }
+    .calendar-day.has-events:hover .day-tooltip {
+      display: block;
+    }
+
+    /* ===== Events List ===== */
+    .events-list-section {
+      padding: 0 0 60px;
+    }
+    .events-list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+    .events-list-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: #2e7d32;
+      margin: 0;
+    }
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .event-card {
+      display: flex;
+      gap: 24px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+      align-items: flex-start;
+    }
+    .event-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+    .event-date-block {
+      flex-shrink: 0;
+      width: 72px;
+      height: 80px;
+      background: linear-gradient(135deg, #2e7d32, #43a047);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      text-align: center;
+    }
+    .event-date-block .month {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.9;
+    }
+    .event-date-block .day {
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: 2px;
+    }
+    .event-info {
+      flex: 1;
+    }
+    .event-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: #333;
+      margin: 0 0 6px;
+    }
+    .event-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .event-meta span {
+      font-size: 0.85rem;
+      color: #888;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .event-meta i {
+      color: #2e7d32;
+      font-size: 0.8rem;
+    }
+    .event-description {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    /* Past events toggle */
+    .past-events-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: none;
+      border: 2px solid #ddd;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 40px;
+      font-family: 'Open Sans', sans-serif;
+    }
+    .past-events-toggle:hover {
+      border-color: #2e7d32;
+      color: #2e7d32;
+    }
+    .past-events-toggle i {
+      transition: transform 0.3s;
+    }
+    .past-events-toggle.expanded i {
+      transform: rotate(180deg);
+    }
+    .past-events-container {
+      display: none;
+      margin-top: 24px;
+    }
+    .past-events-container.show {
+      display: block;
+    }
+    .past-event-card {
+      opacity: 0.7;
+    }
+    .past-event-card .event-date-block {
+      background: linear-gradient(135deg, #757575, #9e9e9e);
+    }
+
+    /* Empty state */
+    .events-empty {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+    .events-empty i {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      color: #ddd;
+    }
+    .events-empty p {
+      font-size: 1.1rem;
+    }
+
+    /* Loading */
+    .events-loading {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .events-loading .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e9ecef;
+      border-top-color: #2e7d32;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .calendar-header {
+        padding: 16px 20px;
+      }
+      .calendar-header h2 {
+        font-size: 1.15rem;
+      }
+      .calendar-day {
+        min-height: 44px;
+        padding: 6px 4px;
+      }
+      .day-number {
+        font-size: 0.82rem;
+      }
+      .event-dot {
+        width: 5px;
+        height: 5px;
+      }
+      .event-card {
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+      }
+      .event-date-block {
+        width: 100%;
+        height: auto;
+        padding: 12px;
+        flex-direction: row;
+        gap: 8px;
+        border-radius: 8px;
+      }
+      .event-date-block .day {
+        font-size: 1.4rem;
+        margin: 0;
+      }
+      .events-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar" aria-label="Main">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" aria-label="Daffodils Montessori home">
+        <span class="logo-icon" aria-hidden="true">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Montessori</span>
+        </div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li class="has-sub">
+          <a href="about.html">About</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-0" aria-label="About pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-0">
+            <li><a href="about.html">Our Story</a></li>
+            <li><a href="staff.html">Our Staff</a></li>
+            <li><a href="careers.html">Careers</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <a href="programs.html">Programs</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-1" aria-label="Programs pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-1">
+            <li><a href="programs.html">All Programs</a></li>
+            <li><a href="summer-camp.html">Summer Camp</a></li>
+          </ul>
+        </li>
+        <li><a href="tuition.html">Tuition</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="events.html" class="active" aria-current="page">Events</a></li>
+        <li class="has-sub">
+          <a href="policies.html">Families</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-5" aria-label="Families pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-5">
+            <li><a href="policies.html">Handbook & Policies</a></li>
+            <li><a href="menu.html">Lunch Menu</a></li>
+            <li><a href="portal.html">Family Portal</a></li>
+          </ul>
+        </li>
+        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-account-item"><a href="login.html" id="navAccount" class="nav-account"><i class="fas fa-user-circle" aria-hidden="true"></i> Parent Login</a></li>
+        <li class="nav-cta-item"><a href="enrollment.html" class="nav-cta">Apply Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content">
+      <h1 data-editable="eventsTitle">Events Calendar</h1>
+      <p data-editable="eventsDesc">Stay up to date with school events, celebrations, and important dates throughout the year.</p>
+      <div class="breadcrumb">
+        <a href="index.html">Home</a> <i class="fas fa-chevron-right"></i> <span>Events</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Calendar Section -->
+  <section class="calendar-section">
+    <div class="container">
+      <div class="calendar-wrapper">
+        <div class="calendar-header">
+          <button class="calendar-nav-btn" id="prevMonth" aria-label="Previous month">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <h2 id="calendarTitle">March 2026</h2>
+          <button class="calendar-nav-btn" id="nextMonth" aria-label="Next month">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+          <!-- Day labels and days rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Upcoming Events List -->
+      <div class="events-list-section">
+        <div class="events-list-header">
+          <h2><i class="fas fa-calendar-check" style="margin-right:10px;"></i>Upcoming Events</h2>
+        </div>
+        <div id="upcomingEvents">
+          <div class="events-loading">
+            <div class="spinner"></div>
+            <p>Loading events...</p>
+          </div>
+        </div>
+
+        <!-- Past Events -->
+        <button class="past-events-toggle" id="pastToggle">
+          <i class="fas fa-chevron-down"></i>
+          <span>Show Past Events</span>
+        </button>
+        <div class="past-events-container" id="pastEventsContainer">
+          <div id="pastEvents"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Have Questions About Our Events?</h2>
+        <p>We love having families participate in school events. Reach out to learn more or volunteer!</p>
+        <div class="cta-buttons">
+          <a href="contact.html" class="btn btn-primary btn-large">Contact Us</a>
+          <a href="contact.html#tour" class="btn btn-outline btn-large">Book a Tour</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <span class="logo-icon" aria-hidden="true">🌼</span>
+            <div class="logo-text">
+              <span class="logo-name">Daffodils</span>
+              <span class="logo-tagline">Montessori</span>
+            </div>
+          </div>
+          <p data-editable="footerBlurb">Nurturing young minds through the Montessori method. Every child deserves to bloom.</p>
+          <div class="footer-social" id="footerSocial" hidden></div>
+        </div>
+        <div class="footer-links">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="staff.html">Our Staff</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="careers.html">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Programs</h4>
+          <ul>
+            <li><a href="programs.html#toddler">Toddler (2-3)</a></li>
+            <li><a href="programs.html#primary">Primary (3-5)</a></li>
+            <li><a href="programs.html#kindergarten">Kindergarten (5-6)</a></li>
+            <li><a href="summer-camp.html">Summer Camp</a></li>
+            <li><a href="tuition.html">Tuition</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Families</h4>
+          <ul>
+            <li><a href="contact.html#tour">Book a Tour</a></li>
+            <li><a href="enrollment.html">Apply</a></li>
+            <li><a href="policies.html">Handbook &amp; Policies</a></li>
+            <li><a href="menu.html">Lunch Menu</a></li>
+            <li><a href="login.html">Parent Login</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact Us</h4>
+          <ul>
+            <li><i class="fas fa-map-marker-alt" aria-hidden="true"></i> <a href="https://maps.google.com/?q=5051+86th+Ave+NE,+Marysville,+WA+98270" target="_blank" rel="noopener">5051 86th Ave NE, Marysville, WA 98270</a></li>
+            <li><i class="fas fa-phone" aria-hidden="true"></i> <a href="tel:+14256232684">(425) 623-2684</a></li>
+            <li><i class="fas fa-envelope" aria-hidden="true"></i> <a href="mailto:rishiekhanna@yahoo.com">rishiekhanna@yahoo.com</a></li>
+            <li><i class="fas fa-clock" aria-hidden="true"></i> <span data-editable="footerHours">Mon-Fri: 9:00 AM - 5:00 PM</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> Daffodils Montessori. <span data-license></span></p>
+        <div class="footer-bottom-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="policies.html#nondiscrimination">Nondiscrimination</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/site-data.js"></script>
+  <script src="js/config.js"></script>
+  <script src="vendor/supabase/supabase.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    (function() {
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const DOT_COLORS = ['green','orange','blue','pink'];
+
+      let allEvents = [];
+      let currentYear, currentMonth;
+
+      const today = new Date();
+      currentYear = today.getFullYear();
+      currentMonth = today.getMonth();
+
+      // DOM refs
+      const calendarGrid = document.getElementById('calendarGrid');
+      const calendarTitle = document.getElementById('calendarTitle');
+      const prevBtn = document.getElementById('prevMonth');
+      const nextBtn = document.getElementById('nextMonth');
+      const upcomingEl = document.getElementById('upcomingEvents');
+      const pastEventsEl = document.getElementById('pastEvents');
+      const pastToggle = document.getElementById('pastToggle');
+      const pastContainer = document.getElementById('pastEventsContainer');
+
+      // Fetch events
+      async function loadEvents() {
+        try {
+          const data = window.DM && DM.loadPublicData ? await DM.loadPublicData() : { events: (window.SITE_DATA && SITE_DATA.events) || [] };
+          allEvents = (data.events || []).map(function (e) {
+            // Treat plain "YYYY-MM-DD" dates as local days so they don't shift in Pacific time
+            return Object.assign({}, e, { date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date + 'T00:00:00' : e.date });
+          }).sort((a, b) => new Date(a.date) - new Date(b.date));
+        } catch (e) {
+          allEvents = [];
+        }
+        renderCalendar();
+        renderUpcoming();
+        renderPast();
+      }
+
+      // Calendar rendering
+      function renderCalendar() {
+        calendarTitle.textContent = MONTHS[currentMonth] + ' ' + currentYear;
+        calendarGrid.innerHTML = '';
+
+        // Day labels
+        DAY_LABELS.forEach(label => {
+          const el = document.createElement('div');
+          el.className = 'calendar-day-label';
+          el.textContent = label;
+          calendarGrid.appendChild(el);
+        });
+
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        // Events for this month
+        const monthEvents = {};
+        allEvents.forEach((evt, idx) => {
+          const d = new Date(evt.date);
+          if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
+            const day = d.getDate();
+            if (!monthEvents[day]) monthEvents[day] = [];
+            monthEvents[day].push({ ...evt, colorIdx: idx % DOT_COLORS.length });
+          }
+        });
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDay; i++) {
+          const el = document.createElement('div');
+          el.className = 'calendar-day empty';
+          calendarGrid.appendChild(el);
+        }
+
+        // Day cells
+        for (let d = 1; d <= daysInMonth; d++) {
+          const el = document.createElement('div');
+          el.className = 'calendar-day';
+
+          const isToday = d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+          if (isToday) el.classList.add('today');
+
+          const numSpan = document.createElement('span');
+          numSpan.className = 'day-number';
+          numSpan.textContent = d;
+          el.appendChild(numSpan);
+
+          if (monthEvents[d]) {
+            el.classList.add('has-events');
+            const dotsDiv = document.createElement('div');
+            dotsDiv.className = 'event-dots';
+            monthEvents[d].forEach(evt => {
+              const dot = document.createElement('span');
+              dot.className = 'event-dot ' + DOT_COLORS[evt.colorIdx];
+              dotsDiv.appendChild(dot);
+            });
+            el.appendChild(dotsDiv);
+
+            // Tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'day-tooltip';
+            tooltip.textContent = monthEvents[d].map(e => e.title).join(', ');
+            el.appendChild(tooltip);
+
+            // Click to scroll to event in list
+            const dayEvents = monthEvents[d];
+            el.addEventListener('click', () => {
+              // Find matching event card and scroll to it
+              const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+              const cards = document.querySelectorAll('.event-card[data-event-date]');
+              for (const card of cards) {
+                if (card.getAttribute('data-event-date') === dateStr) {
+                  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  card.style.transition = 'box-shadow 0.3s, transform 0.3s';
+                  card.style.boxShadow = '0 0 0 3px #4a7c28, 0 6px 20px rgba(0,0,0,0.15)';
+                  card.style.transform = 'translateY(-4px)';
+                  setTimeout(() => {
+                    card.style.boxShadow = '';
+                    card.style.transform = '';
+                  }, 2000);
+                  break;
+                }
+              }
+              // If it's a past event, expand past events first
+              const isPast = new Date(dateStr) < new Date(new Date().toDateString());
+              if (isPast && !pastContainer.classList.contains('show')) {
+                pastToggle.click();
+                setTimeout(() => {
+                  const pastCards = document.querySelectorAll('.past-event-card[data-event-date]');
+                  for (const card of pastCards) {
+                    if (card.getAttribute('data-event-date') === dateStr) {
+                      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      card.style.boxShadow = '0 0 0 3px #4a7c28, 0 6px 20px rgba(0,0,0,0.15)';
+                      card.style.transform = 'translateY(-4px)';
+                      setTimeout(() => { card.style.boxShadow = ''; card.style.transform = ''; }, 2000);
+                      break;
+                    }
+                  }
+                }, 300);
+              }
+            });
+          }
+
+          calendarGrid.appendChild(el);
+        }
+      }
+
+      // Upcoming events
+      function renderUpcoming() {
+        const now = new Date();
+        now.setHours(0,0,0,0);
+        const upcoming = allEvents.filter(e => new Date(e.date) >= now);
+
+        if (upcoming.length === 0) {
+          upcomingEl.innerHTML = '<div class="events-empty"><i class="fas fa-calendar-xmark"></i><p>No upcoming events at this time. Check back soon!</p></div>';
+          return;
+        }
+
+        upcomingEl.innerHTML = '<div class="events-list">' + upcoming.map(evt => eventCardHTML(evt, false)).join('') + '</div>';
+      }
+
+      // Past events
+      function renderPast() {
+        const now = new Date();
+        now.setHours(0,0,0,0);
+        const past = allEvents.filter(e => new Date(e.date) < now).reverse();
+
+        if (past.length === 0) {
+          pastToggle.style.display = 'none';
+          return;
+        }
+
+        pastToggle.querySelector('span').textContent = 'Show Past Events (' + past.length + ')';
+        pastEventsEl.innerHTML = '<div class="events-list">' + past.map(evt => eventCardHTML(evt, true)).join('') + '</div>';
+      }
+
+      function eventCardHTML(evt, isPast) {
+        const d = new Date(evt.date);
+        const month = MONTH_ABBR[d.getMonth()];
+        const day = d.getDate();
+        const dateAttr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        const cardClass = isPast ? 'event-card past-event-card' : 'event-card';
+
+        let metaHTML = '';
+        if (evt.time) {
+          metaHTML += '<span><i class="fas fa-clock"></i> ' + escHTML(evt.time) + '</span>';
+        }
+        if (evt.location) {
+          metaHTML += '<span><i class="fas fa-map-marker-alt"></i> ' + escHTML(evt.location) + '</span>';
+        }
+
+        const dateStr = MONTHS[d.getMonth()] + ' ' + day + ', ' + d.getFullYear();
+        metaHTML += '<span><i class="fas fa-calendar"></i> ' + dateStr + '</span>';
+
+        let descHTML = '';
+        if (evt.description) {
+          descHTML = '<p class="event-description">' + escHTML(evt.description) + '</p>';
+        }
+
+        return '<div class="' + cardClass + '" data-event-date="' + dateAttr + '">' +
+          '<div class="event-date-block"><span class="month">' + month + '</span><span class="day">' + day + '</span></div>' +
+          '<div class="event-info"><h3>' + escHTML(evt.title || 'Untitled Event') + '</h3>' +
+          '<div class="event-meta">' + metaHTML + '</div>' +
+          descHTML +
+          '</div></div>';
+      }
+
+      function escHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      // Navigation
+      prevBtn.addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+        renderCalendar();
+      });
+
+      nextBtn.addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+        renderCalendar();
+      });
+
+      // Past events toggle
+      pastToggle.addEventListener('click', () => {
+        pastToggle.classList.toggle('expanded');
+        pastContainer.classList.toggle('show');
+        const isExpanded = pastContainer.classList.contains('show');
+        const count = pastToggle.querySelector('span').textContent.match(/\(\d+\)/);
+        pastToggle.querySelector('span').textContent = (isExpanded ? 'Hide Past Events' : 'Show Past Events') + (count ? ' ' + count[0] : '');
+      });
+
+      loadEvents();
+    })();
+  </script>
+</body>
+</html>

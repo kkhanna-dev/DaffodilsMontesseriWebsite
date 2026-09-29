@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daffodils Montessori - Nurturing Young Minds</title>
+  <!-- seo -->
+  <meta name="description" content="Daffodils Montessori is a family-run Montessori school in Marysville, WA for children ages 2 to 6, with toddler, primary, and kindergarten programs.">
+  <link rel="canonical" href="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/">
+  <meta name="theme-color" content="#f4a825">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Daffodils Montessori">
+  <meta property="og:title" content="Daffodils Montessori - Nurturing Young Minds">
+  <meta property="og:description" content="Daffodils Montessori is a family-run Montessori school in Marysville, WA for children ages 2 to 6, with toddler, primary, and kindergarten programs.">
+  <meta property="og:url" content="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/">
+  <meta property="og:image" content="https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/images/og-card.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":["ChildCare","Preschool"],"name":"Daffodils Montessori","url":"https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/","image":"https://kkhanna-dev.github.io/DaffodilsMontesseriWebsite/images/og-card.jpg","telephone":"+1-425-623-2684","email":"rishiekhanna@yahoo.com","address":{"@type":"PostalAddress","streetAddress":"5051 86th Ave NE","addressLocality":"Marysville","addressRegion":"WA","postalCode":"98270","addressCountry":"US"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"09:00","closes":"17:00"}],"description":"Daffodils Montessori is a family-run Montessori school in Marysville, WA for children ages 2 to 6, with toddler, primary, and kindergarten programs."}</script>
+  <!-- /seo -->
+  <link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar" aria-label="Main">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo" aria-label="Daffodils Montessori home">
+        <span class="logo-icon" aria-hidden="true">🌼</span>
+        <div class="logo-text">
+          <span class="logo-name">Daffodils</span>
+          <span class="logo-tagline">Montessori</span>
+        </div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-menu" id="navMenu">
+        <li class="has-sub">
+          <a href="about.html">About</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-0" aria-label="About pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-0">
+            <li><a href="about.html">Our Story</a></li>
+            <li><a href="staff.html">Our Staff</a></li>
+            <li><a href="careers.html">Careers</a></li>
+          </ul>
+        </li>
+        <li class="has-sub">
+          <a href="programs.html">Programs</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-1" aria-label="Programs pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-1">
+            <li><a href="programs.html">All Programs</a></li>
+            <li><a href="summer-camp.html">Summer Camp</a></li>
+          </ul>
+        </li>
+        <li><a href="tuition.html">Tuition</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li class="has-sub">
+          <a href="policies.html">Families</a>
+          <button type="button" class="sub-toggle" aria-expanded="false" aria-controls="sub-5" aria-label="Families pages"><i class="fas fa-chevron-down" aria-hidden="true"></i></button>
+          <ul class="sub-menu" id="sub-5">
+            <li><a href="policies.html">Handbook & Policies</a></li>
+            <li><a href="menu.html">Lunch Menu</a></li>
+            <li><a href="portal.html">Family Portal</a></li>
+          </ul>
+        </li>
+        <li><a href="contact.html">Contact</a></li>
+        <li class="nav-account-item"><a href="login.html" id="navAccount" class="nav-account"><i class="fas fa-user-circle" aria-hidden="true"></i> Parent Login</a></li>
+        <li class="nav-cta-item"><a href="enrollment.html" class="nav-cta">Apply Now</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-subtitle" data-editable="heroSubtitle">Welcome to</p>
+      <h1 class="hero-title" data-editable="heroTitle">Daffodils Montessori</h1>
+      <p class="hero-tagline" data-editable="heroTagline">Where Every Child Blossoms</p>
+      <p class="hero-desc" data-editable="heroDesc">Nurturing curious minds through the Montessori method in a warm, loving environment where children discover the joy of learning at their own pace.</p>
+      <div class="hero-buttons">
+        <a href="contact.html#tour" class="btn btn-primary">Book a Tour</a>
+        <a href="programs.html" class="btn btn-secondary">Explore Programs</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <span data-editable="heroScroll">Scroll to discover</span>
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </section>
+
+  <!-- Announcements Banner -->
+  <section class="home-announcements-bar" id="homeAnnouncementsBar" style="display:none;">
+    <div class="container">
+      <div class="home-announcements-inner">
+        <div class="home-announcements-icon">
+          <i class="fas fa-bullhorn"></i>
+        </div>
+        <div class="home-announcements-content" id="homeAnnouncementsContent"></div>
+        <a href="events.html" class="home-announcements-link">View Events <i class="fas fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Trust & Credentials Bar -->
+  <section class="trust-bar">
+    <div class="container">
+      <div class="trust-items">
+        <div class="trust-item">
+          <i class="fas fa-shield-alt"></i>
+          <span data-editable="trustItem1">State Licensed & Inspected</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-certificate"></i>
+          <span data-editable="trustItem2">AMI/AMS Certified Teachers</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-lock"></i>
+          <span data-editable="trustItem3">Secure Campus & Controlled Access</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-heart"></i>
+          <span data-editable="trustItem4">CPR & First Aid Certified Staff</span>
+        </div>
+        <div class="trust-item">
+          <i class="fas fa-clipboard-check"></i>
+          <span data-editable="trustItem5">Background Checked Employees</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Welcome Section -->
+  <section class="section welcome-section">
+    <div class="container">
+      <div class="welcome-grid">
+        <div class="welcome-image">
+          <div class="image-placeholder welcome-img" data-image-upload="welcomeImage">
+            <i class="fas fa-children"></i>
+            <span>Children Learning Together</span>
+          </div>
+        </div>
+        <div class="welcome-text">
+          <span class="section-label" data-editable="welcomeLabel">About Our School</span>
+          <h2 data-editable="aboutTitle">A Place Where Little Minds Grow Big Dreams</h2>
+          <p data-editable="aboutDesc">At Daffodils Montessori, we believe every child is a unique flower waiting to bloom. Our Montessori-inspired curriculum encourages independence, creativity, and a lifelong love of learning.</p>
+          <p data-editable="aboutDesc2">Founded with a passion for early childhood education, our school provides a nurturing environment where children ages 2-6 explore, discover, and grow at their own natural pace.</p>
+          <div class="welcome-features">
+            <div class="feature">
+              <i class="fas fa-heart"></i>
+              <span data-editable="welcomeFeature1">Nurturing Environment</span>
+            </div>
+            <div class="feature">
+              <i class="fas fa-puzzle-piece"></i>
+              <span data-editable="welcomeFeature2">Hands-On Learning</span>
+            </div>
+            <div class="feature">
+              <i class="fas fa-users"></i>
+              <span data-editable="welcomeFeature3">Small Class Sizes</span>
+            </div>
+            <div class="feature">
+              <i class="fas fa-seedling"></i>
+              <span data-editable="welcomeFeature4">Individual Growth</span>
+            </div>
+          </div>
+          <a href="about.html" class="btn btn-primary">Learn More About Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Programs Overview -->
+  <section class="section programs-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label" data-editable="programsLabel">Our Programs</span>
+        <h2 data-editable="programsHeading">Programs Designed for Every Stage</h2>
+        <p data-editable="programsSubheading">Each program is carefully crafted following Montessori principles to support your child's developmental journey.</p>
+      </div>
+      <div class="programs-grid">
+        <div class="program-card">
+          <div class="program-icon">
+            <i class="fas fa-baby"></i>
+          </div>
+          <h3 data-editable="programCard1Title">Toddler Program</h3>
+          <p class="program-age" data-editable="programCard1Age">Ages 2-3</p>
+          <p data-editable="programCard1Desc">A gentle introduction to the Montessori environment focused on sensory exploration, motor skills, and building confidence.</p>
+          <ul class="program-highlights">
+            <li><i class="fas fa-check"></i> <span data-editable="programCard1Item1">Sensory activities</span></li>
+            <li><i class="fas fa-check"></i> <span data-editable="programCard1Item2">Practical life skills</span></li>
+            <li><i class="fas fa-check"></i> <span data-editable="programCard1Item3">Language development</span></li>
+          </ul>
+          <a href="programs.html" class="program-link">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="program-card featured">
+          <div class="program-badge" data-editable="programCard2Badge">Most Popular</div>
+          <div class="program-icon">
+            <i class="fas fa-star"></i>
+          </div>
+          <h3 data-editable="programCard2Title">Primary Program</h3>
+          <p class="program-age" data-editable="programCard2Age">Ages 3-5</p>
+          <p data-editable="programCard2Desc">Our core Montessori program where children develop independence, academic foundations, and social skills in a prepared environment.</p>
+          <ul class="program-highlights">
+            <li><i class="fas fa-check"></i> <span data-editable="programCard2Item1">Math &amp; language arts</span></li>
+            <li><i class="fas fa-check"></i> <span data-editable="programCard2Item2">Cultural studies</span></li>
+            <li><i class="fas fa-check"></i> <span data-editable="programCard2Item3">Creative expression</span></li>
+          </ul>
+          <a href="programs.html" class="program-link">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="program-card">
+          <div class="program-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <h3 data-editable="programCard3Title">Kindergarten</h3>
+          <p class="program-age" data-editable="programCard3Age">Ages 5-6</p>
+          <p data-editable="programCard3Desc">Advanced preparation for elementary school with emphasis on reading, writing, mathematics, and collaborative learning.</p>
+          <ul class="program-highlights">
+            <li><i class="fas fa-check"></i> <span data-editable="programCard3Item1">Reading &amp; writing</span></li>
+            <li><i class="fas fa-check"></i> <span data-editable="programCard3Item2">Advanced math</span></li>
+            <li><i class="fas fa-check"></i> <span data-editable="programCard3Item3">Science exploration</span></li>
+          </ul>
+          <a href="programs.html" class="program-link">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us -->
+  <section class="section why-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label" data-editable="whyLabel">Why Daffodils</span>
+        <h2 data-editable="whyHeading">Why Families Choose Us</h2>
+      </div>
+      <div class="why-grid">
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+          <h3 data-editable="whyCard1Title">Certified Montessori Teachers</h3>
+          <p data-editable="whyCard1Desc">Our educators hold AMI/AMS certifications and are passionate about guiding each child's unique journey.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-home"></i></div>
+          <h3 data-editable="whyCard2Title">Home-Like Environment</h3>
+          <p data-editable="whyCard2Desc">Our classrooms are warm, inviting spaces designed with child-sized furniture and carefully curated materials.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-leaf"></i></div>
+          <h3 data-editable="whyCard3Title">Nature-Based Learning</h3>
+          <p data-editable="whyCard3Desc">Children engage with beautiful outdoor gardens, nature walks, and hands-on environmental activities.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-hand-holding-heart"></i></div>
+          <h3 data-editable="whyCard4Title">Parent Partnership</h3>
+          <p data-editable="whyCard4Desc">We maintain open communication and invite families to be active participants in their child's education.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-shield-alt"></i></div>
+          <h3 data-editable="whyCard5Title">Safe &amp; Secure</h3>
+          <p data-editable="whyCard5Desc">State-licensed facility with comprehensive safety protocols, secure entry, and low student-to-teacher ratios.</p>
+        </div>
+        <div class="why-card">
+          <div class="why-icon"><i class="fas fa-utensils"></i></div>
+          <h3 data-editable="whyCard6Title">Nutritious Meals</h3>
+          <p data-editable="whyCard6Desc">Freshly prepared, healthy meals and snacks served daily with attention to dietary needs and allergies.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- Testimonials (shown once real reviews are added in Admin) -->
+  <section class="section testimonials-section" id="testimonialsSection" hidden>
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label">Kind Words</span>
+        <h2 data-editable="testimonialsHeading">What Families Say</h2>
+      </div>
+      <div class="quote-grid" id="testimonialsGrid"></div>
+      <div class="reviews-link" id="reviewsLink"></div>
+    </div>
+  </section>
+
+  <!-- What Makes Us Different -->
+  <section class="section differentiator-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-label" data-editable="diffLabel">The Daffodils Difference</span>
+        <h2 data-editable="diffHeading">What Sets Us Apart</h2>
+        <p data-editable="diffSubheading">We're not just another daycare — we're a true Montessori experience built on safety, excellence, and love.</p>
+      </div>
+      <div class="diff-grid">
+        <div class="diff-card">
+          <div class="diff-icon" style="background:#e8f5e9;"><i class="fas fa-award" style="color:#4a7c59;"></i></div>
+          <h3 data-editable="diffCard1Title">Licensed & Accredited</h3>
+          <p data-editable="diffCard1Desc">Fully state-licensed facility that exceeds all safety standards. Regular inspections and continuous compliance ensure the highest quality care for your child.</p>
+          <div class="diff-badge"><i class="fas fa-check-circle"></i> <span data-editable="diffCard1Badge">Verified & Current</span></div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-icon" style="background:#fff3d6;"><i class="fas fa-bullseye" style="color:#e09000;"></i></div>
+          <h3 data-editable="diffCard2Title">Individualized Learning Plans</h3>
+          <p data-editable="diffCard2Desc">Unlike traditional schools, every child gets a personalized curriculum. We observe, adapt, and guide at your child's unique pace — not a one-size-fits-all approach.</p>
+          <div class="diff-badge"><i class="fas fa-star"></i> <span data-editable="diffCard2Badge">Montessori Method</span></div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-icon" style="background:#e3f2fd;"><i class="fas fa-video" style="color:#1565c0;"></i></div>
+          <h3 data-editable="diffCard3Title">Transparent & Connected</h3>
+          <p data-editable="diffCard3Desc">Daily updates, regular progress conversations, and teachers who are easy to reach. You always know how your child's day went.</p>
+          <div class="diff-badge"><i class="fas fa-comments"></i> <span data-editable="diffCard3Badge">Open Communication</span></div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-icon" style="background:#fce4ec;"><i class="fas fa-first-aid" style="color:#c62828;"></i></div>
+          <h3 data-editable="diffCard4Title">Safety First, Always</h3>
+          <p data-editable="diffCard4Desc">All staff are CPR & First Aid certified. We have secured entry, emergency protocols, allergen-aware meal plans, and low student-to-teacher ratios.</p>
+          <div class="diff-badge"><i class="fas fa-shield-alt"></i> <span data-editable="diffCard4Badge">Safety Certified</span></div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-icon" style="background:#f3e5f5;"><i class="fas fa-brain" style="color:#6a1b9a;"></i></div>
+          <h3 data-editable="diffCard5Title">Whole-Child Development</h3>
+          <p data-editable="diffCard5Desc">We nurture academic, social, emotional, and physical growth together. Children leave Daffodils confident, independent, and ready for anything.</p>
+          <div class="diff-badge"><i class="fas fa-child"></i> <span data-editable="diffCard5Badge">Holistic Approach</span></div>
+        </div>
+        <div class="diff-card">
+          <div class="diff-icon" style="background:#e0f2f1;"><i class="fas fa-handshake" style="color:#00695c;"></i></div>
+          <h3 data-editable="diffCard6Title">True Parent Partnership</h3>
+          <p data-editable="diffCard6Desc">Monthly workshops, open-door classroom visits, daily updates, and a simple online application. We make it seamless for families to be part of the journey.</p>
+          <div class="diff-badge"><i class="fas fa-users"></i> <span data-editable="diffCard6Badge">Family Centered</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- License & Safety Credentials -->
+  <section class="section credentials-section">
+    <div class="container">
+      <div class="credentials-banner">
+        <div class="credentials-content">
+          <div class="credentials-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <div class="credentials-text">
+            <h3 data-editable="credentialsTitle">Licensed, Inspected & Trusted</h3>
+            <p data-editable="credentialsDesc">Daffodils Montessori is a fully licensed childcare facility in the state of Washington. Our school meets and exceeds all state requirements for safety, staffing, curriculum, and facility standards. All staff undergo rigorous background checks and maintain current CPR/First Aid certifications.</p>
+          </div>
+        </div>
+        <div class="credentials-badges">
+          <div class="credential-badge">
+            <i class="fas fa-certificate"></i>
+            <span data-editable="credBadge1">WA State Licensed</span>
+          </div>
+          <div class="credential-badge">
+            <i class="fas fa-user-check"></i>
+            <span data-editable="credBadge2">Background Checked</span>
+          </div>
+          <div class="credential-badge">
+            <i class="fas fa-medkit"></i>
+            <span data-editable="credBadge3">CPR/First Aid</span>
+          </div>
+          <div class="credential-badge">
+            <i class="fas fa-fire-extinguisher"></i>
+            <span data-editable="credBadge4">Fire Safety Compliant</span>
+          </div>
+          <div class="credential-badge">
+            <i class="fas fa-utensils"></i>
+            <span data-editable="credBadge5">Health Dept. Approved</span>
+          </div>
+          <div class="credential-badge">
+            <i class="fas fa-door-closed"></i>
+            <span data-editable="credBadge6">Secure Entry System</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2 data-editable="homeCtaTitle">Ready to Give Your Child the Best Start?</h2>
+        <p data-editable="homeCtaDesc">Schedule a tour of our beautiful campus and see the Daffodils difference firsthand. Limited spots available for the upcoming semester.</p>
+        <div class="cta-buttons">
+          <a href="contact.html#tour" class="btn btn-primary btn-large">Book a Tour</a>
+          <a href="contact.html" class="btn btn-outline btn-large">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <div class="footer-logo">
+            <span class="logo-icon" aria-hidden="true">🌼</span>
+            <div class="logo-text">
+              <span class="logo-name">Daffodils</span>
+              <span class="logo-tagline">Montessori</span>
+            </div>
+          </div>
+          <p data-editable="footerBlurb">Nurturing young minds through the Montessori method. Every child deserves to bloom.</p>
+          <div class="footer-social" id="footerSocial" hidden></div>
+        </div>
+        <div class="footer-links">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="staff.html">Our Staff</a></li>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="events.html">Events</a></li>
+            <li><a href="careers.html">Careers</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Programs</h4>
+          <ul>
+            <li><a href="programs.html#toddler">Toddler (2-3)</a></li>
+            <li><a href="programs.html#primary">Primary (3-5)</a></li>
+            <li><a href="programs.html#kindergarten">Kindergarten (5-6)</a></li>
+            <li><a href="summer-camp.html">Summer Camp</a></li>
+            <li><a href="tuition.html">Tuition</a></li>
+          </ul>
+        </div>
+        <div class="footer-links">
+          <h4>Families</h4>
+          <ul>
+            <li><a href="contact.html#tour">Book a Tour</a></li>
+            <li><a href="enrollment.html">Apply</a></li>
+            <li><a href="policies.html">Handbook &amp; Policies</a></li>
+            <li><a href="menu.html">Lunch Menu</a></li>
+            <li><a href="login.html">Parent Login</a></li>
+          </ul>
+        </div>
+        <div class="footer-contact">
+          <h4>Contact Us</h4>
+          <ul>
+            <li><i class="fas fa-map-marker-alt" aria-hidden="true"></i> <a href="https://maps.google.com/?q=5051+86th+Ave+NE,+Marysville,+WA+98270" target="_blank" rel="noopener">5051 86th Ave NE, Marysville, WA 98270</a></li>
+            <li><i class="fas fa-phone" aria-hidden="true"></i> <a href="tel:+14256232684">(425) 623-2684</a></li>
+            <li><i class="fas fa-envelope" aria-hidden="true"></i> <a href="mailto:rishiekhanna@yahoo.com">rishiekhanna@yahoo.com</a></li>
+            <li><i class="fas fa-clock" aria-hidden="true"></i> <span data-editable="footerHours">Mon-Fri: 9:00 AM - 5:00 PM</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span data-year>2026</span> Daffodils Montessori. <span data-license></span></p>
+        <div class="footer-bottom-links">
+          <a href="privacy.html">Privacy Policy</a>
+          <a href="policies.html#nondiscrimination">Nondiscrimination</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/site-data.js"></script>
+  <script src="js/config.js"></script>
+  <script src="vendor/supabase/supabase.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
